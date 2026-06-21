@@ -100,7 +100,13 @@ A Tree is a hierarchical grouping of domains within an Active Directory forest t
 ### Underlying Mechanism
 The tree structure is fundamentally tied to the DNS namespace. When a child domain is created, it is a sub-domain of the parent in DNS. Active Directory uses this hierarchy to manage trust relationships automatically. Because the domains share a contiguous namespace, the trust is transitive by default, meaning that if Domain A trusts Domain B, and Domain B trusts Domain C, then Domain A implicitly trusts Domain C. This transitivity is a core feature of the Kerberos authentication protocol within the forest.
 
-[DIAGRAM: A visual representation of a tree hierarchy showing a root domain and child domains sharing a contiguous namespace]
+```mermaid
+graph TB
+    Root["corp.bank.com<br/>(tree root)"]
+    Root --> US["us.corp.bank.com"]
+    Root --> EMEA["emea.corp.bank.com"]
+    US --> APAC["apac.us.corp.bank.com"]
+```
 
 ### Why It Exists
 The tree structure was originally designed to mirror organizational hierarchies or geographical divisions within a company. It allowed large organizations to delegate administrative control over specific branches of the namespace while maintaining a unified identity environment. It provided a way to organize domains logically, making it easier for users to understand the structure of the network and for administrators to manage delegation based on the domain hierarchy.
@@ -111,7 +117,9 @@ In modern Tier-1 banking architectures, the concept of a "Tree" is largely consi
 ### Operational Considerations
 Managing a tree structure requires careful attention to DNS and trust management. If the DNS hierarchy is broken, authentication and replication can fail. Day-to-day operations involve managing the trust relationships and ensuring that the DNS namespace remains consistent.
 
-[CLI: Command to list domains in a forest to visualize the tree structure]
+```powershell
+Get-ADForest | Select-Object -ExpandProperty Domains
+```
 
 ### Common Misconceptions
 !!! warning "Common Misconceptions"
