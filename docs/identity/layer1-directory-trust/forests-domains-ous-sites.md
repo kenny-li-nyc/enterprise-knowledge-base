@@ -28,3 +28,5 @@ Day-to-day operations at the forest level are rare but high-impact.
 *   **Disaster Recovery:** Forest Recovery is the "nuclear option." If the entire forest is compromised or corrupted, you must perform a forest-wide recovery, which involves restoring the first DC of the forest from backup and rebuilding the rest of the environment.
 *   **Monitoring:** You must monitor the health of the Schema and Configuration partitions. If replication of these partitions fails, the forest becomes inconsistent, leading to authentication failures and service outages.
 
+To verify the current state of your forest configuration, you can use the following PowerShell command:
+
