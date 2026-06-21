@@ -1,0 +1,30 @@
+
+### Common Misconceptions
+!!! warning "Misconception: Forests are just for grouping domains"
+    A common error is believing that forests are merely a way to organize domains. In reality, the forest is the **security boundary**. You cannot "trust" your way out of a forest security boundary; if you need to isolate two environments so that an admin in one cannot affect the other, you *must* use separate forests. Do not create multiple domains in a single forest thinking it provides security isolation—it does not.
+
+### Interview Angle
+1.  **"What is the difference between a Domain and a Forest as a security boundary?"**
+    *   *Model Answer:* A domain is a boundary for administrative delegation and replication. A forest is the ultimate security boundary. An Enterprise Admin in the forest can override any security setting in any domain. If you need to prevent an admin from one environment from having control over another, you must use separate forests.
+2.  **"When would you recommend a multi-forest design?"**
+    *   *Model Answer:* Only when there is a hard requirement for security isolation (e.g., a separate forest for a high-security lab or a separate forest for a subsidiary that cannot be trusted) or when there are conflicting schema requirements that cannot be reconciled.
+3.  **"Explain the role of the Global Catalog in a multi-domain forest."**
+    *   *Model Answer:* The GC provides a forest-wide index of objects. It allows users to search for objects (like finding a user's email address) across the entire forest without needing to query every individual domain controller, which would be inefficient and slow.
+
+### Related Concepts
+- [Domains](#domain)
+- [Trees](#tree)
+- [Trusts](#trusts)
+- [Schema](#schema)
+
+## Tree
+
+## Domain
+
+## OU
+
+## Site
+
+## Why Multiple Domains Existed Historically
+
+## Modern Single-Domain Design Philosophy
