@@ -16,7 +16,33 @@ The forest is implemented through three primary directory partitions that are re
 
 The forest also relies on the Global Catalog (GC). The GC is a special role held by one or more DCs that maintains a partial, read-only copy of every object in every domain within the forest. This allows for forest-wide searches without requiring cross-domain queries for every request. Trust relationships between domains in a forest are automatically created as transitive, two-way Kerberos trusts, allowing for seamless authentication across the entire forest boundary.
 
-[DIAGRAM: Topology of a forest showing partitions, domain controllers, and the Global Catalog role]
+```mermaid
+graph TB
+    SCHEMA[("Schema Partition<br/>(forest-wide)")]
+    CONFIG[("Configuration Partition<br/>(forest-wide)")]
+
+    subgraph FOREST["Forest"]
+        subgraph DA["Domain A"]
+            DC1[DC1]
+            DC2[DC2]
+        end
+        subgraph DB["Domain B"]
+            DC3[DC3]
+        end
+    end
+
+    SCHEMA -.->|replicates to all DCs| DC1
+    SCHEMA -.->|replicates to all DCs| DC2
+    SCHEMA -.->|replicates to all DCs| DC3
+    CONFIG -.->|replicates to all DCs| DC1
+    CONFIG -.->|replicates to all DCs| DC2
+    CONFIG -.->|replicates to all DCs| DC3
+
+    GC{{"Global Catalog<br/>(hosted on select DCs)"}}
+    DC1 ===|hosts GC role| GC
+```
+
+This keeps your original concept (Schema/Config replication + GC) but labels the arrows so a reader doesn't have to guess what each connection means, and uses a single labeled GC node instead of two unexplained dotted lines.
 
 ### Why It Exists
 The forest exists to provide a unified namespace and a shared security context while allowing for the delegation of administrative control. Historically, it was designed to allow organizations to merge disparate IT environments into a single, manageable directory service. It provides a mechanism to enforce a consistent security policy (via Group Policy Objects) and a unified identity store, ensuring that a user's identity is consistent regardless of which domain they authenticate against. It serves as the primary mechanism for managing the "Identity Perimeter" of an organization.
@@ -42,7 +68,9 @@ Day-to-day operations at the forest level are rare but high-impact.
 
 To verify the current state of your forest configuration, you can use the following PowerShell command:
 
-[CLI: Get-ADForest | Select-Object Name, SchemaMaster, DomainNamingMaster, RootDomain]
+```powershell
+Get-ADForest | Select-Object Name, SchemaMaster, DomainNamingMaster, RootDomain
+```
 
 ### Common Misconceptions
 !!! warning "Common Misconceptions"
