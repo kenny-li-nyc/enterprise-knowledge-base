@@ -19,6 +19,40 @@
 
 ## Tree
 
+### Technical Definition
+An Active Directory Tree is a hierarchical collection of one or more domains that share a contiguous namespace. For example, if the root domain is `corp.bank.com`, a child domain named `emea.corp.bank.com` belongs to the same tree. The tree structure is defined by the DNS hierarchy. All domains within a tree share a common schema and configuration partition, as they are part of the same forest.
+
+### Underlying Mechanism
+The tree structure is enforced by the DNS namespace and the trust relationships between domains. When a new child domain is created, a parent-child trust is automatically established. This is a two-way, transitive Kerberos trust. The "Tree Root" domain is the domain at the top of this contiguous namespace. The mechanism relies on the `msDS-AllowedToDelegateTo` and other trust attributes stored in the `System` container of the domain partition to facilitate cross-domain authentication.
+
+### Why It Exists
+The tree structure was designed to mirror organizational structures and provide a logical way to organize domains within a forest. It allows for a contiguous DNS namespace, which simplifies administration and makes it easier for users to understand the relationship between different parts of the organization.
+
+### Enterprise / Banking Reality
+In modern banking architectures, the "Tree" concept is largely legacy. While you may still see multi-tree forests in older environments that grew through organic acquisition or departmental silos, the current standard is a single-domain forest. If you see a multi-tree forest in a bank today, it is often a sign of technical debt or a complex M&A history that has not yet been consolidated.
+
+### Operational Considerations
+Managing multiple trees within a forest adds complexity to DNS management and trust troubleshooting. You must ensure that DNS zones are correctly delegated and that trust paths are optimized.
+*   **DNS Delegation:** Ensure that the parent domain correctly delegates the child domain's DNS zone.
+*   **Trust Troubleshooting:** Use `nltest /dsgetdc:<domain>` and `dcdiag /test:outboundtrusts` to verify connectivity between domains in the tree.
+
+### Common Misconceptions
+!!! warning "Misconception: Trees provide security boundaries"
+    A common misconception is that domains in different trees within the same forest are isolated from each other. They are not. Because they are in the same forest, they share the same schema and configuration, and an Enterprise Admin can manage both. Trees are purely a logical and namespace organization, not a security boundary.
+
+### Interview Angle
+1.  **"What is the difference between a Tree and a Forest?"**
+    *   *Model Answer:* A forest is the security boundary and contains the schema and configuration. A tree is a collection of domains with a contiguous namespace within that forest. A forest can contain multiple trees.
+2.  **"Why would you choose to create a new tree instead of a new child domain?"**
+    *   *Model Answer:* You would create a new tree if you needed a non-contiguous namespace (e.g., `bank.com` and `subsidiary.net` in the same forest). This is rarely done today; usually, you would just use a separate forest or a child domain.
+3.  **"How does the namespace affect trust?"**
+    *   *Model Answer:* The namespace defines the hierarchy of the trust. Parent-child trusts are automatic and transitive. If you have multiple trees, you need a "Forest Trust" or "Shortcut Trust" to bridge the gap if they aren't part of the same contiguous namespace, though within a single forest, the transitive trust is handled by the forest root.
+
+### Related Concepts
+- [Forest](#forest)
+- [Domains](#domain)
+- [DNS](#dns)
+
 ## Domain
 
 ## OU
