@@ -1,0 +1,143 @@
+/* ==========================================================================
+   INFRA // REFERENCE — Blueprint / Schematic Theme
+   Design tokens:
+     bg........#0B1E33  (deep blueprint navy)
+     surface...#102844  (panel/card navy, one step lighter)
+     line......#1E3A5C  (grid + hairline rules)
+     fg........#E8EEF2  (primary text, off-white)
+     fg-muted..#7C93A8  (secondary text, slate)
+     accent....#4FD1E8  (signal cyan — links, headers, active states)
+     warn......#E8A33D  (amber — used only for "Common Misconceptions")
+   Fonts: IBM Plex Mono (headers/labels), IBM Plex Sans (body)
+   Signature element: corner registration marks on admonitions/cards,
+   echoing alignment ticks on an engineering drawing.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+:root {
+  --bp-bg: #0b1e33;
+  --bp-surface: #102844;
+  --bp-line: #1e3a5c;
+  --bp-fg: #e8eef2;
+  --bp-fg-muted: #7c93a8;
+  --bp-accent: #4fd1e8;
+  --bp-warn: #e8a33d;
+}
+
+/* ---- Custom color scheme wiring for mkdocs-material ---- */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: var(--bp-bg);
+  --md-default-fg-color: var(--bp-fg);
+  --md-default-fg-color--light: var(--bp-fg-muted);
+  --md-default-fg-color--lighter: var(--bp-fg-muted);
+  --md-typeset-color: var(--bp-fg);
+  --md-code-bg-color: var(--bp-surface);
+  --md-code-fg-color: var(--bp-fg);
+}
+
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: var(--bp-bg);
+  --md-primary-bg-color: var(--bp-fg);
+}
+
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: var(--bp-accent);
+  --md-accent-bg-color: var(--bp-accent);
+}
+
+/* ---- Typography ---- */
+body,
+.md-typeset {
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-header__title,
+.md-nav__title {
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 0.02em;
+}
+
+.md-typeset h2 {
+  color: var(--bp-accent);
+  border-bottom: 1px solid var(--bp-line);
+  padding-bottom: 0.3em;
+}
+
+.md-typeset code,
+.md-typeset pre {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* ---- Blueprint grid background on the content area ---- */
+[data-md-color-scheme="slate"] .md-main {
+  background-image:
+    linear-gradient(var(--bp-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  background-color: var(--bp-bg);
+  opacity: 1;
+}
+
+[data-md-color-scheme="slate"] .md-main__inner {
+  background-color: rgba(11, 30, 51, 0.86);
+}
+
+/* ---- Signature: registration-mark corners on admonitions ---- */
+.md-typeset .admonition {
+  position: relative;
+  background-color: var(--bp-surface);
+  border: 1px solid var(--bp-line);
+  border-radius: 2px;
+}
+
+.md-typeset .admonition::before,
+.md-typeset .admonition::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--bp-accent);
+  opacity: 0.8;
+}
+
+.md-typeset .admonition::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--bp-accent);
+  border-left: 2px solid var(--bp-accent);
+}
+
+.md-typeset .admonition::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--bp-accent);
+  border-right: 2px solid var(--bp-accent);
+}
+
+/* Warning admonitions (Common Misconceptions) get the amber accent instead */
+.md-typeset .admonition.warning::before,
+.md-typeset .admonition.warning::after {
+  border-color: var(--bp-warn);
+}
+
+/* ---- Tables styled like spec sheets ---- */
+.md-typeset table:not([class]) {
+  border: 1px solid var(--bp-line);
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--bp-surface);
+  color: var(--bp-accent);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* ---- Links ---- */
+.md-typeset a {
+  color: var(--bp-accent);
+}

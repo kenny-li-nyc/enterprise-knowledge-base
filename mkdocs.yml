@@ -1,0 +1,62 @@
+site_name: "INFRA // REFERENCE"
+site_description: "Personal architecture reference and interview prep — Identity, Endpoint, Security, Network, Virtualization/Compute, Storage/Data, Cloud/Hybrid"
+repo_url: https://github.com/kenny-li-nyc/enterprise-knowledge-base
+repo_name: kenny-li-nyc/enterprise-knowledge-base
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+  font:
+    text: IBM Plex Sans
+    code: IBM Plex Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.instant
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Identity:
+      - Overview: identity/index.md
+      - "Layer 1 — Directory & Trust Foundation":
+          - Overview: identity/layer1-directory-trust/index.md
+          - "Forests, Domains, OUs & Sites": identity/layer1-directory-trust/forests-domains-ous-sites.md
