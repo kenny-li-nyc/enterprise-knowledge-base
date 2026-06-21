@@ -91,3 +91,44 @@ Get-ADForest | Select-Object Name, SchemaMaster, DomainNamingMaster, RootDomain
 *   [Trusts](trusts.md)
 *   [Tiered Administration](tiered-administration.md)
 *   [Global Catalog](global-catalog.md)
+
+## Tree
+
+### Technical Definition
+A Tree is a hierarchical grouping of domains within an Active Directory forest that share a contiguous DNS namespace. All domains within a single tree share a common root domain (e.g., `corp.bank.com` is the root, and `us.corp.bank.com` is a child domain within that tree). When a new domain is added to a tree, it automatically establishes a two-way, transitive Kerberos trust with its parent domain, ensuring that authentication can flow seamlessly up and down the hierarchy.
+
+### Underlying Mechanism
+The tree structure is fundamentally tied to the DNS namespace. When a child domain is created, it is a sub-domain of the parent in DNS. Active Directory uses this hierarchy to manage trust relationships automatically. Because the domains share a contiguous namespace, the trust is transitive by default, meaning that if Domain A trusts Domain B, and Domain B trusts Domain C, then Domain A implicitly trusts Domain C. This transitivity is a core feature of the Kerberos authentication protocol within the forest.
+
+[DIAGRAM: A visual representation of a tree hierarchy showing a root domain and child domains sharing a contiguous namespace]
+
+### Why It Exists
+The tree structure was originally designed to mirror organizational hierarchies or geographical divisions within a company. It allowed large organizations to delegate administrative control over specific branches of the namespace while maintaining a unified identity environment. It provided a way to organize domains logically, making it easier for users to understand the structure of the network and for administrators to manage delegation based on the domain hierarchy.
+
+### Enterprise / Banking Reality
+In modern Tier-1 banking architectures, the concept of a "Tree" is largely considered legacy or technical debt. The industry has moved decisively toward "Single Forest, Single Domain" designs. Creating multiple domains (and thus multiple trees) introduces unnecessary complexity, increases the attack surface, and complicates the implementation of Tiered Administration. In a modern bank, you will rarely see a multi-tree design unless it is the result of a legacy merger or acquisition that has not yet been consolidated.
+
+### Operational Considerations
+Managing a tree structure requires careful attention to DNS and trust management. If the DNS hierarchy is broken, authentication and replication can fail. Day-to-day operations involve managing the trust relationships and ensuring that the DNS namespace remains consistent.
+
+[CLI: Command to list domains in a forest to visualize the tree structure]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"Trees are required for security."** Trees provide no additional security; they are purely a logical and namespace organization tool.
+    *   **"A forest can only have one tree."** A forest can contain multiple trees, each with its own contiguous namespace (e.g., `bank.com` and `subsidiary.com` can exist in the same forest as separate trees).
+    *   **"Trees are the same as forests."** A tree is a subset of a forest. A forest can contain one or more trees.
+
+### Interview Angle
+1.  **"What is the difference between a Tree and a Forest?"**
+    *   *Model Answer:* "A Forest is the security boundary and the container for the entire AD environment, including the schema and configuration. A Tree is a logical grouping of domains within that forest that share a contiguous DNS namespace. A forest can contain multiple trees, but a tree cannot exist outside of a forest."
+2.  **"Why would you avoid creating multiple trees in a modern AD design?"**
+    *   *Model Answer:* "Multiple trees imply multiple domains, which increases the attack surface, complicates GPO management, and makes Tiered Administration significantly harder to enforce. In a modern, secure environment, we aim for a single-domain, single-forest design to minimize these risks."
+3.  **"How does the namespace affect trust relationships in a tree?"**
+    *   *Model Answer:* "The contiguous namespace allows for automatic, transitive, two-way Kerberos trusts between parent and child domains. This simplifies authentication across the tree, but it also means that a compromise in one domain can potentially propagate to others if not properly secured."
+
+### Related Concepts
+*   [Forest](forests-domains-ous-sites.md#forest)
+*   [Domains](domains.md)
+*   [DNS](dns.md)
+*   [Trusts](trusts.md)
