@@ -140,3 +140,51 @@ Get-ADForest | Select-Object -ExpandProperty Domains
 *   [Domains](domains.md)
 *   [DNS](dns.md)
 *   [Trusts](trusts.md)
+
+## Domain
+
+### Technical Definition
+A Domain is the fundamental administrative and security partition within an Active Directory forest. It serves as a collection of objects (users, computers, groups, etc.) that share a common directory database, security policies, and trust relationships. Unlike the forest, which is the ultimate security boundary, the domain is the primary unit of administrative delegation and replication. Every domain has its own unique security identifier (SID) prefix, which is used to identify all security principals (users, groups, computers) created within that domain.
+
+### Underlying Mechanism
+The domain is implemented through the Domain Partition, which is replicated only to the Domain Controllers (DCs) within that specific domain. Each domain maintains its own copy of the Active Directory database (`ntds.dit`), which contains the objects for that domain. Authentication within a domain is handled by the DCs using the Kerberos protocol. When a user logs in, the DC validates their credentials and issues a Ticket Granting Ticket (TGT). Trust relationships between domains allow for authentication across domain boundaries, but these trusts are managed at the domain level.
+
+[DIAGRAM: A visual representation of a domain showing Domain Controllers, the Domain Partition, and the relationship to the forest]
+
+### Why It Exists
+Historically, domains were created to manage replication traffic and administrative boundaries. In the early days of Windows 2000/2003, network bandwidth was limited, and replicating the entire directory to every site was not feasible. Domains allowed organizations to partition the directory into smaller, manageable chunks. They also provided a way to delegate administrative control to different departments or geographical regions, allowing local administrators to manage their own users and computers without having full control over the entire forest.
+
+### Enterprise / Banking Reality
+In modern Tier-1 banking, the domain is no longer used as a primary security boundary. The "Single Forest, Single Domain" design is the standard. If you see multiple domains in a bank, it is almost always a sign of legacy infrastructure or a result of a recent merger. From an audit and compliance perspective, managing multiple domains is a nightmare. It requires managing multiple sets of GPOs, multiple trust relationships, and multiple administrative teams. In a modern, secure environment, we consolidate domains to simplify the security posture and reduce the attack surface.
+
+| Feature | Domain | Forest |
+| :--- | :--- | :--- |
+| **Security Boundary** | No (Secondary) | Yes (Primary) |
+| **Replication** | Domain-specific | Forest-wide |
+| **Admin Scope** | Domain-specific | Enterprise-wide |
+| **Trusts** | Inter-domain | Cross-forest |
+
+### Operational Considerations
+Day-to-day operations in a domain involve managing user accounts, group memberships, and GPOs. Monitoring the health of the domain controllers is critical, as they are the gatekeepers of authentication. You must also monitor the replication health between DCs to ensure that changes are propagated correctly.
+
+[CLI: Command to list domain controllers in a domain]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"Domains are the security boundary."** This is the most dangerous misconception. The forest is the security boundary. If you have multiple domains in a forest, an attacker who compromises one domain can often compromise the entire forest.
+    *   **"I need a new domain for every department."** This is a legacy design pattern. Use OUs for administrative delegation, not domains.
+    *   **"Domains provide isolation."** Domains provide administrative isolation, not security isolation.
+
+### Interview Angle
+1.  **"Why is the domain not considered a security boundary?"**
+    *   *Model Answer:* "The domain is an administrative boundary, not a security boundary. Because all domains in a forest share the same schema, configuration, and trust relationships, an attacker who gains control of one domain can often leverage those trusts to move laterally and compromise the entire forest."
+2.  **"What are the downsides of having multiple domains in a forest?"**
+    *   *Model Answer:* "Multiple domains increase complexity, administrative overhead, and the attack surface. They require managing inter-domain trusts, complex GPO structures, and fragmented security policies, which makes it harder to maintain a consistent security posture."
+3.  **"When would you actually recommend a multi-domain design?"**
+    *   *Model Answer:* "I would only recommend a multi-domain design in very specific, rare scenarios, such as when there is a strict regulatory requirement for data isolation that cannot be met with OUs, or when there is a need for different password policies that cannot be handled by Fine-Grained Password Policies (FGPP). Even then, I would strongly push for a single-domain design first."
+
+### Related Concepts
+*   [Forest](forests-domains-ous-sites.md#forest)
+*   [Tree](forests-domains-ous-sites.md#tree)
+*   [OUs](ous.md)
+*   [Trusts](trusts.md)
