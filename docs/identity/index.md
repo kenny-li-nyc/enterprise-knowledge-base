@@ -9,5 +9,6 @@ into sub-layers:
 - **[Layer 1 — Directory & Trust Foundation](layer1-directory-trust/index.md)**
     - [Forests, Domains, OUs & Sites](layer1-directory-trust/forests-domains-ous-sites.md)
     - [Trust Architecture](layer1-directory-trust/trust-architecture.md) *(In Progress)*
+    - [Replication Architecture](layer1-directory-trust/replication-architecture.md) *(In Progress)*
 - Layer 2 — *planned*
 - Layer 3 — *planned*
