@@ -35,3 +35,39 @@ In a disaster recovery scenario, if the Schema Master is permanently lost, you m
 ### Related Concepts
 *   [Schema Extensions (Section 1.4)] - For details on OIDs, syntaxes, and linked attributes.
 *   Global Catalog (Section 1.4) - For understanding how schema changes impact the Partial Attribute Set.
+
+## 2. Domain Naming Master
+
+### Technical Definition
+The Domain Naming Master is a forest-wide FSMO role responsible for controlling the addition or removal of domains and application partitions from the Active Directory forest. As discussed in Section 1.1, the forest structure relies on a rigid hierarchy of domains and trusts; the Domain Naming Master acts as the gatekeeper for this structure, ensuring that no two domains in the forest share the same name and that the forest-wide configuration partition remains consistent.
+
+### Underlying Mechanism
+When an administrator adds a new domain or an application partition to the forest, the request is processed by the Domain Naming Master. The role holder verifies that the proposed domain name is unique within the forest by checking the `CN=Partitions,CN=Configuration,DC=ForestRootDomain` container. Once the name is validated, the Domain Naming Master updates the configuration partition, which then replicates to all other domain controllers. This role is identified by the `fSMORoleOwner` attribute on the `CN=Partitions,CN=Configuration,DC=ForestRootDomain` object.
+
+### Why It Exists
+The Domain Naming Master exists to prevent naming collisions and ensure the integrity of the forest's namespace. In a multi-domain environment, allowing multiple domain controllers to independently create domains would lead to duplicate domain names, broken trust relationships, and a fragmented forest structure. By centralizing this authority, Active Directory guarantees that the forest namespace remains unique and that all domain controllers have a consistent view of the domains and application partitions that constitute the forest.
+
+### Enterprise / Banking Reality
+In large banking enterprises, the Domain Naming Master is rarely utilized after the initial forest deployment, as the addition of new domains is a significant architectural event. However, it remains a critical role for managing application partitions, which are often used to store application-specific data (e.g., DNS zones or custom configuration data) that needs to be replicated across specific sets of domain controllers. Because this role controls the forest's structural integrity, it is a high-value target for attackers; unauthorized domain creation could be used to establish a rogue domain with elevated privileges. Consequently, the Domain Naming Master should be placed on a secure, well-monitored DC, and any changes to the forest structure should be strictly controlled and audited.
+
+### Operational Considerations
+The Domain Naming Master is not required for day-to-day operations such as user authentication, group policy application, or object management. It is only required when adding or removing domains or application partitions.
+[CLI: Get-ADDomainController -Filter * | Where-Object {$_.OperationMasterRoles -contains "DomainNamingMaster"}]
+[CLI: ntdsutil roles connections "connect to server <DC_Name>" quit "transfer domain naming master"]
+If the Domain Naming Master is unavailable, you cannot add or remove domains or application partitions. In a disaster recovery scenario, if the role holder is permanently lost, you must seize the role on a healthy DC. As with the Schema Master, seizure is a destructive operation and should only be performed if the original DC is confirmed to be unrecoverable.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the Domain Naming Master is required for the creation of new Organizational Units (OUs) or child objects within an existing domain. This is false. The Domain Naming Master only governs the creation and deletion of *domains* and *application partitions* at the forest level. You can freely create OUs, users, and computers in any domain without the Domain Naming Master being online.
+
+### Interview Angle
+1. **Scenario:** You are tasked with adding a new child domain to the existing forest. The Domain Naming Master is currently offline. Can you proceed?
+   *Model Answer:* No, you cannot proceed. The Domain Naming Master is required to validate the uniqueness of the new domain name and update the configuration partition. You must either restore the Domain Naming Master or transfer/seize the role to a healthy DC before the domain creation process can succeed.
+2. **Scenario:** An auditor asks how you ensure that no unauthorized domains have been added to the forest. How do you respond?
+   *Model Answer:* I would audit the `CN=Partitions,CN=Configuration,DC=ForestRootDomain` container for any unexpected objects. Additionally, I would review the event logs on the Domain Naming Master for any domain creation events (Event ID 4741/4742) and cross-reference these with our approved Change Management records.
+3. **Scenario:** Why is the Domain Naming Master role often placed on the same DC as the Schema Master?
+   *Model Answer:* Both roles are forest-wide and are only required for infrequent, high-impact structural changes. Placing them on the same DC simplifies management and ensures that these critical roles are hosted on a single, highly secured, and well-monitored server, reducing the attack surface.
+
+### Related Concepts
+*   [Directory Structure (Section 1.1)] - For context on forest, domain, and trust relationships.
+*   [Trust Architecture (Section 1.2)] - For understanding how domain creation impacts trust relationships.
