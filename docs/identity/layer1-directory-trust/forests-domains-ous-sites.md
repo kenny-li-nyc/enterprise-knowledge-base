@@ -174,7 +174,7 @@ In modern Tier-1 banking, the domain is no longer used as a primary security bou
 | **Trusts** | Inter-domain | Cross-forest |
 
 ### Operational Considerations
-Day-to-day operations in a domain involve managing user accounts, group memberships, and GPOs. Monitoring the health of the domain controllers is critical, as they are the gatekeepers of authentication. You must also monitor the replication health between DCs to ensure that changes are propagated correctly.
+Day-to-day operations in a domain involve managing user accounts, group memberships, and GPOs. Monitoring the health of the domain controllers is critical, as they are the gatekeepers of authentication. You must also monitor the replication health between DCs to ensure that they are propagated correctly.
 
 ```powershell
 Get-ADDomainController -Filter * | Select-Object Name, Site, OperationMasterRoles
@@ -199,3 +199,50 @@ Get-ADDomainController -Filter * | Select-Object Name, Site, OperationMasterRole
 *   [Tree](forests-domains-ous-sites.md#tree)
 *   [OUs](ous.md)
 *   [Trusts](trusts.md)
+
+## Site
+
+### Technical Definition
+An Active Directory Site is a logical representation of the physical network topology. It is defined as a collection of one or more IP subnets that are connected by high-speed, reliable network links. Sites are used to manage replication traffic and client authentication, ensuring that users authenticate against the nearest available Domain Controller and that replication traffic is optimized for the underlying network infrastructure.
+
+### Underlying Mechanism
+The site topology is stored in the Configuration Partition of the Active Directory database. The Knowledge Consistency Checker (KCC) uses this information to build the replication topology. Sites are connected by "Site Links," which define the cost, schedule, and frequency of replication between sites. When a client attempts to authenticate, it queries DNS for a Domain Controller in its current site. If no DC is available in the local site, the client will fail over to a DC in the next closest site based on the site link costs.
+
+[DIAGRAM: A visual representation of sites, subnets, and site links showing how replication traffic is managed]
+
+### Why It Exists
+Sites exist to solve the problem of managing replication traffic in a distributed network. Without sites, Active Directory would not know the physical location of its Domain Controllers or clients, leading to inefficient replication and slow authentication times. By defining sites, administrators can control how and when replication occurs, ensuring that bandwidth-intensive replication traffic does not saturate slow WAN links and that users have a fast, reliable authentication experience.
+
+### Enterprise / Banking Reality
+In a Tier-1 banking environment, site design is critical for global operations. A bank with data centers in New York, London, and Singapore will have distinct sites for each location. The site design must be carefully planned to ensure that replication traffic is optimized and that authentication is fast for users in every region. This often involves complex site link bridge configurations and careful monitoring of replication latency. Audit and compliance requirements often dictate that replication traffic must be encrypted and that certain data must remain within specific geographical boundaries, which is managed through site and subnet definitions.
+
+| Feature | Site | Domain |
+| :--- | :--- | :--- |
+| **Purpose** | Physical Topology | Logical/Admin Structure |
+| **Replication** | Controls traffic flow | Controls data scope |
+| **Boundary** | Network-based | Administrative-based |
+
+### Operational Considerations
+Day-to-day operations involve managing subnets and site links. If a new office is opened, it must be added to the appropriate site. If a network link goes down, the site topology must be updated to ensure that replication continues. Monitoring replication latency between sites is essential to ensure that the directory remains consistent across the global enterprise.
+
+[CLI: Command to list sites and their associated subnets]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"Sites are security boundaries."** Sites are purely for network and replication optimization; they provide no security isolation.
+    *   **"Sites are the same as OUs."** Sites are physical/network-based, while OUs are logical/administrative-based.
+    *   **"I don't need to define sites if I have a small network."** Even in small networks, defining sites is best practice to ensure that clients authenticate to the correct Domain Controller and that replication is efficient.
+
+### Interview Angle
+1.  **"How do sites affect authentication and replication?"**
+    *   *Model Answer:* "Sites allow Active Directory to understand the physical network topology. They ensure that clients authenticate to the nearest Domain Controller, reducing latency, and they allow administrators to control replication traffic, ensuring that bandwidth-intensive replication does not saturate slow network links."
+2.  **"What is the role of the KCC in site topology?"**
+    *   *Model Answer:* "The Knowledge Consistency Checker (KCC) is a process that runs on every Domain Controller. It uses the site topology information to automatically build and maintain the replication topology, ensuring that all Domain Controllers are connected and that replication is efficient."
+3.  **"How do you handle site link costs in a complex network?"**
+    *   *Model Answer:* "Site link costs are used to determine the preferred path for replication. In a complex network, you should carefully configure these costs to reflect the actual network bandwidth and latency, ensuring that replication traffic takes the most efficient path."
+
+### Related Concepts
+*   [Replication](replication.md)
+*   [Subnets](subnets.md)
+*   [KCC](kcc.md)
+*   [Domain Controllers](domain-controllers.md)
