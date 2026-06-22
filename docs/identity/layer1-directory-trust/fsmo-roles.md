@@ -72,6 +72,117 @@ If the Domain Naming Master is unavailable, you cannot add or remove domains or 
 *   [Directory Structure (Section 1.1)] - For context on forest, domain, and trust relationships.
 *   [Trust Architecture (Section 1.2)] - For understanding how domain creation impacts trust relationships.
 
+## 3. RID Master
+
+### Technical Definition
+The RID (Relative Identifier) Master is a domain-wide FSMO role responsible for allocating unique RID pools to domain controllers within a specific domain. Every security principal (user, group, computer) in Active Directory is assigned a Security Identifier (SID), which consists of a domain SID and a unique RID; the RID Master ensures that no two objects in the domain are ever assigned the same RID.
+
+### Underlying Mechanism
+When a domain controller creates a new security principal, it must append a unique RID to the domain SID. To avoid constant communication with the RID Master, the RID Master issues "pools" of RIDs (typically 500 at a time) to each DC. When a DC consumes 50% of its current pool, it requests a new block from the RID Master. The RID Master tracks the current allocation and ensures that the total number of RIDs issued does not exceed the theoretical limit of the 31-bit RID space.
+
+### Why It Exists
+The RID Master is the architectural safeguard against SID collisions. In a multi-master environment where any DC can create objects, allowing DCs to generate their own RIDs would inevitably lead to duplicate SIDs, which would break access control lists (ACLs) and security token validation. By centralizing the issuance of RID pools, Active Directory guarantees that every object created across the domain has a globally unique SID.
+
+### Enterprise / Banking Reality
+In large banking environments, RID pool exhaustion is a rare but catastrophic failure mode, often triggered by massive, automated provisioning scripts or bulk migration activities that create thousands of objects in a short window. From a compliance perspective, the RID Master is critical because SID uniqueness is the bedrock of the Windows security model; if SIDs were duplicated, an attacker could potentially gain unauthorized access to resources intended for a different user. Monitoring RID pool availability is a standard operational requirement for Tier-1 infrastructure teams.
+
+### Operational Considerations
+The RID Master is required for the creation of new security principals. If the RID Master is offline, DCs can continue to create objects until their current local RID pool is exhausted. Once the pool is empty, object creation will fail.
+[CLI: dcdiag /test:ridmanager]
+[CLI: repadmin /showrepl]
+[CLI: ntdsutil roles connections "connect to server <DC_Name>" quit "transfer rid master"]
+Monitoring for RID pool exhaustion events (Event ID 16650) is essential.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the RID Master is required for user authentication or for modifying existing objects. This is false. The RID Master is only involved when a domain controller needs to request a new pool of RIDs to create *new* security principals. If the RID Master is offline, existing users can still log in, and existing objects can be modified without issue.
+
+### Interview Angle
+1. **Scenario:** You are investigating a ticket where a DC is unable to create new user accounts, but existing users can log in without issue. What is your first diagnostic step?
+   *Model Answer:* I would check the RID pool status on the affected DC and verify the availability of the RID Master. The symptoms suggest the DC has exhausted its local RID pool and cannot request a new one, likely because the RID Master is offline or unreachable.
+2. **Scenario:** How does the RID Master prevent SID collisions in a multi-master environment?
+   *Model Answer:* It acts as the central authority for RID allocation. By issuing distinct, non-overlapping blocks of RIDs to each domain controller, it ensures that every DC has a unique range of RIDs to assign to new objects, thereby guaranteeing that no two objects in the domain ever share the same SID.
+3. **Scenario:** Under what circumstances would you consider seizing the RID Master role?
+   *Model Answer:* I would only seize the RID Master role if the original holder is confirmed to be permanently offline and cannot be restored within a reasonable timeframe. Seizing the role carries the risk of duplicate RID pool allocation if the original holder comes back online, so it must be followed by the immediate decommissioning of the original role holder.
+
+### Related Concepts
+*   Security Identifiers (SIDs)
+*   Domain Controllers
+
+## 4. PDC Emulator
+
+### Technical Definition
+The PDC (Primary Domain Controller) Emulator is a domain-wide FSMO role that acts as the authoritative source for legacy compatibility, time synchronization, and critical account security operations. Despite the "Primary" nomenclature—a holdover from the Windows NT 4.0 era—it is a vital, high-traffic role in modern Active Directory environments, serving as the "first point of contact" for password changes and account lockouts.
+
+### Underlying Mechanism
+The PDC Emulator functions as the authoritative time source for the domain, typically synchronizing with an external Stratum 1 NTP source and propagating that time to all other DCs via the W32Time service. For security operations, it acts as the "write-priority" target: when a user changes their password, the change is immediately replicated to the PDC Emulator. If a user attempts to authenticate with a new password that has not yet replicated to the local DC, the local DC forwards the authentication request to the PDC Emulator to verify the password before rejecting the login. Similarly, account lockout processing is centralized here to prevent "lockout race conditions" where a user might otherwise be able to bypass lockout thresholds by hitting different DCs.
+
+### Why It Exists
+The PDC Emulator exists to solve the inherent latency issues of a multi-master replication model. By centralizing password changes and account lockouts, it ensures that security policies are enforced consistently and immediately, preventing attackers from exploiting replication lag to bypass account lockouts. Furthermore, it maintains backward compatibility for legacy applications that still rely on NT 4.0-style PDC/BDC semantics, such as older GPO processing and DFS namespace management.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, the PDC Emulator is arguably the most critical FSMO role. Because it handles password changes and account lockouts, its failure directly impacts user experience and security posture. If the PDC Emulator is unavailable, password changes will fail, and account lockouts may not trigger correctly, potentially allowing brute-force attacks to succeed. In high-security environments, the PDC Emulator should be hosted on a high-performance, low-latency DC, and its health must be monitored with the highest priority. It is also the primary target for time synchronization audits, as accurate timestamps are required for Kerberos authentication and transaction logging.
+
+### Operational Considerations
+The PDC Emulator is heavily utilized for authentication traffic and time synchronization. Monitoring its health is critical to preventing widespread authentication failures.
+[CLI: w32tm /query /source]
+[CLI: Get-ADDomainController -Filter * | Where-Object {$_.OperationMasterRoles -contains "PDCEmulator"}]
+[CLI: ntdsutil roles connections "connect to server <DC_Name>" quit "transfer pdc"]
+If the PDC Emulator is unavailable, you must prioritize its restoration or seizure. Unlike other roles, the PDC Emulator is so critical that it should be restored from backup or seized immediately if it cannot be recovered within a short window.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the PDC Emulator is only needed for legacy NT 4.0 clients. This is false. Even in a modern, Windows 11/Server 2022 environment, the PDC Emulator is essential for password change processing, account lockout enforcement, and time synchronization. It is a core component of the modern Active Directory security architecture.
+
+### Interview Angle
+1. **Scenario:** Users are reporting that they are locked out of their accounts, but the lockout is not taking effect immediately, allowing them to continue attempting passwords. What role should you investigate?
+   *Model Answer:* I would immediately investigate the PDC Emulator. Since the PDC Emulator is responsible for processing account lockouts, its unavailability or failure to communicate with other DCs can lead to inconsistent lockout enforcement and "race conditions" where lockouts are delayed.
+2. **Scenario:** You are designing a multi-site Active Directory environment. Where should you place the PDC Emulator?
+   *Model Answer:* I would place the PDC Emulator in the primary data center, ideally on a high-performance DC with low latency to the majority of the user base. This ensures that password changes and account lockouts are processed quickly and reliably, minimizing the impact of replication latency.
+3. **Scenario:** How does the PDC Emulator impact Kerberos authentication?
+   *Model Answer:* The PDC Emulator acts as the authoritative time source for the domain. Since Kerberos relies on timestamps to prevent replay attacks, the PDC Emulator's role in maintaining accurate time synchronization is critical for the stability and security of Kerberos authentication across the domain.
+
+### Related Concepts
+*   W32Time Service
+*   Kerberos Authentication
+*   Account Lockout Policies
+
+## 5. Infrastructure Master
+
+### Technical Definition
+The Infrastructure Master is a domain-wide FSMO role responsible for updating cross-domain object references. When an object in one domain is referenced by an object in another domain (e.g., a user from Domain A is added to a group in Domain B), the Infrastructure Master ensures that the reference remains valid even if the source object is renamed or moved.
+
+### Underlying Mechanism
+The Infrastructure Master periodically compares its local data with the Global Catalog (GC) to identify "phantom" objects—references to objects in other domains. If the Infrastructure Master detects that a referenced object has been renamed or moved, it updates the local reference to point to the new location. As discussed in Section 1.4, the Global Catalog is essential for this process, as it provides the necessary cross-domain object information.
+
+### Why It Exists
+The Infrastructure Master exists to maintain the integrity of cross-domain object references. In a multi-domain forest, object references can easily become stale if the source object is modified. By centralizing the update process, Active Directory ensures that all domain controllers have a consistent and accurate view of cross-domain relationships, preventing broken ACLs and authentication failures.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, the Infrastructure Master is critical for maintaining the integrity of complex, multi-domain security groups and access control lists. If the Infrastructure Master is unavailable, cross-domain references may become stale, leading to "Access Denied" errors for users attempting to access resources in other domains. In environments where all domain controllers are Global Catalog servers, the Infrastructure Master role is technically redundant, as every DC has a full, up-to-date view of the forest. However, it is still best practice to assign the role to a non-GC server to ensure it remains active and monitored.
+
+### Operational Considerations
+The Infrastructure Master is not required for day-to-day operations in all-GC domains, but it is essential in environments with non-GC domain controllers.
+[CLI: Get-ADDomainController -Filter * | Where-Object {$_.OperationMasterRoles -contains "InfrastructureMaster"}]
+[CLI: ntdsutil roles connections "connect to server <DC_Name>" quit "transfer infrastructure master"]
+Monitoring for replication errors and ensuring that the Infrastructure Master is correctly configured is vital for maintaining cross-domain trust and access control.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the Infrastructure Master is required for all cross-domain authentication. This is false. Cross-domain authentication relies on trust relationships and the Global Catalog, not the Infrastructure Master. The Infrastructure Master is only responsible for updating the *references* to objects, not for the authentication process itself.
+
+### Interview Angle
+1. **Scenario:** You are designing a multi-domain forest. Should you place the Infrastructure Master on a Global Catalog server?
+   *Model Answer:* No, it is best practice to place the Infrastructure Master on a non-Global Catalog server. If the Infrastructure Master is on a GC server, it will not perform its update duties because it will not see any "phantom" objects, as it already has a full view of the forest.
+2. **Scenario:** Users are reporting "Access Denied" errors when accessing resources in a different domain. What role should you investigate?
+   *Model Answer:* I would investigate the Infrastructure Master. If the Infrastructure Master is failing to update cross-domain references, users may be unable to access resources because the security identifiers (SIDs) in the ACLs are pointing to stale or incorrect objects.
+3. **Scenario:** Why is the Infrastructure Master role considered "less critical" than the PDC Emulator?
+   *Model Answer:* The Infrastructure Master is responsible for background maintenance of cross-domain references, whereas the PDC Emulator is critical for real-time authentication and security policy enforcement. While the Infrastructure Master is important for long-term directory health, its failure does not have the immediate, high-impact consequences of a PDC Emulator outage.
+
+### Related Concepts
+*   [Global Catalog (Section 1.4)] - For understanding the role of the GC in cross-domain object lookups.
+*   [Trust Architecture (Section 1.2)] - For context on cross-domain trust and authentication.
+
 ## 6. Failure Scenarios
 
 ### Technical Definition
