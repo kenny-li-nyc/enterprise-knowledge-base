@@ -189,3 +189,43 @@ Operational challenges include latency, DNS resolution, and trust health. Cross-
 *   [Trust Fundamentals](trust-architecture.md#trust-fundamentals)
 *   [Kerberos](kerberos.md)
 *   [DNS](dns.md)
+
+## Enterprise Trust Design & M&A
+
+### Technical Definition
+Enterprise Trust Design & M&A refers to the strategic architectural patterns used to integrate identity environments during organizational changes, such as mergers, acquisitions, or divestitures. It involves the planning, implementation, and management of trust relationships between disparate Active Directory forests to enable secure resource sharing and user collaboration while maintaining the integrity of each organization's identity perimeter.
+
+### Underlying Mechanism
+This design pattern leverages Forest Trusts, UPN Suffix Routing, and DNS Conditional Forwarders or Stub Zones to bridge the gap between independent forests. When two organizations merge, the goal is often to establish a "hub-and-spoke" trust model where a central identity forest (the "hub") trusts or is trusted by the acquired organization's forest (the "spoke"). This allows for centralized management of identities and resources. The mechanism involves configuring the trust to allow for cross-forest authentication, while simultaneously implementing strict security controls (SID filtering, selective authentication) to prevent the "bleeding" of privileges between the two environments.
+
+[DIAGRAM: A visual representation of a hub-and-spoke trust model for M&A integration]
+
+### Why It Exists
+This design pattern exists to support business growth and organizational change. Mergers and acquisitions are common in the banking industry, and the ability to quickly and securely integrate IT environments is a competitive advantage. It allows organizations to realize the synergies of the merger (e.g., shared services, unified collaboration) without compromising the security of either organization's identity infrastructure.
+
+### Enterprise / Banking Reality
+In a Tier-1 bank, M&A trust design is a high-stakes, high-visibility project. It is not just a technical integration; it is a security and compliance integration. The design pattern is to create a "clean room" environment where the acquired organization's forest is treated as untrusted until it has been audited and secured. The integration is often phased, starting with limited resource sharing and gradually moving toward full identity integration. Audit and compliance teams will require rigorous documentation of the trust architecture, the security controls in place, and the plan for eventual consolidation or decommissioning of the acquired forest.
+
+### Operational Considerations
+Operational challenges include managing the lifecycle of the trust, ensuring consistent security policies, and planning for the eventual consolidation or decommissioning of the acquired forest. Monitoring is critical, as the integration of two disparate environments is a prime target for attackers. You must monitor for any unauthorized access attempts or anomalies in the authentication flow.
+
+[CLI: Command to configure a forest trust for M&A integration]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"M&A integration means full forest trust immediately."** This is a dangerous assumption. Integration should be phased, starting with limited access and gradually increasing as security is verified.
+    *   **"Trusts are permanent."** Trusts should be treated as temporary or at least subject to regular review, especially in M&A scenarios where the long-term goal is often consolidation.
+    *   **"I can just merge the two forests."** Merging forests is a massive, high-risk project. It is often better to maintain separate forests and use trusts to bridge them until a full consolidation is feasible.
+
+### Interview Angle
+1.  **"How do you approach the integration of two forests during an M&A event?"**
+    *   *Model Answer:* "I would start with a thorough audit of both forests, followed by a phased integration plan. I would prioritize security by implementing strict controls (SID filtering, selective authentication) and using a hub-and-spoke trust model. I would also plan for the long-term goal of consolidation or decommissioning."
+2.  **"What are the security risks of M&A trust integration?"**
+    *   *Model Answer:* "The primary risks are lateral movement, privilege escalation, and the introduction of insecure configurations from the acquired forest. These risks must be mitigated through rigorous security controls, continuous monitoring, and regular audits."
+3.  **"How do you manage the lifecycle of trusts in an M&A scenario?"**
+    *   *Model Answer:* "I would treat trusts as temporary or subject to regular review. I would document the business justification for each trust, implement strict security controls, and have a clear plan for decommissioning the trust when it is no longer needed."
+
+### Related Concepts
+*   [Forests, Domains, OUs & Sites](forests-domains-ous-sites.md)
+*   [Trust Fundamentals](trust-architecture.md#trust-fundamentals)
+*   [Trust Security Controls](trust-architecture.md#trust-security-controls)
