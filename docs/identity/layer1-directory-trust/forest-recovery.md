@@ -71,3 +71,38 @@ Monitoring the `msDS-deletedObjectLifetime` is essential to ensure that objects 
 ### Related Concepts
 *   [Forest Services (Section 1.4)] - For the foundational mechanics of object deletion and tombstoning.
 *   [Replication Architecture (Section 1.3)] - For understanding how object deletion and restoration propagate across the forest.
+
+## 3. Authoritative restore
+
+### Technical Definition
+Authoritative restore is a recovery process that forces a restored object or subtree to be treated as the definitive, "latest" version across the entire forest, overriding any conflicting data on other domain controllers. It is the escalation path when the AD Recycle Bin is inapplicable, such as when dealing with structural database corruption or malicious modifications that have already replicated globally.
+
+### Underlying Mechanism
+It works by manipulating the Update Sequence Number (USN) of the restored objects. By using `ntdsutil` to mark an object as authoritative, the administrator artificially inflates the object's version number to a value significantly higher than the current high-watermark vector of any other DC in the forest, as discussed in Section 1.3. This ensures that during the next replication cycle, all other domain controllers recognize the restored object as the most recent version and accept it, overwriting their own local, incorrect copies.
+
+### Why It Exists
+It exists to resolve conflicts where an incorrect state—such as a corrupted attribute, an accidental modification, or a malicious change—has already replicated to all domain controllers. Unlike a non-authoritative restore, which would simply pull the "bad" data back from replication partners, an authoritative restore ensures the "good" data from the backup becomes the new truth, effectively "rewriting history" for the affected objects.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, authoritative restore is a "break-glass" procedure. It is used when a critical security group, application configuration, or service account is corrupted and the change has propagated globally. Because it forces a state change across the entire forest, it carries the risk of reverting legitimate changes made to other objects if the scope of the restore is not carefully defined. It is strictly governed by Change Management and requires a full audit trail to ensure that the "authoritative" state is indeed the desired one.
+
+### Operational Considerations
+Authoritative restore requires booting the domain controller into DSRM. The process involves restoring the System State non-authoritatively first, then using `ntdsutil` to mark the specific objects or subtrees as authoritative.
+[CLI: ntdsutil "activate instance ntds" "authoritative restore" "restore object <DistinguishedName>"]
+After the restore, the DC must be rebooted into normal mode to resume replication and propagate the authoritative changes.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that an authoritative restore is a general-purpose "undo" button. It is not. It is a surgical tool that should only be used when the scope of the corruption is well-understood. Applying an authoritative restore to a broad scope (like the entire domain) can cause massive data loss by reverting legitimate changes made by other administrators or automated processes.
+
+### Interview Angle
+1. **Scenario:** You are faced with a scenario where a critical group policy object (GPO) has been corrupted and the change has replicated to all DCs. The Recycle Bin is not applicable because the object was modified, not deleted. What is your recovery strategy?
+   *Model Answer:* I would perform an authoritative restore of the specific GPO object. This ensures that the "known-good" version from our backup is forced onto all domain controllers, overriding the corrupted version. I would carefully scope the restore to only the affected GPO to avoid impacting other directory objects.
+2. **Scenario:** What is the primary risk of performing an authoritative restore on a large subtree?
+   *Model Answer:* The primary risk is the "reversion" of legitimate changes. If you restore a large subtree authoritatively, any changes made to objects within that subtree since the backup was taken will be lost, as the restored version will overwrite them. This can lead to significant operational disruption and data loss.
+3. **Scenario:** How do you verify that an authoritative restore was successful?
+   *Model Answer:* I would verify the object's attributes and version numbers on the restored DC and then monitor replication to ensure that the changes have propagated to all other domain controllers. I would also check the event logs for any replication errors or conflicts.
+
+### Related Concepts
+*   [Replication Architecture (Section 1.3)] - For understanding USN and high-watermark vectors.
+*   [Forest Services (Section 1.4)] - For the AD Recycle Bin, which is the preferred method for deletion recovery.
