@@ -35,3 +35,39 @@ Monitoring the health of the AD FS farm, including the WAP servers and the under
 ### Related Concepts
 *   [Trust Architecture (Section 1.2)] - For understanding the cryptographic trust anchors and forest trust boundaries.
 *   [Authentication (Section 1.7)] - For understanding the local authentication context and Kerberos/NTLM handshakes.
+
+## 2. SAML/OIDC trusts
+
+### Technical Definition
+SAML (Security Assertion Markup Language) and OIDC (OpenID Connect) are the industry-standard protocols for federated identity. SAML is an XML-based framework for exchanging authentication and authorization data, while OIDC is a lightweight identity layer built on top of the OAuth 2.0 protocol, using JSON Web Tokens (JWTs).
+
+### Underlying Mechanism
+SAML relies on XML-based assertions signed by the Identity Provider (IdP) and consumed by the Service Provider (SP). OIDC uses an ID Token (a JWT) to convey identity information, often accompanied by an Access Token for API authorization. Both protocols rely on a trust relationship established via metadata exchange (e.g., SAML metadata XML or OIDC discovery endpoints) and cryptographic signing keys. The IdP signs the assertion or token, and the SP validates the signature against the IdP's public key to establish the user's identity.
+
+### Why It Exists
+These protocols exist to provide a standardized, interoperable way to federate identity across heterogeneous environments. They decouple the identity provider from the relying party, allowing for seamless SSO across web, mobile, and API-based applications, regardless of the underlying platform or technology stack.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, SAML and OIDC are the primary protocols for modernizing identity. SAML is often used for legacy web applications, while OIDC is the standard for modern, cloud-native, and mobile applications. Banking security standards require that these protocols be implemented with strong cryptographic signing (e.g., SHA-256 or higher), secure token handling, and strict validation of the IdP's metadata to prevent "man-in-the-middle" or "token-replay" attacks.
+
+### Operational Considerations
+Managing these trusts requires careful lifecycle management of signing certificates and metadata.
+[CLI: Get-AdfsRelyingPartyTrust -Name "BankingApp"]
+[CLI: Update-FederationMetadata -Url "https://idp.bank.com/metadata"]
+Monitoring for token validation errors, certificate expiration, and metadata updates is critical for maintaining SSO availability.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that SAML and OIDC are interchangeable. This is false. While both provide identity federation, they are designed for different use cases. SAML is typically used for web-based SSO, while OIDC is optimized for modern, API-driven, and mobile applications. Choosing the wrong protocol can lead to significant integration challenges and security gaps.
+
+### Interview Angle
+1. **Scenario:** You are migrating a legacy application from SAML to OIDC. What are the key architectural considerations?
+   *Model Answer:* I would focus on the differences in token handling, the shift from XML to JSON, and the need for a modern OAuth 2.0-compliant authorization server. I would also ensure that the application's security policies are correctly mapped to the new OIDC claims.
+2. **Scenario:** How do you secure the trust relationship between an IdP and an SP?
+   *Model Answer:* I would enforce strict validation of the IdP's metadata, use strong cryptographic signing (e.g., RSA-2048 or higher), and implement token binding or other mechanisms to prevent token replay attacks. I would also regularly rotate the signing certificates.
+3. **Scenario:** Why is OIDC preferred for mobile applications?
+   *Model Answer:* OIDC is lightweight, JSON-based, and designed for modern web and mobile architectures. It integrates seamlessly with OAuth 2.0, making it the ideal choice for securing APIs and mobile app backends, whereas SAML's XML-based structure is often too heavy and complex for these use cases.
+
+### Related Concepts
+*   [AD FS (Section 1.9)] - For the STS implementation.
+*   [Authentication (Section 1.7)] - For the underlying authentication context.
