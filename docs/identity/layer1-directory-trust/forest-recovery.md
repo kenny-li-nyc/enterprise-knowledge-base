@@ -106,3 +106,38 @@ After the restore, the DC must be rebooted into normal mode to resume replicatio
 ### Related Concepts
 *   [Replication Architecture (Section 1.3)] - For understanding USN and high-watermark vectors.
 *   [Forest Services (Section 1.4)] - For the AD Recycle Bin, which is the preferred method for deletion recovery.
+
+## 4. Non-Authoritative restore
+
+### Technical Definition
+A non-authoritative restore is the standard recovery procedure where a domain controller is restored from a backup and then allowed to participate in normal replication. Upon reboot, the restored DC recognizes that its database is "older" than its replication partners and requests all updates that occurred since the backup was taken, effectively bringing itself up to date with the rest of the forest.
+
+### Underlying Mechanism
+When a DC is restored non-authoritatively, it retains its original invocation ID and USN high-watermark vectors. Because the restored database is older than the current state of the forest, the DC's replication partners detect that the restored DC is behind. They then push all missing changes to the restored DC. This process relies on the standard replication topology discussed in Section 1.3, ensuring that the restored DC eventually converges with the current state of the forest without requiring manual intervention to "force" data onto other DCs.
+
+### Why It Exists
+It exists to provide a safe, automated way to recover a domain controller from a failure (e.g., hardware failure, OS corruption) without impacting the rest of the forest. By allowing the restored DC to pull updates from its partners, Active Directory ensures that the restored DC becomes consistent with the current, authoritative state of the forest, preventing the "split-brain" issues that would arise if the restored DC were to assert its own (outdated) state as truth.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, non-authoritative restore is the default recovery path for individual domain controller failures. It is low-risk and highly automated, making it the preferred method for restoring service after a localized outage. However, in a forest-wide recovery scenario, the first DC restored must be done non-authoritatively (or via a specific "clean" restore) to establish the baseline, after which other DCs can be restored or re-promoted. Compliance frameworks prioritize this method because it maintains the integrity of the replication topology and avoids the risks associated with authoritative overrides.
+
+### Operational Considerations
+The process involves restoring the System State backup in DSRM mode. Once the restore is complete, the DC is rebooted into normal mode, where it automatically initiates replication with its partners.
+[CLI: wbadmin start systemstaterecovery -version:<VersionIdentifier>]
+Monitoring replication health after the restore is critical to ensure that the DC successfully synchronizes with its partners and that no replication conflicts arise.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that a non-authoritative restore will "lose" data that was created after the backup. This is false. While the restored DC itself is "behind" at the moment of reboot, it immediately begins pulling the missing updates from its replication partners. Within a short period (depending on replication latency), the restored DC will be fully synchronized and contain all the data that existed in the forest at the time of the restore.
+
+### Interview Angle
+1. **Scenario:** A domain controller in a remote branch office suffers a hardware failure. You restore it from a backup taken three days ago. What is the impact on the forest?
+   *Model Answer:* The impact is minimal. The restored DC will boot up, recognize it is behind, and automatically pull the missing updates from its replication partners. It will be fully synchronized with the rest of the forest shortly after reboot, with no manual intervention required.
+2. **Scenario:** Why is a non-authoritative restore safer than an authoritative restore?
+   *Model Answer:* A non-authoritative restore is safer because it allows the restored DC to converge with the current, authoritative state of the forest. It avoids the risk of overwriting legitimate changes or causing replication conflicts that can occur with an authoritative restore.
+3. **Scenario:** How do you ensure that a restored DC does not cause a USN rollback?
+   *Model Answer:* I ensure that the DC is restored using a VSS-aware backup solution that supports the VM Generation ID (if virtualized) or by following the proper DSRM restore procedures. This prevents the DC from reusing old USNs and causing replication inconsistencies.
+
+### Related Concepts
+*   [Replication Architecture (Section 1.3)] - For understanding replication vectors and convergence.
+*   [System State (Section 1.6)] - For the foundational backup and restore process.
