@@ -72,3 +72,39 @@ Monitoring for NTLM authentication events is critical for identifying legacy app
 ### Related Concepts
 *   [Kerberos Core Architecture (Section 1.7)] - For understanding the preferred authentication protocol.
 *   [Trust Architecture (Section 1.2)] - For understanding how NTLM authentication behaves across trust boundaries.
+
+## 3. Delegation models
+
+### Technical Definition
+Delegation is an Active Directory feature that allows a service (the "front-end") to impersonate a user to access resources on another service (the "back-end") on that user's behalf. This is essential for multi-tier applications where a web server must access a database using the user's identity rather than the web server's own service account.
+
+### Underlying Mechanism
+There are three primary delegation models: Unconstrained, Constrained, and Resource-Based Constrained Delegation (RBCD). Unconstrained delegation allows a service to impersonate a user to *any* service in the domain by forwarding the user's TGT. Constrained delegation restricts this to a specific list of services defined in the `msDS-AllowedToDelegateTo` attribute. RBCD, the most secure model, allows the *target* resource to define which service accounts are permitted to delegate to it, using the `msDS-AllowedToActOnBehalfOfOtherIdentity` attribute. These models rely on S4U2Self (Service for User to Self) and S4U2Proxy (Service for User to Proxy) extensions to the Kerberos protocol, which allow a service to obtain a service ticket for a user without the user's password.
+
+### Why It Exists
+Delegation exists to solve the "double-hop" problem in multi-tier application architectures. Without delegation, a web server would have to use its own service account to access a database, which would require granting the web server's service account access to all user data, violating the principle of least privilege. Delegation allows the application to maintain the user's security context throughout the entire request chain.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, unconstrained delegation is considered a critical security vulnerability and is strictly prohibited. It allows a compromised service to impersonate any user who authenticates to it, leading to immediate privilege escalation. Constrained delegation is the minimum standard, but RBCD is the preferred architectural pattern because it decentralizes the delegation configuration, allowing resource owners to control access without requiring Domain Admin privileges. Audit and compliance frameworks require strict documentation and periodic review of all delegation configurations.
+
+### Operational Considerations
+Managing delegation requires careful planning and monitoring.
+[CLI: Get-ADObject -Identity <ServiceAccount> -Properties msDS-AllowedToDelegateTo]
+[CLI: Set-ADObject -Identity <TargetResource> -Add @{'msDS-AllowedToActOnBehalfOfOtherIdentity' = <ServiceAccountSID>}]
+Monitoring for delegation-related events and auditing the delegation attributes on service accounts is essential for maintaining a secure environment.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that delegation is "just for Kerberos." While delegation is a Kerberos feature, it is often confused with NTLM impersonation. Delegation is specifically designed for Kerberos-based authentication and does not work with NTLM. If an application relies on NTLM, delegation will not function, and the application will likely fail.
+
+### Interview Angle
+1. **Scenario:** You are auditing a legacy application that uses unconstrained delegation. What is your recommendation?
+   *Model Answer:* I would immediately recommend migrating the application to Resource-Based Constrained Delegation (RBCD). Unconstrained delegation is a major security risk, and RBCD provides the same functionality with significantly improved security by restricting the scope of delegation to specific resources.
+2. **Scenario:** How does RBCD differ from traditional constrained delegation?
+   *Model Answer:* Traditional constrained delegation is configured on the *delegating* service account, requiring Domain Admin privileges to modify. RBCD is configured on the *target* resource, allowing the resource owner to define which service accounts can delegate to it, which is more secure and easier to manage.
+3. **Scenario:** What are the security risks of S4U2Self and S4U2Proxy?
+   *Model Answer:* While these extensions are necessary for delegation, they can be abused if not properly configured. If a service account is granted excessive delegation rights, an attacker who compromises that account can impersonate users to access sensitive resources. This is why strict adherence to the principle of least privilege is critical when configuring delegation.
+
+### Related Concepts
+*   [Kerberos Core Architecture (Section 1.7)] - For understanding the underlying Kerberos protocol.
+*   [Trust Architecture (Section 1.2)] - For understanding how delegation behaves across trust boundaries.
