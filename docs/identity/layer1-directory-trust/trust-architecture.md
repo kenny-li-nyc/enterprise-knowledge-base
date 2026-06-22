@@ -100,3 +100,46 @@ Managing trust types requires understanding the implications of each type. For i
 *   [Trust Fundamentals](trust-architecture.md#trust-fundamentals)
 *   [Trust Security Controls](trust-architecture.md#trust-security-controls)
 *   [Kerberos](kerberos.md)
+
+## Trust Security Controls
+
+### Technical Definition
+Trust Security Controls are the mechanisms used to restrict and validate authentication traffic across trust boundaries. These controls include SID Filtering, Selective Authentication, and Quarantine. They are designed to prevent unauthorized access, lateral movement, and privilege escalation by ensuring that only legitimate authentication requests are processed and that security principals cannot impersonate identities from other domains or forests.
+
+### Underlying Mechanism
+These controls operate by inspecting the authentication tokens (specifically the Privilege Attribute Certificate, or PAC) and the Kerberos referral process. 
+- **SID Filtering:** When a trust is established, Active Directory can be configured to filter out any SIDs in the user's token that do not belong to the trusted domain. This prevents "SID History" attacks, where an attacker injects a high-privilege SID into their own account's SID history to gain elevated access in the trusting domain.
+- **Selective Authentication:** This control restricts which users can authenticate to specific resources in the trusting domain. When enabled, the trusting domain controller checks the "Allowed to Authenticate" permission on the target computer object before granting access.
+- **Quarantine:** This is a state applied to a trust that restricts the scope of authentication until the trust is fully validated and configured.
+
+[DIAGRAM: A visual representation of how SID filtering and Selective Authentication intercept and validate authentication requests]
+
+### Why It Exists
+These controls exist because trusts are inherently risky. By default, a trust allows any user in the trusted domain to authenticate to any resource in the trusting domain. In a large enterprise, this is unacceptable. These controls provide the necessary granularity to enforce the principle of least privilege and to contain the impact of a potential compromise in one domain or forest.
+
+### Enterprise / Banking Reality
+In a Tier-1 bank, these controls are mandatory for all cross-forest trusts. SID filtering is enabled by default for forest trusts and must never be disabled. Selective authentication is the standard for high-value assets (e.g., Tier 0 systems, core banking applications). The design pattern is to use "Allowed to Authenticate" permissions on computer objects to strictly control access. Audit teams will verify that these controls are in place and that they are correctly configured. Any deviation from this standard is considered a significant security risk and will be flagged during audits.
+
+### Operational Considerations
+Implementing these controls requires careful planning. Selective authentication, in particular, can be complex to manage, as it requires explicitly granting "Allowed to Authenticate" permissions on every computer object that needs to be accessed by users from the trusted domain. If this is not done correctly, authentication will fail, and users will be unable to access resources. Monitoring involves checking for Event IDs related to authentication failures (e.g., 4624, 4625) and auditing the "Allowed to Authenticate" permissions.
+
+[CLI: Command to configure Selective Authentication on a computer object]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"SID filtering breaks everything."** SID filtering only breaks authentication if the user's token contains invalid or malicious SIDs. If the trust is configured correctly, it should have no impact on legitimate authentication.
+    *   **"Selective authentication is only for users."** Selective authentication applies to both users and groups. You must grant the "Allowed to Authenticate" permission to the specific security principal that needs access.
+    *   **"I can just enable these controls after the trust is established."** While you can enable them later, it is best practice to plan and configure them during the trust creation process to avoid service disruptions.
+
+### Interview Angle
+1.  **"What is the purpose of SID filtering in a cross-forest trust?"**
+    *   *Model Answer:* "SID filtering prevents SID history injection attacks by ensuring that only SIDs belonging to the trusted domain are allowed in the user's token. It is a critical security control for preventing privilege escalation across trust boundaries."
+2.  **"How does Selective Authentication differ from standard authentication?"**
+    *   *Model Answer:* "Standard authentication allows any user in the trusted domain to authenticate to any resource in the trusting domain. Selective authentication restricts this by requiring an explicit 'Allowed to Authenticate' permission on the target computer object, providing a much higher level of control."
+3.  **"What are the operational challenges of implementing Selective Authentication?"**
+    *   *Model Answer:* "The main challenge is the administrative overhead of managing the 'Allowed to Authenticate' permissions on every computer object that needs to be accessed. It requires a well-defined process for granting and revoking these permissions to avoid service disruptions and security gaps."
+
+### Related Concepts
+*   [Trust Fundamentals](trust-architecture.md#trust-fundamentals)
+*   [Trust Types](trust-architecture.md#trust-types)
+*   [Kerberos](kerberos.md)
