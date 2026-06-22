@@ -13,7 +13,7 @@ enough to use as both interview prep and a long-term technical reference.
 ## Layers
 
 - **[Identity](identity/index.md)** — directory services, trust, PKI, federation, PAM
-- **Endpoint** — *planned*
+- **[Endpoint](endpoint/index.md)** — device lifecycle, configuration, application delivery
 - **Security** — *planned*
 - **Network** — *planned*
 - **Virtualization / Compute** — *planned*
