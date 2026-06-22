@@ -203,3 +203,57 @@ Operational considerations involve monitoring the health and replication status 
     *   **"GCs are only for logon."** While GCs are critical for Universal Group membership resolution during logon, they are also essential for forest-wide searches and other directory operations.
 
 ### Interview Angle
+1.  **"What is the impact of adding an attribute to the Partial Attribute Set (PAS)?"**
+    *   *Model Answer:* "Adding an attribute to the PAS triggers a forest-wide replication event, as all GC servers in the forest must be updated with the new attribute. This can significantly increase replication traffic and storage requirements, so it should be done carefully and only when necessary."
+2.  **"How do you determine the optimal placement of GC servers?"**
+    *   *Model Answer:* "The optimal placement of GC servers depends on the network topology and the distribution of users and resources. In general, GC servers should be placed in every major site to ensure that authentication and search operations are fast and reliable. I would also consider the bandwidth and latency of the network links between sites."
+3.  **"What happens if a GC server is unavailable?"**
+    *   *Model Answer:* "If a GC server is unavailable, forest-wide operations, such as searching for users across domains or resolving Universal Group memberships, may fail or be significantly slower. Authentication may also be impacted if the user's domain controller relies on the GC for Universal Group membership resolution."
+
+### Related Concepts
+*   [Forests, Domains, OUs & Sites](forests-domains-ous-sites.md#forest)
+*   [Replication Topology & KCC](replication-architecture.md#replication-topology-kcc)
+*   [AD Partitions](replication-architecture.md#ad-partitions)
+
+## Replication Troubleshooting
+
+### Technical Definition
+Replication troubleshooting is the systematic process of identifying, diagnosing, and resolving issues that prevent Active Directory domain controllers from synchronizing directory data. It involves analyzing replication metadata, verifying network connectivity, ensuring DNS integrity, and utilizing diagnostic tools to pinpoint the root cause of replication failures, which can range from simple network outages to complex database corruption.
+
+### Underlying Mechanism
+Troubleshooting relies on understanding the replication pipeline. When replication fails, the KCC or the replication engine logs specific events in the Directory Service event log. Troubleshooting involves:
+- **Metadata Analysis:** Using `repadmin /showrepl` or `repadmin /replsummary` to identify which DCs are failing to replicate and which partitions are affected.
+- **Connectivity Verification:** Using `ping`, `tracert`, or `Test-NetConnection` to ensure that the DCs can communicate over the required ports (e.g., 135, 445, 389, 636, 3268, 3269).
+- **DNS Integrity:** Verifying that SRV records are correctly registered and that DCs can resolve each other's FQDNs.
+- **Database Health:** Using `ntdsutil` to check the integrity of the `ntds.dit` database if corruption is suspected.
+- **Event Log Analysis:** Reviewing Event IDs such as 1311 (KCC topology errors), 1864 (replication latency), and 1925 (replication failure).
+
+### Why It Exists
+Replication is the heartbeat of Active Directory. If replication fails, the directory becomes inconsistent, leading to authentication failures, GPO application issues, and service outages. Troubleshooting exists to restore the directory to a consistent state as quickly as possible, minimizing the impact on business operations.
+
+### Enterprise / Banking Reality
+In a Tier-1 banking environment, replication troubleshooting is a high-priority, high-visibility activity. Automated monitoring systems (e.g., SCOM, SIEM) are configured to alert on any replication failure, and these alerts are treated as critical incidents. Troubleshooting is typically a Tier-3 or Tier-4 activity, requiring deep expertise in Active Directory internals. Audit and compliance teams require that all replication issues be documented, tracked, and resolved within defined SLAs. The focus is on proactive prevention through robust monitoring and regular health checks.
+
+### Operational Considerations
+Operational considerations involve maintaining a set of standard operating procedures (SOPs) for replication troubleshooting. This includes having a clear escalation path, well-defined diagnostic steps, and a library of common fixes. Administrators should be proficient in using `repadmin`, `dcdiag`, and `ntdsutil`. Regular health checks, such as running `dcdiag /test:replications`, should be part of the routine maintenance schedule.
+
+[CLI: Command to run a comprehensive replication health check]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"Replication is broken."** Replication failures are often a symptom of an underlying issue, such as DNS misconfiguration, network connectivity problems, or time synchronization issues, rather than a failure of the replication engine itself.
+    *   **"Force replication fixes everything."** While `repadmin /syncall` can force replication, it does not fix the root cause of the failure. If the underlying issue is not addressed, the replication will fail again.
+    *   **"I can just restore the DC from backup."** Restoring a DC from backup is a last resort and should only be done if all other troubleshooting steps have failed, as it can lead to USN rollback issues if not performed correctly.
+
+### Interview Angle
+1.  **"How do you approach a replication failure?"**
+    *   *Model Answer:* "I start by identifying the scope of the failure—is it one DC, one partition, or the entire forest? I then use `repadmin /showrepl` to get a detailed view of the replication status. I check the Directory Service event log for specific error codes. I verify network connectivity and DNS integrity, as these are the most common causes of replication issues. I then use `dcdiag` to perform a comprehensive health check."
+2.  **"What is the role of DNS in replication troubleshooting?"**
+    *   *Model Answer:* "DNS is critical for replication. Domain controllers use DNS to locate their replication partners. If DNS is misconfigured, DCs will be unable to resolve each other's FQDNs, leading to replication failures. I always verify DNS health as one of the first steps in troubleshooting."
+3.  **"How do you interpret Event ID 1311?"**
+    *   *Model Answer:* "Event ID 1311 indicates that the KCC is unable to build a valid replication topology. This is often caused by site or subnet misconfigurations, or by a lack of connectivity between domain controllers. I would investigate the site and subnet definitions and verify network connectivity between the affected DCs."
+
+### Related Concepts
+*   [Replication Topology & KCC](replication-architecture.md#replication-topology-kcc)
+*   [Sites / Site Links / Costs](replication-architecture.md#sites-site-links-costs)
+*   [DNS](dns.md)
