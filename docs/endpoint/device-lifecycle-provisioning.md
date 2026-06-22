@@ -107,3 +107,39 @@ Monitoring compliance across different enrollment models is essential, as is ens
 ### Related Concepts
 *   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries for staged devices.
 *   [Directory Authorization & Delegation (Section 1.8)] - For the scoped permission sets required for enrollment agents to register devices.
+
+## 4. Asset tagging & inventory systems
+
+### Technical Definition
+Asset tagging is the process of assigning a unique identifier (physical or logical) to an endpoint device to track its location, ownership, and status throughout its lifecycle. Inventory systems are the centralized databases (CMDBs) that store this metadata, providing a single source of truth for the organization's hardware estate.
+
+### Underlying Mechanism
+Asset tagging often involves physical barcodes or RFID tags linked to a database record. Logically, this is implemented via unique identifiers like serial numbers, UUIDs, or hardware hashes stored in an MDM or CMDB. Inventory systems use APIs to ingest data from procurement portals, MDMs, and network scanners, creating a dynamic, real-time view of the device estate.
+
+### Why It Exists
+It exists to provide visibility and accountability. Without accurate asset tagging and inventory, organizations cannot effectively manage their hardware, ensure compliance, or respond to security incidents. It is the foundation for all lifecycle management activities.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, asset tagging is a regulatory mandate (e.g., BCBS 239, SOX). Banks must maintain a precise, real-time inventory of all endpoints to ensure that every device is accounted for and secured. This often involves automated discovery tools that scan the network and cross-reference findings with the CMDB to identify "shadow IT" or unmanaged devices.
+
+### Operational Considerations
+Effective inventory management requires automated discovery and integration.
+[CLI: Get-AssetInventory -Filter "Status -eq 'Active'"]
+[CLI: Sync-CMDB -Source "MDM" -Destination "AssetDB"]
+Monitoring for discrepancies between the CMDB and the MDM is critical for maintaining data accuracy.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that manual spreadsheets are sufficient for asset inventory. This is false. Manual spreadsheets are prone to error, quickly become outdated, and cannot scale to the needs of a large enterprise. Automated, real-time inventory systems are the only way to maintain an accurate and compliant asset estate.
+
+### Interview Angle
+1. **Scenario:** How do you handle "shadow IT" devices that appear on the network but are not in the CMDB?
+   *Model Answer:* I would implement automated network discovery tools that scan for new devices and automatically flag them for investigation. I would then integrate this data with our CMDB to identify and either onboard or quarantine the unauthorized devices.
+2. **Scenario:** Why is real-time inventory critical for security incident response?
+   *Model Answer:* Real-time inventory allows us to quickly identify which devices are affected by a security vulnerability or incident. It enables us to isolate the affected devices, assess the impact, and initiate remediation without delay.
+3. **Scenario:** How do you ensure the accuracy of your CMDB?
+   *Model Answer:* I would implement automated data ingestion from multiple sources (MDM, network scanners, procurement portals) and use reconciliation rules to resolve conflicts. I would also perform regular audits to verify the data against physical assets.
+
+### Related Concepts
+*   [Procurement-to-decommission lifecycle stages (Section 2.1)]
+*   [Device enrollment models (Section 2.1)]
