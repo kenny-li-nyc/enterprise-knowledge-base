@@ -1,6 +1,6 @@
-# 2.2 Endpoint Identity & Trust
+#  Endpoint Identity & Trust
 
-## Topic 1: Device Identity in AD vs. Entra ID
+## 1. Device Identity in AD vs. Entra ID
 
 ### Technical Definition
 Device identity serves as the foundational anchor for Zero Trust architecture, distinguishing between three primary states of endpoint registration: Microsoft Entra joined, Hybrid Microsoft Entra joined, and Microsoft Entra registered. An Entra joined device is cloud-native, where the device identity exists solely within the Entra ID tenant, and the user authenticates directly against the cloud directory. A Hybrid Microsoft Entra joined device maintains a dual identity: it is joined to an on-premises Active Directory (AD) domain and simultaneously registered in Entra ID, allowing for legacy Kerberos-based authentication on-premises while leveraging cloud-based Conditional Access policies. A Microsoft Entra registered device, often referred to as Workplace Joined, is typically a personal or mobile device where the user adds their work account to the OS, establishing a lightweight identity relationship that allows for device-level compliance checks without full management or domain membership.
