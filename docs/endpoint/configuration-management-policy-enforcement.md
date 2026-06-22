@@ -151,3 +151,41 @@ Operationalizing these configuration methods requires a deep understanding of th
 - Section 2.3: MDM Policy Profiles (Intune, Jamf, Workspace ONE)
 - Section 2.3: Configuration drift detection & remediation
 - Section 2.3: Policy reporting & compliance dashboards
+
+## 5. Configuration drift detection & remediation
+
+### Technical Definition
+Configuration drift detection and remediation is the process of identifying and correcting unauthorized or unintended changes to an endpoint's configuration state. Drift occurs when the actual state of a device (e.g., registry settings, file permissions, installed software) diverges from the desired state defined by organizational policy. Detection involves continuous monitoring of the device's configuration, while remediation involves automatically re-applying the desired policy to bring the device back into compliance, ensuring that the endpoint remains in a known-good, secure state.
+
+### Underlying Mechanism
+The mechanism relies on the management agent (e.g., Intune, MECM, or a DSC engine) performing periodic "compliance scans" or "enforcement cycles." During these cycles, the agent compares the current local configuration against the policy definition stored on the management server. If a discrepancy is detected—such as a user manually disabling a security feature or a local script modifying a registry key—the agent triggers a remediation action. This action typically involves re-applying the original policy settings, effectively overwriting the unauthorized change and restoring the device to its intended configuration.
+
+[DIAGRAM: Sequence diagram showing the drift detection cycle, the comparison logic, and the remediation action]
+
+### Why It Exists
+Drift detection and remediation exist to maintain the integrity of the security posture in a dynamic environment. Users with local administrative rights, malware, or even failed software updates can inadvertently or maliciously alter system configurations, creating security vulnerabilities or operational instability. By automating the detection and remediation of these changes, organizations can ensure that their security baselines are enforced consistently across the entire fleet, reducing the risk of configuration-related security incidents and minimizing the need for manual intervention.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, configuration drift is a significant compliance and security risk. Regulators require proof that systems are configured according to hardened baselines (e.g., FFIEC, PCI-DSS). Drift detection provides the necessary evidence that these baselines are being maintained, and automated remediation ensures that any deviations are corrected immediately. Architects must design drift detection policies to be both comprehensive and performant, ensuring that the remediation process does not negatively impact system performance or user productivity, while providing detailed logs for audit and compliance reporting.
+
+### Operational Considerations
+Operationalizing drift detection requires a balance between automated remediation and alerting. While automated remediation is powerful, it can also be disruptive if a policy is incorrectly configured or if a legitimate change is flagged as drift. Administrators must implement a "monitor-first" approach, where drift is detected and alerted on before automated remediation is enabled. This allows for the validation of policies and the identification of "false positives" before they are automatically corrected. Furthermore, administrators must monitor the remediation logs to identify patterns of drift, which can indicate broader issues such as a buggy application or a need for policy refinement.
+
+[CLI: PowerShell command to trigger a manual compliance check and view the remediation status on a Windows device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that automated remediation is a "silver bullet" for security. In reality, it only corrects *known* configuration deviations; it does not protect against zero-day exploits or advanced persistent threats that do not manifest as configuration drift. Another error is assuming that remediation is always successful; if a device is in a severely compromised state, the management agent itself may be disabled or tampered with, rendering automated remediation ineffective.
+
+### Interview Angle
+1. Question: How do you distinguish between "legitimate" configuration changes and "drift" in a large enterprise environment?
+   Answer: The distinction is made through policy definition. Any change that is not explicitly defined in the desired state policy is considered drift. Legitimate changes must be managed through the formal change management process, where the desired state policy is updated to reflect the new configuration.
+2. Question: What are the risks of aggressive automated remediation, and how do you mitigate them?
+   Answer: The primary risk is "remediation loops" or the disruption of critical business processes due to incorrectly applied policies. Mitigation involves a phased rollout of remediation policies, starting with "monitor-only" mode to validate the policy, and implementing robust alerting to identify and investigate remediation failures.
+3. Question: How do you handle drift in a co-managed environment where both MECM and Intune are enforcing policies?
+   Answer: The key is to ensure that the workload authority is clearly defined and that the policies in both management planes are aligned. If both planes attempt to manage the same setting, it can lead to "policy flapping," where the device constantly toggles between the two configurations. This is mitigated by ensuring that only one management plane is authoritative for any given setting.
+
+### Related Concepts
+- Section 2.3: Co-management (GPO + MDM coexistence)
+- Section 2.3: Policy reporting & compliance dashboards
+- Section 2.3: Declarative/desired-state configuration (DSC)
