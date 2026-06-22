@@ -10,5 +10,6 @@ into sub-layers:
     - [Forests, Domains, OUs & Sites](layer1-directory-trust/forests-domains-ous-sites.md)
     - [Trust Architecture](layer1-directory-trust/trust-architecture.md) *(In Progress)*
     - [Replication Architecture](layer1-directory-trust/replication-architecture.md) *(In Progress)*
+    - [Forest Services](layer1-directory-trust/forest-services.md) *(In Progress)*
 - Layer 2 — *planned*
 - Layer 3 — *planned*
