@@ -107,3 +107,39 @@ Monitoring for trust-related errors, claims transformation failures, and unautho
 ### Related Concepts
 *   [Trust Architecture (Section 1.2)] - For understanding the cryptographic trust anchors and SID filtering.
 *   [AD FS (Section 1.9)] - For the STS implementation.
+
+## 4. Hybrid identity (Entra Connect/Cloud Sync)
+
+### Technical Definition
+Hybrid identity synchronization is the process of extending on-premises Active Directory identities into a cloud-based identity provider, such as Microsoft Entra ID, to enable unified access management across hybrid environments. It bridges the gap between the on-premises directory, which serves as the authoritative source of truth, and the cloud control plane, allowing users to authenticate to cloud-native applications using their existing corporate credentials.
+
+### Underlying Mechanism
+The synchronization process is facilitated by either Microsoft Entra Connect (a full-featured sync engine) or Microsoft Entra Cloud Sync (a lightweight agent-based model). These tools monitor the on-premises Active Directory for changes—such as user creation, password updates, or group membership modifications—and propagate these changes to the cloud directory via secure outbound connections. This process relies on the local authentication context established via Kerberos or NTLM, as described in Section 1.7, to ensure that the user's identity is verified on-premises before the cloud-based authentication token is issued.
+
+### Why It Exists
+Hybrid identity exists to support the modern enterprise's transition to cloud-based services while maintaining the security and governance of an on-premises Active Directory. It allows organizations to leverage their existing investment in Active Directory for cloud authentication, providing a seamless SSO experience for users and a centralized point of control for administrators.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, hybrid identity is a critical security boundary. The synchronization account is a Tier-0 asset; if compromised, an attacker could potentially manipulate cloud identities or gain unauthorized access to cloud resources. Banking compliance frameworks (e.g., FFIEC, DORA) mandate that the synchronization process be monitored for anomalies, that the sync account be highly privileged but strictly isolated, and that the cloud identity provider be configured with robust conditional access policies that mirror on-premises security requirements.
+
+### Operational Considerations
+Operational management focuses on the health of the sync engine and the integrity of the synchronized data.
+[CLI: Get-ADSyncScheduler]
+[CLI: Start-ADSyncSyncCycle -PolicyType Delta]
+Monitoring for sync errors, such as attribute conflicts or permission issues, is essential for maintaining identity consistency.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that hybrid identity synchronization is a backup for on-premises Active Directory. This is false. Synchronization is a one-way or two-way data flow, not a backup. If the on-premises Active Directory is lost, the cloud identity provider cannot be used to restore it.
+
+### Interview Angle
+1. **Scenario:** How do you secure the Entra Connect sync account?
+   *Model Answer:* I would treat the sync account as a Tier-0 asset, applying the same security controls as a Domain Admin account. I would also implement "Least Privilege" by restricting the account's permissions to only what is necessary for synchronization, and I would monitor its activity for any suspicious behavior.
+2. **Scenario:** What are the trade-offs between Entra Connect and Cloud Sync?
+   *Model Answer:* Entra Connect is a full-featured sync engine that supports complex scenarios, such as multi-forest synchronization and custom attribute mapping. Cloud Sync is a lightweight, agent-based model that is easier to deploy and manage but has more limited functionality. I would choose based on the complexity of the environment and the specific requirements of the organization.
+3. **Scenario:** How do you handle a situation where the sync engine is compromised?
+   *Model Answer:* I would immediately disable the sync engine, isolate the server, and initiate an incident response process. I would then verify the integrity of the cloud identity provider and, if necessary, perform a "clean-room" restoration of the cloud identities to ensure that no malicious changes have been propagated.
+
+### Related Concepts
+*   [Authentication (Section 1.7)] - For the underlying authentication context.
+*   [Trust Architecture (Section 1.2)] - For understanding the cryptographic trust anchors.
