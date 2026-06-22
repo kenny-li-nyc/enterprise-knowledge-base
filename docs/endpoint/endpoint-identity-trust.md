@@ -102,3 +102,41 @@ Operationalizing compliance signals requires careful management of "grace period
 
 ### Related Concepts
 - Section 2.3: Device Compliance and Conditional Access Policies
+
+## 4. Device-bound vs. User-bound Credentials
+
+### Technical Definition
+Device-bound credentials are cryptographic keys that are physically tied to a specific piece of hardware, such as a Trusted Platform Module (TPM) or a Secure Enclave, ensuring that the credential cannot be exported or used on any other device. In contrast, user-bound credentials—often implemented via FIDO2 roaming authenticators or smart cards—are tied to the user's identity and can be used across multiple devices, provided the user possesses the physical authenticator. This distinction is critical in Zero Trust architectures, as it separates the assurance of the device's integrity from the assurance of the user's identity.
+
+### Underlying Mechanism
+Device-bound credentials rely on asymmetric key pairs generated within the hardware security module (HSM) or TPM. The private key is marked as non-exportable, meaning the authentication handshake must occur on the device itself. User-bound credentials, such as those used in FIDO2/WebAuthn, utilize a portable authenticator (e.g., a YubiKey or a mobile device) that holds the private key. When the user authenticates, the authenticator performs a local user verification (e.g., biometric or PIN) and then signs the challenge. The identity provider verifies the signature, confirming both the user's presence and the validity of the credential, regardless of the device being used to access the resource.
+
+[DIAGRAM: Comparison matrix and flow diagram showing the difference between TPM-bound key usage and portable FIDO2 authenticator usage]
+
+### Why It Exists
+The separation of device-bound and user-bound credentials exists to provide flexibility in access control without compromising security. Device-bound credentials ensure that sensitive corporate data is only accessed from managed, trusted hardware, mitigating the risk of credential theft from compromised machines. User-bound credentials provide a secure, phishing-resistant method for users to access resources from various locations or devices, supporting modern work-from-anywhere requirements while maintaining high assurance levels.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, the strategy is often a hybrid approach. Device-bound credentials (e.g., Windows Hello for Business) are mandated for standard workstations to ensure that only corporate-managed assets can access the internal network. Simultaneously, user-bound credentials (e.g., FIDO2 security keys) are deployed for high-privilege administrative access or for users who require access from multiple devices. This dual-layer approach ensures that even if a user's password is stolen, the attacker cannot gain access without the physical device or the specific hardware-bound credential.
+
+### Operational Considerations
+Operationalizing these credentials requires distinct lifecycle management strategies. Device-bound credentials must be managed as part of the device lifecycle (e.g., provisioning during Autopilot, revocation upon device retirement). User-bound credentials require a robust registration and recovery process, as the loss of a physical authenticator can lock a user out of their account. Administrators must implement self-service portals for users to register new authenticators and ensure that the revocation of lost or stolen authenticators is immediate and synchronized across all identity providers.
+
+[CLI: PowerShell command to list registered FIDO2 keys and TPM-backed credentials for a specific user account]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that user-bound credentials are less secure than device-bound credentials because they are portable. In reality, modern FIDO2-based user-bound credentials are highly resistant to phishing and man-in-the-middle attacks, often providing a higher level of assurance than traditional passwords. Another error is assuming that device-bound credentials alone are sufficient for all scenarios; they do not protect against an attacker who has physical access to the device and can bypass the OS-level authentication.
+
+### Interview Angle
+1. Question: How do you determine when to enforce device-bound vs. user-bound credentials for a specific user group?
+   Answer: The decision should be based on the risk profile of the resource and the user's mobility requirements. High-risk, static workstations should enforce device-bound credentials, while mobile users or those requiring access to multiple systems should utilize user-bound, phishing-resistant credentials.
+2. Question: What are the primary challenges in managing a large-scale deployment of user-bound FIDO2 keys?
+   Answer: The primary challenges are the physical logistics of distribution, the need for a secure self-service registration process, and the requirement for a robust "break-glass" recovery procedure for when a user loses their physical key.
+3. Question: How do you ensure that a user-bound credential has not been compromised if the physical authenticator is lost?
+   Answer: The identity provider must support immediate revocation of the specific credential ID. This should be coupled with a policy that requires re-verification of the user's identity (e.g., through an alternative MFA method or manager approval) before a new credential can be registered.
+
+### Related Concepts
+- Section 1.7: Kerberos and NTLM Authentication Mechanics
+- Section 2.1: FIDO2 and Passwordless Authentication
+- Section 2.3: Device Compliance and Conditional Access Policies
