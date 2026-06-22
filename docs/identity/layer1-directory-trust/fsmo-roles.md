@@ -62,4 +62,36 @@ If the Domain Naming Master is unavailable, you cannot add or remove domains or 
 
 ### Interview Angle
 1. **Scenario:** You are tasked with adding a new child domain to the existing forest. The Domain Naming Master is currently offline. Can you proceed?
-   *Model Answer:* No, you cannot proceed. The Domain Naming Master is required to validate the uniqueness of the new domain name and update the configuration partition. You must either restore the Domain Naming Master or transfer/seize the role to a
+   *Model Answer:* No, you cannot proceed. The Domain Naming Master is required to validate the uniqueness of the new domain name and update the configuration partition. You must either restore the Domain Naming Master or transfer/seize the role to a healthy DC before the domain creation process can succeed.
+2. **Scenario:** An auditor asks how you ensure that no unauthorized domains have been added to the forest. How do you respond?
+   *Model Answer:* I would audit the `CN=Partitions,CN=Configuration,DC=ForestRootDomain` container for any unexpected objects. Additionally, I would review the event logs on the Domain Naming Master for any domain creation events (Event ID 4741/4742) and cross-reference these with our approved Change Management records.
+3. **Scenario:** Why is the Domain Naming Master role often placed on the same DC as the Schema Master?
+   *Model Answer:* Both roles are forest-wide and are only required for infrequent, high-impact structural changes. Placing them on the same DC simplifies management and ensures that these critical roles are hosted on a single, highly secured, and well-monitored server, reducing the attack surface.
+
+### Related Concepts
+*   [Directory Structure (Section 1.1)] - For context on forest, domain, and trust relationships.
+*   [Trust Architecture (Section 1.2)] - For understanding how domain creation impacts trust relationships.
+
+## 6. Failure Scenarios
+
+### Technical Definition
+Failure scenarios in the context of FSMO roles refer to the operational impact and recovery procedures required when a domain controller holding one or more FSMO roles becomes unavailable. These scenarios are categorized by the scope of the role (forest-wide vs. domain-wide) and the criticality of the role to ongoing directory services.
+
+### Underlying Mechanism
+When a FSMO role holder fails, the directory does not automatically fail over. Because FSMO roles are single-master, the directory services on other domain controllers will continue to function for standard operations (like authentication or object modification) but will be unable to perform the specific tasks gated by the missing role. The directory relies on the administrator to manually intervene—either by restoring the original role holder or by seizing the role to a new, healthy domain controller.
+
+### Why It Exists
+The FSMO architecture exists to prevent conflicts in a multi-master environment. However, this design introduces a single point of failure for specific operations. The failure scenarios exist to define the boundaries of this risk: some roles (like the PDC Emulator) are critical for daily operations and require immediate recovery, while others (like the Schema Master) are only required for infrequent administrative tasks and can tolerate longer outages.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, FSMO failure handling is a core component of the Disaster Recovery (DR) plan. The primary risk is not just the outage itself, but the potential for "split-brain" scenarios if a role is seized while the original holder is still active. Strict operational procedures are required:
+| Role | Scope | Outage Tolerance | Seizure Risk |
+| :--- | :--- | :--- | :--- |
+| Schema Master | Forest | High | Low |
+| Domain Naming Master | Forest | High | Low |
+| RID Master | Domain | Medium | Medium |
+| PDC Emulator | Domain | Low | High |
+| Infrastructure Master | Domain | High | Low |
+
+### Operational Considerations
+Diagnosis is the first step in any failure scenario. Use the following command to identify the current role holders:
