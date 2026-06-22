@@ -227,3 +227,41 @@ Operationalizing compliance dashboards requires careful management of data quali
 - Section 2.3: Configuration drift detection & remediation
 - Section 2.3: Co-management (GPO + MDM coexistence)
 - Section 3.2: SIEM and Security Operations Center (SOC) Integration
+
+## 7. Declarative/desired-state configuration (DSC)
+
+### Technical Definition
+Declarative/Desired-State Configuration (DSC) is a management paradigm where the administrator defines the "what" (the target state of the system) rather than the "how" (the sequence of commands to achieve that state). In a DSC model, the system is continuously monitored and automatically adjusted to match the defined configuration. This approach contrasts with imperative management, where scripts or manual commands are executed to change system settings. DSC ensures that the system configuration is predictable, repeatable, and self-healing, which is essential for maintaining consistency in complex, large-scale environments.
+
+### Underlying Mechanism
+The mechanism relies on a DSC engine (such as PowerShell DSC, or modern equivalents like Azure Automanage or Intune's declarative policy engine) that operates in a continuous loop. The administrator provides a configuration file (often in a declarative language like JSON, YAML, or PowerShell DSC scripts) that describes the desired state of the system. The DSC engine then compares the current state of the system against this desired state. If a discrepancy is found, the engine executes the necessary actions to bring the system into compliance. This process is idempotent, meaning that applying the same configuration multiple times results in the same state, without causing side effects.
+
+[DIAGRAM: Sequence diagram showing the DSC engine's continuous loop: monitor, compare, and remediate]
+
+### Why It Exists
+DSC was developed to address the fragility and complexity of imperative configuration management. In large-scale environments, imperative scripts are often brittle, difficult to test, and prone to errors when executed in different contexts. DSC provides a robust, declarative framework that simplifies configuration management, improves consistency, and enables "infrastructure as code" (IaC) practices. By focusing on the desired state, DSC allows administrators to manage complex systems with greater confidence, knowing that the system will automatically maintain its configuration regardless of the environment.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, DSC is a critical component of the "Infrastructure as Code" strategy. It allows the bank to define hardened, compliant configurations for servers and endpoints as code, which can be version-controlled, tested, and deployed automatically. This approach significantly reduces the risk of configuration errors and ensures that the bank's infrastructure remains in a known-good, compliant state at all times. DSC is particularly valuable for managing high-security environments where manual configuration changes are strictly prohibited and every change must be documented and auditable.
+
+### Operational Considerations
+Operationalizing DSC requires a shift in mindset from "scripting" to "modeling." Administrators must learn to define system configurations in a declarative manner, which requires a deep understanding of the system's components and their dependencies. Furthermore, DSC requires a robust infrastructure to support the deployment and monitoring of configurations, including version control systems (e.g., Git), CI/CD pipelines, and centralized monitoring tools. This shift requires significant investment in training and tooling, but the long-term benefits in terms of consistency, reliability, and security are substantial.
+
+[CLI: PowerShell command to apply a DSC configuration and verify the current state of the system]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that DSC is only for servers. In reality, DSC principles are increasingly being applied to endpoint management, with modern MDM platforms adopting declarative policy engines that mirror the DSC model. Another error is assuming that DSC is a "set and forget" solution; it requires ongoing maintenance of the configuration models, especially as the system evolves and new requirements emerge.
+
+### Interview Angle
+1. Question: How does DSC differ from traditional imperative scripting?
+   Answer: The key difference is the focus on the "desired state" rather than the "sequence of actions." DSC is declarative and idempotent, ensuring that the system reaches and maintains the defined state, whereas imperative scripting is procedural and can be brittle, often requiring complex error handling to ensure consistency.
+2. Question: What are the challenges of implementing DSC in a large banking environment?
+   Answer: The primary challenges are the cultural shift from imperative to declarative management, the need for robust infrastructure to support IaC practices, and the complexity of modeling large, heterogeneous environments. These challenges are mitigated through phased adoption, investment in training, and the use of mature tooling.
+3. Question: How do you handle configuration drift in a DSC-managed environment?
+   Answer: Drift is handled automatically by the DSC engine. Because the engine continuously monitors the system against the desired state, any unauthorized changes are detected and remediated automatically, ensuring that the system remains in compliance without manual intervention.
+
+### Related Concepts
+- Section 2.3: Configuration drift detection & remediation
+- Section 2.3: Policy reporting & compliance dashboards
+- Section 3.3: Infrastructure as Code (IaC) and CI/CD Pipelines
