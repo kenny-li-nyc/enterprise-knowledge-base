@@ -5,7 +5,7 @@
 | # | Topic | Status |
 |---|-------|--------|
 | 1 | [Forests, Domains, OUs & Sites](forests-domains-ous-sites.md) | In progress |
-| 2 | Trust Architecture | Planned |
+| 2 | [Trust Architecture](trust-architecture.md) | In progress |
 | 3 | Replication Architecture | Planned |
 | 4 | Forest Services | Planned |
 | 5 | FSMO Roles | Planned |
