@@ -144,3 +144,39 @@ Monitoring the effectiveness of DAC policies and ensuring that claims are correc
 ### Related Concepts
 *   [Claims-based authorization (Section 1.8)] - For the foundational claims model.
 *   [ACLs/DACLs (Section 1.8)] - For the underlying security descriptor model.
+
+## 5. Group nesting strategy (AGDLP/AGUDLP)
+
+### Technical Definition
+Group nesting strategy refers to the structured approach of organizing security groups to manage permissions efficiently across complex, multi-domain Active Directory environments. The two primary strategies are AGDLP (Account, Global, Domain Local, Permission) and AGUDLP (Account, Global, Universal, Domain Local, Permission), which define the hierarchy of group types used to assign access to resources.
+
+### Underlying Mechanism
+The mechanism relies on the nesting of group scopes. In AGDLP, user accounts are added to Global groups (which contain accounts from a single domain), Global groups are nested into Domain Local groups (which contain groups from any domain in the forest), and permissions are assigned to the Domain Local groups on the resource. AGUDLP introduces Universal groups, which can contain Global groups from any domain and are nested into Domain Local groups. This hierarchy ensures that changes to user membership (Global groups) do not require changes to resource permissions (Domain Local groups), minimizing replication traffic and administrative overhead.
+
+### Why It Exists
+These strategies exist to provide a scalable, predictable, and manageable framework for permission assignment. Without a structured nesting strategy, group memberships become a chaotic "spaghetti" of nested groups, making it impossible to determine who has access to what, leading to security vulnerabilities and audit failures. AGDLP/AGUDLP provides a standardized blueprint that simplifies administration and ensures consistent access control across the entire forest.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, AGDLP/AGUDLP is the standard for managing access in large, multi-domain forests. It is essential for maintaining the principle of least privilege and ensuring that access is granted based on job function. Banking environments often enforce these strategies through automated provisioning systems, ensuring that group memberships are always compliant with the defined hierarchy. Audit teams rely on this structure to verify that access is correctly assigned and that there are no unauthorized group nesting configurations.
+
+### Operational Considerations
+Implementing these strategies requires a clear naming convention and a disciplined approach to group management.
+[CLI: Add-ADGroupMember -Identity "Global_Finance_Users" -Members "jdoe"]
+[CLI: Add-ADGroupMember -Identity "DomainLocal_Finance_Resources" -Members "Global_Finance_Users"]
+Monitoring for non-compliant group nesting is critical for maintaining the integrity of the authorization model.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that group nesting is just for organization. This is false. Group nesting is a fundamental architectural tool for permission management. Using it incorrectly—such as nesting Domain Local groups into Global groups—can break the AGDLP/AGUDLP model and lead to unpredictable access behavior.
+
+### Interview Angle
+1. **Scenario:** Why is AGDLP preferred over a flat group structure in a multi-domain forest?
+   *Model Answer:* AGDLP provides a structured, scalable approach to permission management. It decouples user accounts from resource permissions, allowing for easier administration and ensuring that changes to user membership do not require changes to resource permissions.
+2. **Scenario:** When would you choose AGUDLP over AGDLP?
+   *Model Answer:* I would choose AGUDLP in a multi-domain forest where resources are accessed by users from multiple domains. Universal groups allow for the aggregation of Global groups from different domains, simplifying the assignment of permissions to resources that are accessed by a forest-wide user base.
+3. **Scenario:** What is the risk of "circular nesting" in group strategies?
+   *Model Answer:* Circular nesting occurs when a group is nested into another group that is already a member of the first group. This can cause infinite loops in group membership evaluation, leading to authentication failures and performance issues. It is a critical configuration error that must be prevented through strict group management policies.
+
+### Related Concepts
+*   [Group-based access models (Section 1.8)] - For the foundational group model.
+*   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries.
