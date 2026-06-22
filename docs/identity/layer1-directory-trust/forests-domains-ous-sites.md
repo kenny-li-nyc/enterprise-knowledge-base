@@ -149,7 +149,16 @@ A Domain is the fundamental administrative and security partition within an Acti
 ### Underlying Mechanism
 The domain is implemented through the Domain Partition, which is replicated only to the Domain Controllers (DCs) within that specific domain. Each domain maintains its own copy of the Active Directory database (`ntds.dit`), which contains the objects for that domain. Authentication within a domain is handled by the DCs using the Kerberos protocol. When a user logs in, the DC validates their credentials and issues a Ticket Granting Ticket (TGT). Trust relationships between domains allow for authentication across domain boundaries, but these trusts are managed at the domain level.
 
-[DIAGRAM: A visual representation of a domain showing Domain Controllers, the Domain Partition, and the relationship to the forest]
+```mermaid
+graph TB
+    subgraph Forest
+        subgraph Domain["corp.bank.com"]
+            DC1[DC]
+            DC2[DC]
+        end
+    end
+    DC1 <-->|replication| DC2
+```
 
 ### Why It Exists
 Historically, domains were created to manage replication traffic and administrative boundaries. In the early days of Windows 2000/2003, network bandwidth was limited, and replicating the entire directory to every site was not feasible. Domains allowed organizations to partition the directory into smaller, manageable chunks. They also provided a way to delegate administrative control to different departments or geographical regions, allowing local administrators to manage their own users and computers without having full control over the entire forest.
@@ -167,7 +176,9 @@ In modern Tier-1 banking, the domain is no longer used as a primary security bou
 ### Operational Considerations
 Day-to-day operations in a domain involve managing user accounts, group memberships, and GPOs. Monitoring the health of the domain controllers is critical, as they are the gatekeepers of authentication. You must also monitor the replication health between DCs to ensure that changes are propagated correctly.
 
-[CLI: Command to list domain controllers in a domain]
+```powershell
+Get-ADDomainController -Filter * | Select-Object Name, Site, OperationMasterRoles
+```
 
 ### Common Misconceptions
 !!! warning "Common Misconceptions"
