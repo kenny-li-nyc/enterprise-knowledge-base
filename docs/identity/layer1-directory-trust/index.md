@@ -8,5 +8,5 @@
 | 2 | [Trust Architecture](trust-architecture.md) | In progress |
 | 3 | [Replication Architecture](replication-architecture.md) | In progress |
 | 4 | [Forest Services](forest-services.md) | In progress |
-| 5 | FSMO Roles | Planned |
+| 5 | [FSMO Roles](fsmo-roles.md) | Complete |
 | 6 | Forest Recovery | Planned |

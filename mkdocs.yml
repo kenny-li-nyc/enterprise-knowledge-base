@@ -70,3 +70,4 @@ nav:
           - "Trust Architecture": identity/layer1-directory-trust/trust-architecture.md
           - "Replication Architecture": identity/layer1-directory-trust/replication-architecture.md
           - "Forest Services": identity/layer1-directory-trust/forest-services.md
+          - "FSMO Roles": identity/layer1-directory-trust/fsmo-roles.md
