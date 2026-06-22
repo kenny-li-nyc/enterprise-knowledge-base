@@ -108,3 +108,39 @@ Monitoring the health of the KDC and ensuring that claims are correctly configur
 ### Related Concepts
 *   [Dynamic Access Control (Section 1.8)] - For the implementation of claims-based policies.
 *   [Group-based access models (Section 1.8)] - For the foundational RBAC model.
+
+## 4. Dynamic access control
+
+### Technical Definition
+Dynamic Access Control (DAC) is a policy-based authorization framework that combines user claims, device claims, and resource properties to enforce access decisions. It extends traditional ACLs by allowing administrators to define central access policies that are evaluated at the time of access, rather than relying solely on static group memberships.
+
+### Underlying Mechanism
+DAC relies on the Central Access Policy (CAP) engine. Administrators define Central Access Rules (CARs) that specify conditions (e.g., "User.Department == Resource.Department"). These rules are bundled into Central Access Policies, which are deployed via Group Policy to file servers. When a user attempts to access a file, the file server evaluates the user's claims (from their Kerberos ticket) and the resource's properties (from the file system) against the active CAP. If the conditions are met, access is granted; otherwise, it is denied. This evaluation happens in real-time at the resource level.
+
+### Why It Exists
+DAC exists to provide a more granular, context-aware authorization model that can adapt to dynamic business environments. Traditional ACLs are static and difficult to manage at scale, especially when access requirements depend on factors like user department, project assignment, or device security posture. DAC allows for "policy-based" security that is easier to audit, manage, and enforce across large, distributed file shares.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, DAC is a powerful tool for enforcing data governance and compliance. It allows banks to implement policies like "Only users in the 'Legal' department can access files marked as 'Confidential' on the 'Legal' file share." This is critical for meeting regulatory requirements (e.g., GDPR, CCPA) regarding data privacy and access control. DAC also provides a centralized way to audit access policies, making it easier to demonstrate compliance to regulators.
+
+### Operational Considerations
+DAC requires a well-defined classification strategy for data and a robust identity governance program to manage user and device claims.
+[CLI: New-ADCentralAccessRule -Name "FinanceRule" -Condition "(@User.Department == @Resource.Department)"]
+[CLI: Set-ADCentralAccessPolicy -Identity "FinancePolicy" -CentralAccessRules "FinanceRule"]
+Monitoring the effectiveness of DAC policies and ensuring that claims are correctly configured is essential for maintaining authorization availability.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that DAC is a replacement for ACLs. This is false. DAC is an *extension* of the existing ACL model. It adds a layer of policy-based evaluation on top of the traditional DACL, allowing for more complex, attribute-based access decisions.
+
+### Interview Angle
+1. **Scenario:** How does DAC improve upon traditional group-based access?
+   *Model Answer:* DAC allows for dynamic, attribute-based access decisions that can adapt to changing business needs without the need for constant group management. It provides a more flexible and context-aware authorization framework.
+2. **Scenario:** What are the primary challenges of implementing DAC?
+   *Model Answer:* The primary challenges are the need for a well-defined data classification strategy, the complexity of defining and managing central access policies, and the potential for performance impact on file servers. It requires a robust identity governance program to ensure that claims are accurate and up-to-date.
+3. **Scenario:** How does DAC help with regulatory compliance?
+   *Model Answer:* DAC provides a centralized, policy-driven way to enforce and audit access to sensitive data. It allows banks to demonstrate to regulators that access is granted based on clear, documented policies, rather than ad-hoc group memberships.
+
+### Related Concepts
+*   [Claims-based authorization (Section 1.8)] - For the foundational claims model.
+*   [ACLs/DACLs (Section 1.8)] - For the underlying security descriptor model.
