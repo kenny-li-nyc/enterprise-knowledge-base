@@ -64,14 +64,40 @@ nav:
   - Home: index.md
   - Identity:
       - Overview: identity/index.md
-      - "Layer 1 — Directory & Trust Foundation":
+      - "Directory & Trust Foundation":
           - Overview: identity/layer1-directory-trust/index.md
+
+          # Structure — how the directory is built and stays alive
           - "Forests, Domains, OUs & Sites": identity/layer1-directory-trust/forests-domains-ous-sites.md
-          - "Trust Architecture": identity/layer1-directory-trust/trust-architecture.md
           - "Replication Architecture": identity/layer1-directory-trust/replication-architecture.md
-          - "Forest Services": identity/layer1-directory-trust/forest-services.md
           - "FSMO Roles": identity/layer1-directory-trust/fsmo-roles.md
           - "Forest Recovery": identity/layer1-directory-trust/forest-recovery.md
+
+          # Use — how identity is consumed
           - "Authentication": identity/layer1-directory-trust/authentication.md
           - "Authorization": identity/layer1-directory-trust/authorization.md
+
+          # Trust — how identity crosses boundaries
+          - "Trust Architecture": identity/layer1-directory-trust/trust-architecture.md
           - "Federation": identity/layer1-directory-trust/federation.md
+
+          # Services — supporting infrastructure
+          - "Forest Services": identity/layer1-directory-trust/forest-services.md
+  - Endpoint:
+      - Overview: endpoint/index.md
+
+      # Lifecycle & Identity
+      - "Device Lifecycle & Provisioning": endpoint/device-lifecycle-provisioning.md
+      - "Endpoint Identity & Trust": endpoint/endpoint-identity-trust.md
+
+      # Configuration & Maintenance
+      - "Configuration Management & Policy Enforcement": endpoint/configuration-management-policy-enforcement.md
+      - "Patch & Update Management": endpoint/patch-update-management.md
+      - "Endpoint Hardening & Baseline Configuration": endpoint/endpoint-hardening-baseline-configuration.md
+
+      # Application & Access
+      - "Application Management & Delivery": endpoint/application-management-delivery.md
+      - "Remote Access & Connectivity": endpoint/remote-access-connectivity.md
+
+      # Resilience
+      - "Endpoint Recovery & Resilience": endpoint/endpoint-recovery-resilience.md
