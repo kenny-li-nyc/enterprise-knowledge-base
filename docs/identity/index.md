@@ -6,8 +6,8 @@ the enterprise — and how that trust is established, propagated, and revoked.
 To keep this from becoming an unmanageable wall of content, the Identity layer is split
 into sub-layers:
 
-- **[Layer 1 — Directory & Trust Foundation](layer1-directory-trust/index.md)** — forests,
-  domains, trust architecture, replication, FSMO, forest recovery
+- **[Layer 1 — Directory & Trust Foundation](layer1-directory-trust/index.md)**
+    - [Forests, Domains, OUs & Sites](layer1-directory-trust/forests-domains-ous-sites.md)
+    - [Trust Architecture](layer1-directory-trust/trust-architecture.md) *(In Progress)*
 - Layer 2 — *planned*
 - Layer 3 — *planned*
-
