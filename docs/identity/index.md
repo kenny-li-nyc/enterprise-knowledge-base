@@ -15,5 +15,6 @@ into sub-layers:
     - [Forest Recovery](layer1-directory-trust/forest-recovery.md)
     - [Authentication](layer1-directory-trust/authentication.md)
     - [Authorization](layer1-directory-trust/authorization.md)
+    - [Federation](layer1-directory-trust/federation.md)
 - Layer 2 — *planned*
 - Layer 3 — *planned*

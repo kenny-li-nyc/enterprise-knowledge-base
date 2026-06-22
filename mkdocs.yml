@@ -74,3 +74,4 @@ nav:
           - "Forest Recovery": identity/layer1-directory-trust/forest-recovery.md
           - "Authentication": identity/layer1-directory-trust/authentication.md
           - "Authorization": identity/layer1-directory-trust/authorization.md
+          - "Federation": identity/layer1-directory-trust/federation.md
