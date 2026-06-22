@@ -71,3 +71,40 @@ If the Domain Naming Master is unavailable, you cannot add or remove domains or 
 ### Related Concepts
 *   [Directory Structure (Section 1.1)] - For context on forest, domain, and trust relationships.
 *   [Trust Architecture (Section 1.2)] - For understanding how domain creation impacts trust relationships.
+
+## 3. RID Master
+
+### Technical Definition
+The RID (Relative Identifier) Master is a domain-wide FSMO role responsible for allocating unique RID pools to domain controllers within a specific domain. Every security principal (user, group, computer) in Active Directory is assigned a Security Identifier (SID), which consists of a domain SID and a unique RID; the RID Master ensures that no two objects in the domain are ever assigned the same RID.
+
+### Underlying Mechanism
+When a domain controller creates a new security principal, it must append a unique RID to the domain SID. To avoid constant communication with the RID Master, the RID Master issues "pools" of RIDs (typically 500 at a time) to each DC. When a DC consumes 50% of its current pool, it requests a new block from the RID Master. The RID Master tracks the current allocation and ensures that the total number of RIDs issued does not exceed the theoretical limit of the 31-bit RID space.
+
+### Why It Exists
+The RID Master is the architectural safeguard against SID collisions. In a multi-master environment where any DC can create objects, allowing DCs to generate their own RIDs would inevitably lead to duplicate SIDs, which would break access control lists (ACLs) and security token validation. By centralizing the issuance of RID pools, Active Directory guarantees that every object created across the domain has a globally unique SID.
+
+### Enterprise / Banking Reality
+In large banking environments, RID pool exhaustion is a rare but catastrophic failure mode, often triggered by massive, automated provisioning scripts or bulk migration activities that create thousands of objects in a short window. From a compliance perspective, the RID Master is critical because SID uniqueness is the bedrock of the Windows security model; if SIDs were duplicated, an attacker could potentially gain unauthorized access to resources intended for a different user. Monitoring RID pool availability is a standard operational requirement for Tier-1 infrastructure teams.
+
+### Operational Considerations
+The RID Master is required for the creation of new security principals. If the RID Master is offline, DCs can continue to create objects until their current local RID pool is exhausted. Once the pool is empty, object creation will fail.
+[CLI: dcdiag /test:ridmanager]
+[CLI: repadmin /showrepl]
+[CLI: ntdsutil roles connections "connect to server <DC_Name>" quit "transfer rid master"]
+Monitoring for RID pool exhaustion events (Event ID 16650) is essential.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the RID Master is required for user authentication or for modifying existing objects. This is false. The RID Master is only involved when a domain controller needs to request a new pool of RIDs to create *new* security principals. If the RID Master is offline, existing users can still log in, and existing objects can be modified without issue.
+
+### Interview Angle
+1. **Scenario:** You are investigating a ticket where a DC is unable to create new user accounts, but existing users can log in without issue. What is your first diagnostic step?
+   *Model Answer:* I would check the RID pool status on the affected DC and verify the availability of the RID Master. The symptoms suggest the DC has exhausted its local RID pool and cannot request a new one, likely because the RID Master is offline or unreachable.
+2. **Scenario:** How does the RID Master prevent SID collisions in a multi-master environment?
+   *Model Answer:* It acts as the central authority for RID allocation. By issuing distinct, non-overlapping blocks of RIDs to each domain controller, it ensures that every DC has a unique range of RIDs to assign to new objects, thereby guaranteeing that no two objects in the domain ever share the same SID.
+3. **Scenario:** Under what circumstances would you consider seizing the RID Master role?
+   *Model Answer:* I would only seize the RID Master role if the original holder is confirmed to be permanently offline and cannot be restored within a reasonable timeframe. Seizing the role carries the risk of duplicate RID pool allocation if the original holder comes back online, so it must be followed by the immediate decommissioning of the original role holder.
+
+### Related Concepts
+*   Security Identifiers (SIDs)
+*   Domain Controllers
