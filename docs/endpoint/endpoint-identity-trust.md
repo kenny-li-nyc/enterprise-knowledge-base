@@ -140,3 +140,41 @@ Operationalizing these credentials requires distinct lifecycle management strate
 - Section 1.7: Kerberos and NTLM Authentication Mechanics
 - Section 2.1: FIDO2 and Passwordless Authentication
 - Section 2.3: Device Compliance and Conditional Access Policies
+
+## 5. Device Attestation & Health Certificates
+
+### Technical Definition
+Device attestation is the process by which a device proves its integrity and configuration state to a relying party (such as an identity provider or a management server) using hardware-backed cryptographic evidence. This process typically involves the TPM generating an "attestation quote"—a signed statement containing the current state of the device's boot configuration, firmware, and OS kernel. Health certificates are the resulting artifacts issued by an attestation service (like Microsoft's Device Health Attestation or a private PKI) that certify the device has passed these integrity checks, effectively acting as a "clean bill of health" for the endpoint.
+
+### Underlying Mechanism
+The mechanism relies on the TPM's ability to perform "Measured Boot." As the device boots, each component (firmware, bootloader, kernel, drivers) is measured (hashed) and stored in the TPM's Platform Configuration Registers (PCRs). When an attestation request is made, the TPM signs the current PCR values with an Attestation Identity Key (AIK), which is bound to the TPM's Endorsement Key (EK). This signed quote is sent to an attestation service, which verifies the measurements against a known-good baseline. If the measurements match, the service issues a health certificate or a signed claim that the device is in a trusted state, which can then be used to authorize access to sensitive resources.
+
+[DIAGRAM: Sequence diagram showing the Measured Boot process, the TPM signing the PCRs, and the attestation service issuing a health certificate]
+
+### Why It Exists
+Device attestation exists to solve the "rootkit" and "firmware-level compromise" problem. Traditional software-based security agents can be disabled or bypassed by malware that gains kernel-level access. By moving the verification of the device's integrity to the hardware (TPM) and the boot process, organizations can ensure that the device has not been tampered with before the OS even loads. This provides a level of assurance that is impossible to achieve with software-only solutions, making it a critical component for high-security environments where the integrity of the endpoint is paramount.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, device attestation is often a requirement for accessing the most sensitive transactional systems. Architects must ensure that the attestation service is highly available and that the baseline measurements are kept up-to-date with the latest firmware and OS patches. A common pattern is to integrate attestation results directly into Conditional Access policies: if a device fails attestation (e.g., due to an unauthorized firmware modification), it is automatically blocked from accessing the banking network, regardless of the user's credentials or compliance status.
+
+### Operational Considerations
+Operationalizing device attestation requires careful management of the "known-good" baselines. If a firmware update changes the boot measurements, the attestation service must be updated to recognize the new baseline, or the entire fleet will fail attestation. This requires tight integration between the patch management process and the attestation service. Administrators must also monitor for "attestation failures" as a potential indicator of a compromised device or a failed update, and ensure that there is a clear remediation path for devices that fail to attest.
+
+[CLI: PowerShell command to query the current TPM PCR values and verify the device's attestation status]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that attestation is a "set and forget" configuration. In reality, it requires continuous maintenance of the baseline measurements. Another error is assuming that attestation protects against all forms of compromise; it only verifies the integrity of the boot process and firmware, not the security of the applications running on top of the OS.
+
+### Interview Angle
+1. Question: How do you handle a situation where a legitimate firmware update causes a fleet of devices to fail attestation?
+   Answer: The process must include a "pre-flight" phase where new firmware baselines are validated in a test environment and then pushed to the attestation service before the firmware is deployed to the production fleet.
+2. Question: What is the difference between device compliance (from Section 3) and device attestation?
+   Answer: Compliance is about the *configuration* and *state* of the OS and applications (e.g., is the firewall on?), while attestation is about the *integrity* of the hardware and boot process (e.g., has the firmware been tampered with?).
+3. Question: Why is attestation considered a "higher" form of trust than standard compliance?
+   Answer: Attestation is rooted in hardware and the boot process, making it much harder to spoof than software-based compliance signals, which can be manipulated by a compromised kernel.
+
+### Related Concepts
+- Section 2.2: Device Certificates & TPM-backed Keys
+- Section 2.3: Conditional Access Device Compliance Signals
+- Section 3.1: Secure Boot and Measured Boot Architecture
