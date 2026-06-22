@@ -179,3 +179,39 @@ Monitoring for deployment success and ensuring that the provisioning packages ar
 ### Related Concepts
 *   [Device enrollment models (Section 2.1)]
 *   [Imaging vs. zero-touch provisioning (Section 2.1)]
+
+## 6. Decommissioning & secure wipe procedures
+
+### Technical Definition
+Decommissioning and secure wipe procedures constitute the final phase of the device lifecycle, ensuring that all corporate data, credentials, and configuration profiles are irrecoverably destroyed before a device is repurposed, sold, or physically destroyed. This process is designed to prevent data leakage and ensure compliance with data privacy regulations.
+
+### Underlying Mechanism
+Secure wipe procedures typically involve a cryptographic erase (crypto-erase) or a multi-pass overwrite of the storage media. Crypto-erase involves destroying the encryption keys that protect the data, rendering the data unreadable. Overwrite procedures involve writing random patterns of data to the storage media, making it impossible to recover the original data. For mobile devices, this is often handled by the MDM, which sends a "wipe" command that triggers a factory reset and, in many cases, a cryptographic erase of the storage. For PCs, this may involve a combination of BIOS/UEFI-level secure erase commands and software-based wiping tools that adhere to NIST SP 800-88 R1 standards.
+
+### Why It Exists
+These procedures exist to mitigate the risk of data leakage from retired assets. In an era where data is the most valuable asset, the potential for sensitive information to be recovered from a discarded hard drive or mobile device is a significant security and compliance risk. Secure wipe procedures provide a verifiable, auditable method for ensuring that data is destroyed, protecting the organization from data breaches and regulatory penalties.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, decommissioning is a highly regulated process. Banking standards (e.g., PCI-DSS, GLBA) require that all storage media be sanitized according to NIST SP 800-88 R1 guidelines before it leaves the organization's control. This often involves a multi-step process: logical wipe via MDM, physical destruction of the storage media by a certified ITAD partner, and the issuance of a certificate of destruction. The entire process must be documented and auditable, providing a clear chain of custody from the moment the device is retired until it is destroyed.
+
+### Operational Considerations
+Effective decommissioning requires a clear policy, standardized procedures, and reliable ITAD partners.
+[CLI: Invoke-DeviceWipe -DeviceId <DeviceId> -KeepEnrollmentData $false]
+[CLI: Get-DeviceWipeStatus -DeviceId <DeviceId>]
+Monitoring the decommissioning process is critical, as is ensuring that all devices are accounted for and that the certificates of destruction are properly filed and audited.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that a "factory reset" is equivalent to a secure wipe. This is false. A factory reset may remove the user's data, but it does not guarantee that the data is irrecoverable. Secure wipe procedures, such as cryptographic erase or multi-pass overwriting, are required to ensure that the data is truly destroyed and cannot be recovered by forensic tools.
+
+### Interview Angle
+1. **Scenario:** You are designing a decommissioning policy for a bank. What are the key requirements for secure wipe?
+   *Model Answer:* The policy must mandate adherence to NIST SP 800-88 R1 for media sanitization. It must also require a verifiable chain of custody, including a certificate of destruction for all storage media, and it must be audited regularly to ensure compliance.
+2. **Scenario:** Why is physical destruction often preferred over logical wiping?
+   *Model Answer:* Physical destruction provides the highest level of assurance that the data is irrecoverable. While logical wiping (like crypto-erase) is effective, physical destruction eliminates any doubt and is often the preferred method for highly sensitive data, especially when the storage media is no longer needed.
+3. **Scenario:** How do you handle devices that cannot be wiped (e.g., damaged hardware)?
+   *Model Answer:* Devices that cannot be wiped must be treated as high-risk and must be physically destroyed. I would ensure that these devices are tracked and that their destruction is documented and verified by a certified ITAD partner, just like any other retired asset.
+
+### Related Concepts
+*   [Procurement-to-decommission lifecycle stages (Section 2.1)]
+*   [Asset tagging & inventory systems (Section 2.1)]
