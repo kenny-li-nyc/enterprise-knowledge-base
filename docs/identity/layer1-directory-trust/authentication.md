@@ -108,3 +108,39 @@ Monitoring for delegation-related events and auditing the delegation attributes 
 ### Related Concepts
 *   [Kerberos Core Architecture (Section 1.7)] - For understanding the underlying Kerberos protocol.
 *   [Trust Architecture (Section 1.2)] - For understanding how delegation behaves across trust boundaries.
+
+## 4. Smart Card, PKI & Modern Authentication
+
+### Technical Definition
+Smart Card and PKI-based authentication leverage X.509 digital certificates to provide strong, multi-factor authentication (MFA) for Active Directory. Modern variants, such as Windows Hello for Business (WHfB) and FIDO2, extend this paradigm by using hardware-backed cryptographic keys (TPM) to provide phishing-resistant authentication that replaces or augments traditional password-based logins.
+
+### Underlying Mechanism
+Certificate-based authentication relies on the KDC's ability to validate a user's certificate against a trusted Root CA. When a user authenticates with a smart card or WHfB, the client sends a PKINIT (Public Key Cryptography for Initial Authentication) request to the KDC. The KDC validates the certificate's chain of trust and the user's mapping to an Active Directory account (via the `altSecurityIdentities` attribute). Upon successful validation, the KDC issues a TGT, allowing the user to proceed with standard Kerberos authentication. FIDO2/WebAuthn implementations often leverage the same underlying PKI trust model or integrate via modern identity providers (like Azure AD/Entra ID) to provide a seamless, passwordless experience.
+
+### Why It Exists
+These technologies exist to eliminate the reliance on static, phishable passwords. By requiring a physical token (Smart Card) or a hardware-bound key (TPM/FIDO2), organizations can ensure that authentication is tied to a specific, authorized device and user, significantly reducing the risk of credential theft, brute-force attacks, and social engineering.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, phishing-resistant MFA is a regulatory mandate (e.g., FFIEC, DORA). Smart cards are the traditional standard for high-security environments, but they are increasingly being replaced by WHfB and FIDO2 for better user experience and lower operational overhead. Banking architectures must support a hybrid model, ensuring that legacy applications can still consume certificate-based identities while modern applications leverage FIDO2/WebAuthn. The PKI infrastructure (CA hierarchy, CRL distribution) is a critical component of this architecture and must be hardened against compromise.
+
+### Operational Considerations
+Deploying and managing PKI-based authentication requires robust lifecycle management.
+[CLI: Get-ADUser -Identity <User> -Properties altSecurityIdentities]
+[CLI: certutil -view -restrict "Disposition=20"]
+Monitoring certificate expiration, CRL availability, and the health of the CA infrastructure is vital for preventing authentication outages.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "passwordless" means "no authentication." This is false. Passwordless authentication is *stronger* than password-based authentication because it replaces a weak, phishable secret with a strong, hardware-bound cryptographic key. It is not a reduction in security, but a significant upgrade.
+
+### Interview Angle
+1. **Scenario:** You are designing an MFA strategy for a bank. Why would you prioritize FIDO2 over traditional Smart Cards?
+   *Model Answer:* FIDO2 provides a superior user experience and is inherently phishing-resistant, as the authentication is bound to the origin (the specific website or service). Smart cards are cumbersome to manage and prone to physical loss, whereas FIDO2 can be integrated into modern devices (biometrics, TPM), making it more scalable and secure.
+2. **Scenario:** How do you handle the revocation of a compromised certificate in an AD environment?
+   *Model Answer:* I would revoke the certificate in the issuing CA and ensure that the Certificate Revocation List (CRL) is updated and distributed to all domain controllers. The KDC will check the CRL during the PKINIT process and reject any authentication attempts using the revoked certificate.
+3. **Scenario:** What is the role of the `altSecurityIdentities` attribute in AD?
+   *Model Answer:* This attribute maps a user's X.509 certificate to their Active Directory account. It is the critical link that allows the KDC to identify which user is authenticating when a certificate is presented during the PKINIT process.
+
+### Related Concepts
+*   [Kerberos Core Architecture (Section 1.7)] - For understanding the PKINIT process.
+*   [Trust Architecture (Section 1.2)] - For understanding the PKI trust hierarchy.
