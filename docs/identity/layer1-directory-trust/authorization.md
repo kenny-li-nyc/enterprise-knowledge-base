@@ -35,3 +35,40 @@ Monitoring for changes to DACLs on sensitive objects is vital for detecting unau
 ### Related Concepts
 *   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries.
 *   [Trust Architecture (Section 1.2)] - For understanding how cross-forest SIDs are validated within an authentication token.
+
+## 2. Group-based access models
+
+### Technical Definition
+Group-based access models are the primary mechanism for aggregating security principals (users, computers, and other groups) to simplify the assignment of permissions. Instead of assigning access rights to individual users, administrators assign rights to groups, and users are then added to those groups. This abstraction layer decouples the identity of the user from the permissions they hold, enabling scalable, role-based access control (RBAC).
+
+### Underlying Mechanism
+When a user authenticates, the KDC compiles a list of all SIDs associated with that user—including their own SID and the SIDs of all groups they belong to—into the Privilege Attribute Certificate (PAC) within their Kerberos ticket. When the user accesses a resource, the resource server evaluates the object's DACL against the SIDs present in the user's PAC. This process is highly efficient because the resource server does not need to query the domain controller for group membership at the time of access; the group membership is "baked into" the user's security token.
+
+### Why It Exists
+Group-based access exists to solve the management complexity of individual permission assignment. In an enterprise with thousands of users, managing permissions on a per-user basis is operationally impossible and prone to error. Groups provide a logical structure that mirrors business roles, allowing administrators to grant or revoke access to entire departments or project teams with a single change to group membership.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, group-based access is the foundation of RBAC. Banking regulations require that access be granted based on job function, and groups are the primary tool for implementing this. However, "group bloat" and "nested group complexity" are significant risks. Banking environments must implement strict group lifecycle management, including regular attestation (reviewing group membership) and automated provisioning/deprovisioning. Audit teams focus heavily on group membership changes, particularly for high-privilege groups, to detect unauthorized access.
+
+### Operational Considerations
+Effective group management requires a clear strategy and consistent tooling.
+[CLI: Add-ADGroupMember -Identity "Finance_Users" -Members "jdoe"]
+[CLI: Get-ADGroupMember -Identity "Finance_Users"]
+Monitoring for changes to sensitive groups is critical for security.
+[DIAGRAM: A diagram showing the relationship between users, groups, and resources, illustrating how group membership simplifies permission assignment.]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the "Everyone" or "Authenticated Users" groups are safe to use for general access. This is false. These groups include all users in the domain (or forest), and granting them permissions can lead to massive security vulnerabilities. Always use specific, purpose-built groups for access control.
+
+### Interview Angle
+1. **Scenario:** You are designing a group strategy for a large, multi-domain forest. What is your approach to group nesting?
+   *Model Answer:* I would adopt a standard AGDLP (Account, Global, Domain Local, Permission) strategy. This ensures that group nesting is predictable and manageable across domains. I would use Global groups to organize users by role, and Domain Local groups to assign permissions to resources, nesting the Global groups into the Domain Local groups.
+2. **Scenario:** How do you mitigate the risk of "token bloat" in a large environment?
+   *Model Answer:* Token bloat occurs when a user is a member of too many groups, causing their Kerberos ticket to exceed the maximum size. I would mitigate this by implementing a strict group nesting policy, using Universal groups sparingly, and regularly auditing group memberships to remove unnecessary assignments.
+3. **Scenario:** Why is group attestation important in a banking environment?
+   *Model Answer:* Group attestation is the process of periodically reviewing group memberships to ensure that users still require the access they have been granted. It is a critical control for maintaining least privilege and meeting regulatory requirements for access governance.
+
+### Related Concepts
+*   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries.
+*   [Trust Architecture (Section 1.2)] - For understanding how cross-forest SIDs are validated within an authentication token.
