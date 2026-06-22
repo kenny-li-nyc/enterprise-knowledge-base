@@ -144,3 +144,36 @@ Monitoring certificate expiration, CRL availability, and the health of the CA in
 ### Related Concepts
 *   [Kerberos Core Architecture (Section 1.7)] - For understanding the PKINIT process.
 *   [Trust Architecture (Section 1.2)] - For understanding the PKI trust hierarchy.
+
+## 5. Protected Users & Authentication Policies
+
+### Technical Definition
+Protected Users and Authentication Policies are advanced security features designed to mitigate credential theft and lateral movement by enforcing stricter authentication constraints on high-privilege accounts. The "Protected Users" security group applies a set of hard-coded, non-configurable restrictions, while Authentication Policies and Silos allow for granular, policy-driven control over where and how accounts can authenticate.
+
+### Underlying Mechanism
+Membership in the Protected Users group triggers immediate, non-configurable restrictions: NTLM authentication is disabled, DES/RC4 encryption is blocked, and TGT lifetimes are reduced to 4 hours. Authentication Policies and Silos operate at the KDC level: Policies define restrictions (e.g., TGT lifetime, allowed authentication protocols) and are applied to accounts, while Silos group accounts and services together, ensuring that accounts within a silo can only authenticate to services within that same silo. This is enforced via the `msDS-AuthenticationPolicy` and `msDS-AuthenticationPolicySilo` attributes on user and computer objects.
+
+### Why It Exists
+These features exist to provide "Tier-0" isolation. By restricting the authentication capabilities of high-privilege accounts (like Domain Admins), organizations can prevent attackers from using stolen credentials to move laterally across the network. They effectively "lock down" the most sensitive accounts, ensuring that even if an attacker gains access to a workstation, they cannot use the credentials of a protected user to compromise the domain.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, Protected Users and Authentication Policies are mandatory for securing the Tier-0 identity infrastructure. Banking security frameworks require that all Domain Admins and other high-privilege accounts be members of the Protected Users group and be subject to strict Authentication Policies. This prevents "pass-the-hash" and "pass-the-ticket" attacks from being used to escalate privileges. The implementation of Authentication Silos is a key architectural pattern for isolating administrative environments from general-purpose user environments.
+
+### Operational Considerations
+Implementing these features requires careful planning to avoid breaking legitimate administrative workflows.
+[CLI: Add-ADGroupMember -Identity "Protected Users" -Members <AdminAccount>]
+[CLI: New-ADAuthenticationPolicy -Name "Tier0Policy" -TGTLifetime 04:00:00]
+[CLI: New-ADAuthenticationPolicySilo -Name "Tier0Silo"]
+Monitoring for authentication failures caused by these policies is critical, as they can inadvertently block legitimate administrative access if not configured correctly.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that service accounts should be added to the Protected Users group for "extra security." This is false. Service accounts often rely on NTLM or specific delegation models that are blocked by the Protected Users group. Adding service accounts to this group will almost certainly cause service outages.
+
+### Interview Angle
+1. **Scenario:** You are designing a Tier-0 isolation strategy. How do you use Authentication Silos to protect your Domain Admins?
+   *Model Answer:* I would create an Authentication Silo specifically for Domain Admins and the Tier-0 servers they manage. I would then apply an Authentication Policy to this silo that restricts authentication to only the necessary DCs and administrative workstations, effectively creating a "security boundary" that prevents lateral movement.
+2. **Scenario:** Why is NTLM blocked for members of the Protected Users group?
+   *Model Answer:* NTLM is blocked because it is inherently insecure and susceptible to relay attacks. By forcing members of the Protected Users group to use only Kerberos, we eliminate the risk of NTLM-based credential theft for these high-privilege accounts.
+3. **Scenario:** What happens if you apply an Authentication Policy to a service account that requires NTLM?
+   *Model Answer:* The service account will fail to authenticate, leading to service outages. Authentication Policies can be very restrictive, and it is critical to audit the authentication requirements of all accounts before applying these policies.
