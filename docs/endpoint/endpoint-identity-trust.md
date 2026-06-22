@@ -98,7 +98,7 @@ Operationalizing compliance signals requires careful management of "grace period
 2. Question: What are the risks of relying solely on compliance signals for access control?
    Answer: The primary risk is "compliance drift" or false positives, where a device is technically compliant but compromised. Compliance signals should be one layer of a defense-in-depth strategy, combined with user behavior analytics (UBA) and threat protection signals.
 3. Question: How do you handle "emergency access" scenarios where a device is non-compliant but a user needs immediate access to a critical system?
-   Answer: Avoid hard-coding exceptions. Instead, implement a "break-glass" process that involves temporary policy exclusions, which are logged, audited, and automatically revoked after a short duration to maintain the integrity of the security posture.
+   Answer: Avoid hard-coding exceptions. Instead, implement a "break-glass" process that involves temporary policy exclusions, which are which are logged, audited, and automatically revoked after a short duration to maintain the integrity of the security posture.
 
 ### Related Concepts
 - Section 2.3: Device Compliance and Conditional Access Policies
@@ -178,3 +178,41 @@ Operationalizing device attestation requires careful management of the "known-go
 - Section 2.2: Device Certificates & TPM-backed Keys
 - Section 2.3: Conditional Access Device Compliance Signals
 - Section 3.1: Secure Boot and Measured Boot Architecture
+
+## 6. Cross-domain/cross-tenant device trust (multi-org environments)
+
+### Technical Definition
+Cross-domain and cross-tenant device trust refers to the architectural capability of allowing an endpoint managed in one identity boundary (e.g., Tenant A) to securely access resources in another identity boundary (e.g., Tenant B) while maintaining a consistent security posture. This is achieved through B2B collaboration settings, cross-tenant access policies, and the propagation of device compliance claims across organizational boundaries. It enables seamless collaboration in scenarios such as mergers, acquisitions, joint ventures, or supply chain integration, where users from one organization must access applications in another without requiring a full identity migration.
+
+### Underlying Mechanism
+The mechanism relies on the configuration of "Cross-tenant access settings" within the Entra ID portal. When a user from Tenant A accesses a resource in Tenant B, the IdP in Tenant B evaluates the trust settings configured for Tenant A. If "Trust device compliance claims" is enabled, Tenant B will accept the device compliance status issued by Tenant A's UEM/Intune environment. This requires a pre-established trust relationship where both tenants agree to honor the device identity and compliance signals of the other. The authentication handshake involves the exchange of claims, where the home tenant asserts the device's identity and compliance state, and the resource tenant validates these assertions against its own Conditional Access policies.
+
+[DIAGRAM: Sequence diagram showing the cross-tenant authentication flow, claim exchange, and trust validation between two Entra ID tenants]
+
+### Why It Exists
+This capability exists to support the modern, interconnected enterprise. Organizations frequently collaborate with partners, subsidiaries, or acquired entities that maintain their own independent IT infrastructure. Without cross-tenant trust, users would be forced to maintain multiple identities or devices, leading to significant friction and security gaps. By enabling cross-tenant trust, organizations can extend their Zero Trust perimeter to include external identities and devices, ensuring that security policies are enforced consistently regardless of the user's home organization.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, cross-tenant trust is a high-risk, high-reward architectural decision. It is essential for M&A activities where the bank needs to integrate an acquired entity's workforce quickly. However, it introduces the risk of "trust transitivity," where a compromise in the partner tenant could potentially impact the bank's own environment. Banking architects must implement strict "least privilege" access controls, ensuring that cross-tenant trust is limited to specific applications and that device compliance requirements are strictly enforced for all external users accessing sensitive data.
+
+### Operational Considerations
+Operationalizing cross-tenant trust requires rigorous governance. Administrators must regularly audit cross-tenant access settings to ensure that trust relationships are still valid and that access is not overly permissive. Monitoring is critical; the SOC must be able to distinguish between internal and external access attempts and alert on anomalous behavior originating from trusted partner tenants. Furthermore, there must be a clear process for revoking trust relationships if a partner organization's security posture degrades or if the business relationship ends.
+
+[CLI: PowerShell command to list and audit cross-tenant access settings and trust configurations]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that cross-tenant trust is "all or nothing." In reality, it can be highly granular, allowing organizations to trust device compliance for some users while requiring full MFA for others. Another error is assuming that trusting a partner's device compliance signal is equivalent to managing that device; it is not, and the resource tenant remains responsible for defining the policies that govern access to its own resources.
+
+### Interview Angle
+1. Question: How do you mitigate the risk of "trust transitivity" when establishing a cross-tenant trust relationship with a partner organization?
+   Answer: Mitigation involves implementing granular Conditional Access policies that restrict access to specific applications, enforcing MFA for all cross-tenant access, and continuously monitoring the partner's security posture through threat intelligence and regular audits.
+2. Question: What are the key differences between B2B guest access and cross-tenant synchronization?
+   Answer: B2B guest access is a lightweight, on-demand model for collaboration, while cross-tenant synchronization is a more robust, automated model for long-term integration, providing a more seamless experience but requiring more complex configuration and governance.
+3. Question: How do you handle a scenario where a partner organization's security standards do not meet your bank's requirements?
+   Answer: You should not establish a trust relationship. Instead, require the partner to use your organization's managed devices or provide access through a secure, isolated environment (e.g., a VDI solution) that does not rely on cross-tenant trust.
+
+### Related Concepts
+- Section 1.9: Identity Federation and Hybrid Synchronization
+- Section 2.3: Device Compliance and Conditional Access Policies
+- Section 4.1: B2B Collaboration and External Identities
