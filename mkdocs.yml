@@ -67,3 +67,5 @@ nav:
       - "Layer 1 — Directory & Trust Foundation":
           - Overview: identity/layer1-directory-trust/index.md
           - "Forests, Domains, OUs & Sites": identity/layer1-directory-trust/forests-domains-ous-sites.md
+          - "Trust Architecture": identity/layer1-directory-trust/trust-architecture.md
+          - "Replication Architecture": identity/layer1-directory-trust/replication-architecture.md
