@@ -71,3 +71,39 @@ Monitoring the success of ZTP deployments is critical, as is ensuring that the c
 ### Related Concepts
 *   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries for staged devices.
 *   [Directory Authorization & Delegation (Section 1.8)] - For the scoped permission sets required for enrollment agents to register devices.
+
+## 3. Device enrollment models (corporate, BYOD, shared/kiosk)
+
+### Technical Definition
+Device enrollment models define the relationship between the organization and the endpoint, dictating the level of management, security control, and user privacy. Corporate-owned models provide full management and control; Bring Your Own Device (BYOD) models focus on containerization and data separation; and Shared/Kiosk models are designed for multi-user, restricted-access scenarios.
+
+### Underlying Mechanism
+Corporate enrollment typically uses device-level management (e.g., DEP, Autopilot) to enforce full control over the OS, including security policies, application deployment, and remote wipe capabilities. BYOD enrollment uses Mobile Application Management (MAM) or "Work Profiles" to create a secure, encrypted container for corporate data, leaving the personal data untouched. Shared/Kiosk models utilize specialized enrollment profiles that restrict the device to a single application or a limited set of applications, often with a "guest" or "multi-user" profile that resets the device state after each session.
+
+### Why It Exists
+These models exist to accommodate the diverse needs of the modern workforce, balancing the requirement for security and compliance with the need for flexibility and user privacy. By offering different enrollment models, organizations can tailor their management strategy to the specific risk profile of the device and the user, ensuring that corporate data is protected without unnecessarily infringing on personal privacy or hindering productivity.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, the enrollment model is a critical security decision. Corporate-owned devices are the standard for high-risk roles (e.g., traders, developers, executives) and are subject to full management and monitoring. BYOD is often restricted to low-risk roles (e.g., contractors, general staff) and is limited to email and collaboration tools via MAM. Shared/Kiosk devices are used for branch operations, teller machines, and customer-facing kiosks, where security is enforced through strict application whitelisting and session-based resets. Compliance frameworks require that each model be documented, with clear policies on what data can be accessed and what security controls are enforced.
+
+### Operational Considerations
+Managing multiple enrollment models requires a robust MDM/UEM platform that can enforce different policies based on the enrollment type.
+[CLI: Set-DeviceEnrollmentRestriction -Platform "iOS" -AllowPersonalDevices $false]
+[CLI: Get-DeviceEnrollmentProfile -Type "Kiosk"]
+Monitoring compliance across different enrollment models is essential, as is ensuring that the appropriate security policies are applied to each device type.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that BYOD means "unmanaged." This is false. BYOD is a management model, not a lack of management. Even in BYOD, the organization must enforce security policies on the corporate data container, such as requiring MFA, preventing data copy-paste, and ensuring that the device is not jailbroken or rooted.
+
+### Interview Angle
+1. **Scenario:** You are designing an enrollment strategy for a bank. How do you decide which model to use for a specific user group?
+   *Model Answer:* I would perform a risk assessment based on the user's role, the data they access, and the device they use. High-risk roles require corporate-owned devices with full management. Low-risk roles can be supported via BYOD with MAM policies. Kiosk devices are reserved for specific, restricted-use cases.
+2. **Scenario:** How do you ensure that personal data is protected in a BYOD model?
+   *Model Answer:* I would use MAM policies to create a secure, encrypted container for corporate data. This container is logically separated from the personal data, and the MDM has no visibility into or control over the personal apps or data on the device.
+3. **Scenario:** What are the security risks of shared/kiosk devices?
+   *Model Answer:* Shared/kiosk devices are vulnerable to physical tampering, unauthorized application installation, and session-based data leakage. I would mitigate these risks by using a restricted OS profile, disabling unnecessary hardware ports, and ensuring that the device state is reset after each session.
+
+### Related Concepts
+*   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries for staged devices.
+*   [Directory Authorization & Delegation (Section 1.8)] - For the scoped permission sets required for enrollment agents to register devices.
