@@ -177,3 +177,39 @@ Monitoring the health of the restored forest is critical, as is verifying the in
 ### Related Concepts
 *   [System State (Section 1.6)]
 *   [FSMO Roles (Section 1.5)]
+
+## 6. Ransomware scenarios
+
+### Technical Definition
+Ransomware scenarios in the context of Active Directory refer to systemic, malicious encryption of the directory database, SYSVOL, and critical system files across all domain controllers. Unlike localized failures, ransomware is designed to be forest-wide, aiming to paralyze the entire identity infrastructure simultaneously to maximize extortion leverage.
+
+### Underlying Mechanism
+Ransomware typically gains a foothold through credential harvesting (e.g., Pass-the-Hash or Golden Ticket attacks) to escalate privileges to Domain Admin. Once elevated, the attacker disables security software, identifies all domain controllers, and deploys encryption payloads that target the `ntds.dit` file, the SYSVOL share, and the underlying OS registry hives. Because Active Directory is a multi-master system, the ransomware often triggers mass object modifications or deletions before encryption to ensure that even if a single DC is recovered, the directory state remains corrupted or inconsistent.
+
+### Why It Exists
+Ransomware exists as a high-impact financial extortion model. By targeting the identity provider (Active Directory), attackers effectively lock the entire enterprise, preventing users from logging in, accessing resources, or even initiating recovery procedures. It is the ultimate "denial of service" attack against the enterprise's ability to operate.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, ransomware is treated as a Tier-0 existential threat. Banking regulators (e.g., FFIEC, DORA) mandate "cyber-resilience" strategies that go beyond traditional backups. This includes "Cyber-Vaulting"—storing immutable, air-gapped copies of the forest in isolated environments that are physically or logically disconnected from the production network. The recovery strategy must assume that the production environment is fully compromised and that the recovery must occur in a "clean room" environment, with rigorous validation of the restored data before re-integration.
+
+### Operational Considerations
+Detection is the first line of defense. Monitoring for mass object deletion, modification, or unauthorized schema changes is critical.
+[CLI: Get-EventLog -LogName Security -InstanceId 4741, 4742, 4738]
+[CLI: Get-ADReplicationPartnerMetadata -Target <DC_Name>]
+In a ransomware event, the operational focus shifts from "repair" to "rebuild." The procedure involves isolating the infected environment, verifying the integrity of the air-gapped backups, and orchestrating a full forest recovery in a clean, isolated network.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "we have backups, so we are safe." This is false. Ransomware often targets backup repositories, attempting to encrypt or delete them before encrypting the production environment. If your backups are not immutable, air-gapped, and regularly tested for integrity, they are not a reliable recovery path.
+
+### Interview Angle
+1. **Scenario:** You are the lead architect for a bank that has just been hit by a forest-wide ransomware attack. The production environment is encrypted. What is your immediate priority?
+   *Model Answer:* My immediate priority is to isolate the environment to prevent further spread and then verify the integrity of our air-gapped, immutable backups. I would not attempt to restore into the existing, compromised network; instead, I would initiate a clean-room recovery process.
+2. **Scenario:** How do you differentiate between a standard hardware failure and a ransomware attack in Active Directory?
+   *Model Answer:* A hardware failure is typically localized to a single DC or a specific site. A ransomware attack is characterized by systemic, forest-wide symptoms: mass object deletions, unauthorized privilege escalation, and the simultaneous encryption of critical files across multiple domain controllers.
+3. **Scenario:** Why is "Cyber-Vaulting" considered a mandatory architectural pattern for Tier-1 banks?
+   *Model Answer:* Cyber-Vaulting provides an immutable, air-gapped recovery point that is protected from the production network. It ensures that even if the entire production forest is compromised, we have a clean, untampered baseline to initiate a forest recovery, which is essential for meeting our regulatory and business continuity obligations.
+
+### Related Concepts
+*   [System State (Section 1.6)]
+*   [Forest Recovery (Section 1.6)]
