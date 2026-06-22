@@ -141,3 +141,39 @@ Monitoring replication health after the restore is critical to ensure that the D
 ### Related Concepts
 *   [Replication Architecture (Section 1.3)] - For understanding replication vectors and convergence.
 *   [System State (Section 1.6)] - For the foundational backup and restore process.
+
+## 5. Forest recovery
+
+### Technical Definition
+Forest recovery is the process of restoring an entire Active Directory forest from a known-good backup state after a catastrophic failure, such as ransomware, structural database corruption, or malicious forest-wide modification. It involves a coordinated, multi-step orchestration to restore the first domain controller (DC) in the forest root domain, followed by the systematic restoration or re-promotion of all other DCs to ensure a clean, consistent directory state.
+
+### Underlying Mechanism
+The process relies on the "Metadata Cleanup" and "Authoritative Restore" concepts. The first DC is restored from a System State backup (non-authoritatively), then FSMO roles are seized or transferred to this DC. Subsequent DCs are either restored from backups or, more commonly in modern practice, demoted and re-promoted to ensure a clean database state. The process uses the `ntdsutil` tool to manage metadata and FSMO roles, ensuring that the restored forest is consistent and that all DCs have a unified view of the directory.
+
+### Why It Exists
+It exists because Active Directory is a single, interconnected entity. If the entire forest is compromised, individual DC restores are insufficient. A full forest recovery is the only way to guarantee that the entire directory is returned to a clean, trusted state, free from the corruption or malicious modifications that necessitated the recovery.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, forest recovery is the ultimate "break-glass" scenario. It is a high-stakes, time-critical operation that must be rehearsed regularly. Banking regulations (e.g., FFIEC) require that this process be documented, tested, and capable of being executed within strict RTOs. It often involves "clean room" environments where the forest is restored in isolation before being reconnected to the production network.
+
+### Operational Considerations
+The process is complex and requires a detailed, step-by-step plan.
+[CLI: ntdsutil "metadata cleanup"]
+[CLI: ntdsutil "roles" "connections" "connect to server <DC_Name>" "seize <Role>"]
+Monitoring the health of the restored forest is critical, as is verifying the integrity of the restored data and the functionality of all trusts and applications.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that forest recovery is a simple, automated process. It is not. It is a complex, manual orchestration that requires deep knowledge of Active Directory internals. Relying on automated tools without a deep understanding of the underlying recovery steps is a recipe for failure.
+
+### Interview Angle
+1. **Scenario:** You are tasked with leading a forest recovery after a ransomware attack. What is your first step?
+   *Model Answer:* I would isolate the environment, verify the integrity of the backups, and establish a "clean room" for the recovery. This prevents the ransomware from re-infecting the restored environment.
+2. **Scenario:** Why is it often better to re-promote DCs rather than restore them from backups during a forest recovery?
+   *Model Answer:* Re-promotion ensures a clean database state, free from any potential corruption or malicious modifications that might be present in the backup. It is a safer, more reliable method for rebuilding the forest.
+3. **Scenario:** How do you handle FSMO roles during a forest recovery?
+   *Model Answer:* I would seize the roles on the first restored DC, then transfer them to the appropriate DCs as the forest is rebuilt. This ensures that the roles are held by the correct servers as the forest structure is restored.
+
+### Related Concepts
+*   [System State (Section 1.6)]
+*   [FSMO Roles (Section 1.5)]
