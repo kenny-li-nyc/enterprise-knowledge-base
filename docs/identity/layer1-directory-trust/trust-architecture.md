@@ -52,3 +52,51 @@ Regular audits of trust relationships are essential. You should use PowerShell t
 *   [Forests, Domains, OUs & Sites](forests-domains-ous-sites.md)
 *   [Trust Types](trust-architecture.md#trust-types)
 *   [Trust Security Controls](trust-architecture.md#trust-security-controls)
+
+## Trust Types
+
+### Technical Definition
+Trust types define the scope and behavior of the relationship between domains or forests. Active Directory supports several distinct trust types, each designed for specific architectural scenarios: Parent-Child, Tree-Root, External, Forest, and Realm trusts. These types dictate whether the trust is transitive, the direction of authentication, and the scope of the trust (domain-level vs. forest-level).
+
+### Underlying Mechanism
+The trust type is stored as a property of the `trustedDomain` object in Active Directory. When a trust is created, the `trustType` attribute (e.g., `DOWNLEVEL`, `UPLEVEL`, `MIT`, `DCE`) and `trustAttributes` (e.g., `FOREST_TRANSITIVE`, `NON_TRANSITIVE`) are set to define how the domain controllers interact. For example, a Forest Trust uses the `FOREST_TRANSITIVE` attribute, which allows the trust to extend to all domains within the forest, whereas an External Trust is non-transitive and limited to the two specific domains involved. The Kerberos Key Distribution Center (KDC) uses these attributes to determine whether to issue a referral ticket or to deny the authentication request.
+
+[DIAGRAM: A comparison matrix or flowchart showing the different trust types and their characteristics]
+
+### Why It Exists
+Different trust types exist to accommodate the evolution of Active Directory and the diverse needs of enterprise environments. Parent-Child and Tree-Root trusts are the "native" trusts that form the structure of a forest. External trusts were the original mechanism for connecting disparate domains before the concept of a "Forest" was fully realized. Forest trusts were introduced to allow for the secure, transitive connection of entire forests, which is essential for large-scale mergers and acquisitions. Realm trusts exist to allow Active Directory to interoperate with non-Windows Kerberos environments (e.g., Unix/Linux).
+
+### Enterprise / Banking Reality
+In a Tier-1 bank, the use of trust types is strictly governed. You will almost exclusively see Parent-Child trusts (if multiple domains exist) and Forest trusts (for connecting to partner or subsidiary forests). External trusts are generally discouraged because they are non-transitive and harder to manage at scale. When connecting to a non-Windows environment, Realm trusts are used, but they are treated with extreme caution due to the potential for security mismatches between the two environments. Audit requirements often mandate that any cross-forest trust must be documented, justified, and reviewed annually.
+
+| Trust Type | Transitive | Scope | Typical Use Case |
+| :--- | :--- | :--- | :--- |
+| **Parent-Child** | Yes | Forest | Building the forest hierarchy |
+| **Tree-Root** | Yes | Forest | Adding a new tree to a forest |
+| **External** | No | Domain | Connecting to a legacy domain |
+| **Forest** | Yes | Forest | Connecting two separate forests |
+| **Realm** | No | Domain | Connecting to non-Windows Kerberos |
+
+### Operational Considerations
+Managing trust types requires understanding the implications of each type. For instance, creating an External trust when a Forest trust is needed can lead to significant administrative overhead, as you would need to create multiple external trusts to achieve the same connectivity. Monitoring involves checking the `trustAttributes` and `trustType` properties to ensure they align with the intended design. If a trust is not behaving as expected (e.g., authentication is failing across a forest boundary), the first step is to verify that the trust type is correctly configured.
+
+[CLI: Command to inspect the properties of a specific trust]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"All trusts are the same."** This is false. Trust types have fundamentally different behaviors regarding transitivity and scope.
+    *   **"I can use an External trust to connect two forests."** While technically possible, it is a poor design choice. Forest trusts are designed for this purpose and provide better manageability and security.
+    *   **"Realm trusts are just like External trusts."** Realm trusts are specifically for non-Windows Kerberos environments and have different configuration requirements and limitations.
+
+### Interview Angle
+1.  **"When would you choose a Forest trust over an External trust?"**
+    *   *Model Answer:* "I would choose a Forest trust when I need to connect two entire forests and require transitive authentication across all domains in both forests. External trusts are non-transitive and limited to the two specific domains, making them unsuitable for large-scale forest-to-forest connectivity."
+2.  **"What are the risks of using Realm trusts?"**
+    *   *Model Answer:* "Realm trusts introduce the risk of security mismatches between Active Directory and the non-Windows Kerberos environment. You must ensure that the encryption types, ticket lifetimes, and other Kerberos settings are compatible, or authentication will fail or be insecure."
+3.  **"How do you determine the correct trust type for a new business requirement?"**
+    *   *Model Answer:* "I would first assess the scope of the requirement: is it domain-to-domain or forest-to-forest? Do I need transitivity? Is it a Windows-to-Windows connection or a cross-platform connection? Based on these answers, I would select the trust type that provides the necessary connectivity with the least amount of administrative overhead and the highest level of security."
+
+### Related Concepts
+*   [Trust Fundamentals](trust-architecture.md#trust-fundamentals)
+*   [Trust Security Controls](trust-architecture.md#trust-security-controls)
+*   [Kerberos](kerberos.md)
