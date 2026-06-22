@@ -72,3 +72,39 @@ Monitoring for changes to sensitive groups is critical for security.
 ### Related Concepts
 *   [Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries.
 *   [Trust Architecture (Section 1.2)] - For understanding how cross-forest SIDs are validated within an authentication token.
+
+## 3. Claims-based authorization
+
+### Technical Definition
+Claims-based authorization is an identity model that makes access decisions based on attributes (claims) associated with a user, device, or resource, rather than relying solely on group memberships. A claim is a statement about an identity (e.g., "Department=Finance," "Clearance=Secret"), which is cryptographically signed and included in the user's Kerberos ticket, allowing for dynamic, attribute-based access control (ABAC).
+
+### Underlying Mechanism
+Claims-based authorization leverages Kerberos Armoring (FAST) to securely transport claims within the Privilege Attribute Certificate (PAC). When a user authenticates, the KDC retrieves the user's attributes from Active Directory and embeds them as claims into the TGT. When the user accesses a resource, the resource server evaluates these claims against a central access policy. This evaluation is dynamic; if a user's department changes in Active Directory, their claims are automatically updated upon their next TGT request, without requiring any changes to group memberships or ACLs.
+
+### Why It Exists
+Claims-based authorization exists to overcome the limitations of traditional group-based models, such as "group bloat," the static nature of group memberships, and the difficulty of managing complex, multi-dimensional access requirements. It provides a more flexible, scalable, and context-aware authorization framework that can adapt to changing business needs without the operational overhead of managing thousands of groups.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, claims-based authorization is the gold standard for implementing Attribute-Based Access Control (ABAC). It allows banks to enforce complex access policies (e.g., "Only users in the Finance department with a clearance level of 'High' can access this file during business hours") that would be impossible to manage with groups alone. This model is highly valued by audit and compliance teams because it provides a clear, attribute-driven audit trail of who accessed what and why, significantly simplifying regulatory reporting.
+
+### Operational Considerations
+Implementing claims-based authorization requires a modern Active Directory environment (Windows Server 2012 or later functional level).
+[CLI: Set-ADClaimType -Identity "Department" -Enabled $true]
+[CLI: Get-ADClaimType -Filter *]
+Monitoring the health of the KDC and ensuring that claims are correctly configured and replicated is essential for maintaining authorization availability.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that claims-based authorization is a replacement for group-based access. This is false. Claims-based authorization is a *complement* to group-based access. It is best used for complex, dynamic access scenarios, while group-based access remains the most efficient method for simple, static permission assignments.
+
+### Interview Angle
+1. **Scenario:** How does claims-based authorization differ from traditional RBAC?
+   *Model Answer:* RBAC is based on static group memberships, which can become unmanageable in large environments. Claims-based authorization (ABAC) is based on dynamic attributes, allowing for more flexible, context-aware access policies that can adapt to changing business requirements without the need for constant group management.
+2. **Scenario:** What are the primary challenges of implementing claims-based authorization?
+   *Model Answer:* The primary challenges are the need for a modern Active Directory environment, the complexity of defining and managing claims, and the potential for performance impact on the KDC. It requires a robust identity governance program to ensure that attributes are accurate and up-to-date.
+3. **Scenario:** How do claims help mitigate the risk of "token bloat"?
+   *Model Answer:* Claims can replace the need for many groups, as a single claim can represent a complex attribute. By reducing the number of groups a user needs to be a member of, claims can help keep the Kerberos ticket size within manageable limits, mitigating the risk of token bloat.
+
+### Related Concepts
+*   [Dynamic Access Control (Section 1.8)] - For the implementation of claims-based policies.
+*   [Group-based access models (Section 1.8)] - For the foundational RBAC model.
