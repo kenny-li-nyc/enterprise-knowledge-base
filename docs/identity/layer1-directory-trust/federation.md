@@ -143,3 +143,39 @@ Monitoring for sync errors, such as attribute conflicts or permission issues, is
 ### Related Concepts
 *   [Authentication (Section 1.7)] - For the underlying authentication context.
 *   [Trust Architecture (Section 1.2)] - For understanding the cryptographic trust anchors.
+
+## 5. B2B trust patterns
+
+### Technical Definition
+B2B (Business-to-Business) trust patterns refer to the architectural frameworks used to enable secure collaboration between distinct organizations. This includes guest access, B2B collaboration (e.g., Entra ID B2B), and federated trust models that allow users from one organization to access resources in another without provisioning local accounts in the resource organization's directory.
+
+### Underlying Mechanism
+B2B trust patterns rely on identity federation (SAML/OIDC) or guest invitation models. In Entra ID B2B, a "guest" object is created in the resource tenant, which points back to the user's home tenant. Authentication is delegated to the home tenant, while authorization is managed in the resource tenant. This allows the resource organization to enforce its own security policies (e.g., Conditional Access) on the guest user, even though the user's identity is managed by their home organization.
+
+### Why It Exists
+B2B trust patterns exist to eliminate the "dummy account" anti-pattern, where organizations create local accounts for external partners. This practice is insecure, difficult to manage, and leads to "account sprawl." B2B trust patterns provide a secure, scalable, and manageable way to enable cross-organizational collaboration, ensuring that external users are authenticated by their home organization while the resource organization retains control over authorization and security policies.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, B2B trust patterns are essential for secure vendor access, joint ventures, and regulatory reporting. Compliance frameworks require that guest access be governed by the same security standards as internal access, including mandatory MFA, device compliance, and regular access reviews. Banking architectures must implement strict "Conditional Access" policies for guest users, ensuring that they are subject to the same security posture as internal employees, while also maintaining a clear audit trail of all cross-organizational access.
+
+### Operational Considerations
+Managing B2B trust patterns requires a robust lifecycle management process for guest accounts.
+[CLI: New-MgInvitation -InvitedUserEmailAddress "partner@external.com" -InviteRedirectUrl "https://myapps.microsoft.com"]
+[CLI: Get-MgUser -Filter "UserType eq 'Guest'"]
+Monitoring for "guest sprawl," ensuring that guest accounts are regularly reviewed and deprovisioned when no longer needed, is critical for maintaining a secure environment.
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that B2B guest access is "free" security. This is false. Guest access requires the same level of governance, monitoring, and security policy enforcement as internal accounts. If not properly managed, guest accounts can become a significant security vulnerability, providing attackers with a foothold into the organization.
+
+### Interview Angle
+1. **Scenario:** You are designing a B2B collaboration strategy for a bank. How do you ensure that guest users are as secure as internal users?
+   *Model Answer:* I would implement strict Conditional Access policies for all guest users, requiring MFA and device compliance. I would also enforce regular access reviews to ensure that guest access is only granted for the duration of the collaboration and is revoked immediately upon completion.
+2. **Scenario:** What is the difference between B2B collaboration and B2B direct connect?
+   *Model Answer:* B2B collaboration is an invitation-based model where the guest user is invited to the resource tenant. B2B direct connect is a trust-based model that allows users from one organization to access resources in another without an invitation, using a pre-established trust relationship. B2B direct connect is typically used for more permanent, high-trust collaborations.
+3. **Scenario:** How do you prevent "guest sprawl" in a large organization?
+   *Model Answer:* I would implement an automated lifecycle management process for guest accounts, including expiration dates and regular access reviews. I would also use monitoring tools to identify inactive guest accounts and automatically deprovision them, ensuring that the directory remains clean and secure.
+
+### Related Concepts
+*   [Trust Architecture (Section 1.2)] - For understanding the cryptographic trust anchors and SID filtering.
+*   [Federation (Section 1.9)] - For the underlying federation protocols and STS implementation.
