@@ -12,5 +12,6 @@ into sub-layers:
     - [Replication Architecture](layer1-directory-trust/replication-architecture.md) *(In Progress)*
     - [Forest Services](layer1-directory-trust/forest-services.md) *(In Progress)*
     - [FSMO Roles](layer1-directory-trust/fsmo-roles.md)
+    - [Forest Recovery](layer1-directory-trust/forest-recovery.md)
 - Layer 2 — *planned*
 - Layer 3 — *planned*
