@@ -132,3 +132,40 @@ Operational considerations involve monitoring the health of DNS zones, ensuring 
 *   [Replication Architecture](replication-architecture.md)
 *   [AD Partitions](replication-architecture.md#ad-partitions)
 *   [Global Catalog](forests-domains-ous-sites.md#forest)
+
+## AD Recycle Bin
+
+### Technical Definition
+The AD Recycle Bin is a feature that allows for the recovery of accidentally deleted Active Directory objects, including their full attribute set, without the need to perform an authoritative restore from a system state backup. It effectively extends the lifecycle of deleted objects, allowing them to be restored to their original state within a configurable timeframe.
+
+### Underlying Mechanism
+When an object is deleted, it is moved to the `Deleted Objects` container. The AD Recycle Bin changes the object's state from "tombstoned" to "deleted," preserving all attributes. The object remains in this state for the duration of the `msDS-deletedObjectLifetime` attribute. The feature itself is enabled by setting the `msDS-EnabledFeature` attribute in the `Optional Features` container within the Configuration Partition, as discussed in the AD Partitions topic. Once enabled, this action is irreversible.
+
+[DIAGRAM: A conceptual view of the object deletion lifecycle, showing the transition from active to deleted state]
+
+### Why It Exists
+It exists to minimize the Recovery Time Objective (RTO) for object restoration. Traditional authoritative restores are complex, require downtime, and carry the risk of data loss for other objects. The Recycle Bin provides a simple, non-disruptive method for restoring individual objects.
+
+### Enterprise / Banking Reality
+In a Tier-1 banking environment, the AD Recycle Bin is a mandatory configuration. It is a critical component of the disaster recovery and business continuity strategy. Audit and compliance frameworks (e.g., FFIEC) require that organizations have the capability to recover from accidental data loss without significant downtime. The Recycle Bin is often configured with a deleted object lifetime that aligns with the organization's data retention policies.
+
+### Operational Considerations
+Enabling the Recycle Bin is a one-way operation. Monitoring involves tracking the `msDS-deletedObjectLifetime` and ensuring that the `Deleted Objects` container is not becoming a performance bottleneck.
+
+[CLI: Command to enable the AD Recycle Bin and restore a deleted object]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"It replaces backups."** It does not; it only handles object deletion, not database corruption or catastrophic failure.
+
+### Interview Angle
+1.  **"What is the primary benefit of the AD Recycle Bin?"**
+    *   *Model Answer:* "The primary benefit is the ability to recover accidentally deleted objects without the need for an authoritative restore, significantly reducing the Recovery Time Objective (RTO) and minimizing the risk of data loss."
+2.  **"What are the limitations of the AD Recycle Bin?"**
+    *   *Model Answer:* "The AD Recycle Bin is not a replacement for backups. It only handles object deletion and does not protect against database corruption or catastrophic failure. It also has a limited retention period defined by the `msDS-deletedObjectLifetime` attribute."
+3.  **"What happens when you enable the AD Recycle Bin?"**
+    *   *Model Answer:* "Enabling the AD Recycle Bin is an irreversible operation. Once enabled, it cannot be disabled. It changes the object deletion lifecycle, allowing deleted objects to be restored with their full attribute set for the duration of the `msDS-deletedObjectLifetime`."
+
+### Related Concepts
+*   [AD Partitions](replication-architecture.md#ad-partitions)
+*   [Replication Architecture](replication-architecture.md)
