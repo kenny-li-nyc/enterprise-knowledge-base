@@ -203,14 +203,3 @@ Operational considerations involve monitoring the health and replication status 
     *   **"GCs are only for logon."** While GCs are critical for Universal Group membership resolution during logon, they are also essential for forest-wide searches and other directory operations.
 
 ### Interview Angle
-1.  **"What is the impact of adding an attribute to the Partial Attribute Set (PAS)?"**
-    *   *Model Answer:* "Adding an attribute to the PAS triggers a forest-wide replication event, as all GC servers in the forest must be updated with the new attribute. This can significantly increase replication traffic and storage requirements, so it should be done carefully and only when necessary."
-2.  **"How do you determine the optimal placement of GC servers?"**
-    *   *Model Answer:* "The optimal placement of GC servers depends on the network topology and the distribution of users and resources. In general, GC servers should be placed in every major site to ensure that authentication and search operations are fast and reliable. I would also consider the bandwidth and latency of the network links between sites."
-3.  **"What happens if a GC server is unavailable?"**
-    *   *Model Answer:* "If a GC server is unavailable, forest-wide operations, such as searching for users across domains or resolving Universal Group memberships, may fail or be significantly slower. Authentication may also be impacted if the user's domain controller relies on the GC for Universal Group membership resolution."
-
-### Related Concepts
-*   [Forests, Domains, OUs & Sites](forests-domains-ous-sites.md#forest)
-*   [Replication Topology & KCC](replication-architecture.md#replication-topology-kcc)
-*   [AD Partitions](replication-architecture.md#ad-partitions)
