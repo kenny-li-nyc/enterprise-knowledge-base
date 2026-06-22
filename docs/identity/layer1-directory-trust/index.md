@@ -11,3 +11,4 @@
 | 5 | [FSMO Roles](fsmo-roles.md) | Complete |
 | 6 | [Forest Recovery](forest-recovery.md) | Complete |
 | 7 | [Authentication](authentication.md) | In progress |
+| 8 | [Authorization](authorization.md) | In progress |
