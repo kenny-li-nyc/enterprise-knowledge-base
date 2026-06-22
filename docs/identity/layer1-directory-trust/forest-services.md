@@ -13,6 +13,33 @@ The Global Catalog stores a full, read-write copy of all objects in its own doma
 ### Why It Exists
 The Global Catalog exists to solve the fundamental problem of search and authentication efficiency in a multi-domain forest. Without a GC, a search for a user or resource in a different domain would require a cross-domain query to that domain's specific domain controllers, which is inefficient and introduces significant latency. The GC provides a single, unified directory interface that allows for rapid, local resolution of forest-wide queries.
 
+### Enterprise / Banking Reality
+In a Tier-1 banking environment, GC placement is a strategic decision. GC servers are typically placed in every major site to ensure that authentication and search operations are fast and reliable. The PAS is carefully managed to include only the attributes necessary for business operations, as adding unnecessary attributes to the PAS increases replication traffic and storage requirements. Audit and compliance teams often require that GC servers be hardened and monitored, as they are critical infrastructure components. Any changes to the PAS are treated as high-risk changes and are subject to rigorous testing and change management procedures.
+
+### Operational Considerations
+Operational considerations involve monitoring the health and replication status of GC servers. Administrators should monitor the replication latency of the PAS and ensure that all GC servers are synchronized. If a GC server fails to replicate the PAS, it can lead to authentication failures and search inconsistencies. Monitoring tools should be configured to alert on replication latency or failures for GC servers.
+
+[CLI: Command to verify the GC status and replication health of a domain controller]
+
+### Common Misconceptions
+!!! warning "Common Misconceptions"
+    *   **"GCs are just domain controllers."** While GCs are domain controllers, they have the additional responsibility of hosting the PAS and providing forest-wide search and authentication services.
+    *   **"GCs replicate everything."** GCs only replicate the Partial Attribute Set (PAS), not the entire directory database of every domain in the forest.
+    *   **"GCs are only for logon."** While GCs are critical for Universal Group membership resolution during logon, they are also essential for forest-wide searches and other directory operations.
+
+### Interview Angle
+1.  **"What is the impact of adding an attribute to the Partial Attribute Set (PAS)?"**
+    *   *Model Answer:* "Adding an attribute to the PAS triggers a forest-wide replication event, as all GC servers in the forest must be updated with the new attribute. This can significantly increase replication traffic and storage requirements, so it should be done carefully and only when necessary."
+2.  **"How do you determine the optimal placement of GC servers?"**
+    *   *Model Answer:* "The optimal placement of GC servers depends on the network topology and the distribution of users and resources. In general, GC servers should be placed in every major site to ensure that authentication and search operations are fast and reliable. I would also consider the bandwidth and latency of the network links between sites."
+3.  **"What happens if a GC server is unavailable?"**
+    *   *Model Answer:* "If a GC server is unavailable, forest-wide operations, such as searching for users across domains or resolving Universal Group memberships, may fail or be significantly slower. Authentication may also be impacted if the user's domain controller relies on the GC for Universal Group membership resolution."
+
+### Related Concepts
+*   [Forests, Domains, OUs & Sites](forests-domains-ous-sites.md#forest)
+*   [Replication Topology & KCC](replication-architecture.md#replication-topology-kcc)
+*   [AD Partitions](replication-architecture.md#ad-partitions)
+
 ## Schema
 
 ### Technical Definition
