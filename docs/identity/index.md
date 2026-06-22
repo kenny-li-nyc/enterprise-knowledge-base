@@ -13,5 +13,6 @@ into sub-layers:
     - [Forest Services](layer1-directory-trust/forest-services.md) *(In Progress)*
     - [FSMO Roles](layer1-directory-trust/fsmo-roles.md)
     - [Forest Recovery](layer1-directory-trust/forest-recovery.md)
+    - [Authentication](layer1-directory-trust/authentication.md)
 - Layer 2 — *planned*
 - Layer 3 — *planned*

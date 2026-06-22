@@ -1,6 +1,6 @@
 # Layer 1 — Directory & Trust Foundation
 
-**Answers:** How is Active Directory organized, and what makes it trustworthy?
+**Answers:** How is Active Directory, and what makes it trustworthy?
 
 | # | Topic | Status |
 |---|-------|--------|
@@ -9,4 +9,5 @@
 | 3 | [Replication Architecture](replication-architecture.md) | In progress |
 | 4 | [Forest Services](forest-services.md) | In progress |
 | 5 | [FSMO Roles](fsmo-roles.md) | Complete |
-| 6 | [Forest Recovery](forest-recovery.md) | In progress |
+| 6 | [Forest Recovery](forest-recovery.md) | Complete |
+| 7 | [Authentication](authentication.md) | In progress |
