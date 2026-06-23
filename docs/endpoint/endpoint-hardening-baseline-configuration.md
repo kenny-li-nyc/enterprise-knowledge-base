@@ -113,3 +113,41 @@ Operationalizing LAPS requires ensuring that the LAPS client is installed and co
 - Section 1.4: Active Directory Schema and Attribute Management
 - Section 2.3: Configuration Management (GPO/MDM)
 - Section 3.1: Privileged Access Management (PAM)
+
+## 4. Removable Media & Peripheral Control Policies
+
+### Technical Definition
+Removable media and peripheral control policies are security configurations that restrict the use of external hardware devices—such as USB flash drives, external hard drives, Bluetooth adapters, and other peripherals—to prevent unauthorized data exfiltration and the introduction of malware. These policies define which devices are permitted to connect to an endpoint, what level of access they have (e.g., read-only vs. read-write), and whether data transferred to or from these devices is subject to encryption or inspection. This is a critical component of a comprehensive Data Loss Prevention (DLP) strategy, particularly in high-security environments where physical access to endpoints is a potential vulnerability.
+
+### Underlying Mechanism
+The mechanism relies on the operating system's Plug and Play (PnP) manager and the device driver stack. When a peripheral is connected, the OS identifies the device based on its hardware ID (VID/PID) and class. Security policies, delivered via the policy delivery vehicles described in Section 2.3, instruct the OS to either allow or block the device based on these identifiers. Advanced peripheral control solutions can also enforce encryption for removable storage, ensuring that any data written to a USB drive is automatically encrypted with an enterprise-managed key. This prevents data from being accessed if the drive is lost or stolen, providing a critical layer of protection for sensitive banking data.
+
+[DIAGRAM: Flowchart illustrating the device connection process, policy evaluation, and the decision to allow, block, or restrict access]
+
+### Why It Exists
+Removable media and peripherals are a major, often overlooked, attack vector. USB drives are a classic method for introducing malware into air-gapped or highly secure networks (the "Stuxnet" scenario), and they are also a primary tool for data exfiltration. By controlling these devices, organizations can significantly reduce the risk of both malicious data theft and the accidental introduction of threats. This is particularly important in banking, where the protection of customer data and transactional integrity is a top priority.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, peripheral control is a non-negotiable requirement for compliance with frameworks like PCI-DSS and FFIEC. Banks typically implement a "default-deny" policy for all removable media, only allowing specific, approved devices (e.g., encrypted USB drives) for authorized users. This is often integrated with DLP solutions that monitor and log all file transfers to removable media, providing a clear audit trail for compliance reporting. Architects must ensure that these policies are granular enough to support business needs (e.g., allowing specific peripherals for specialized hardware) while maintaining a strict security boundary.
+
+### Operational Considerations
+Operationalizing peripheral control requires a robust process for managing device exceptions. Administrators must have a clear, documented procedure for approving and whitelisting new devices, ensuring that this process is both secure and efficient. Monitoring is critical; administrators must track all device connection attempts, including blocked ones, to identify potential security incidents or unauthorized attempts to bypass the policy. Furthermore, administrators must manage the lifecycle of these devices, ensuring that they are decommissioned and wiped securely when they are no longer needed.
+
+[CLI: PowerShell command to query the current device control policy and list all connected peripherals on a Windows device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that blocking USB ports is sufficient to prevent data exfiltration. In reality, data can be exfiltrated through a wide range of other channels, including network connections, cloud storage, and even physical printing. Another error is assuming that peripheral control policies are "set and forget"; they require ongoing maintenance to ensure that they remain effective as new hardware and software are introduced into the environment.
+
+### Interview Angle
+1. Question: How do you balance the need for peripheral control with the operational requirements of users who need to transfer data?
+   Answer: We implement a "default-deny" policy and provide approved, encrypted removable media for authorized users. For those who need to transfer data, we provide secure, managed alternatives, such as encrypted file shares or cloud-based collaboration platforms, which are monitored and audited.
+2. Question: What are the risks of allowing unauthorized Bluetooth peripherals in a banking environment?
+   Answer: The risks include unauthorized data exfiltration, the introduction of malware, and the potential for "man-in-the-middle" attacks where an attacker intercepts data transmitted over the Bluetooth connection. We mitigate this by disabling Bluetooth on all endpoints where it is not strictly required for business operations.
+3. Question: How do you handle a situation where a user needs to connect a specialized peripheral (e.g., a check scanner) that is not on the approved list?
+   Answer: We have a formal exception process where the device is evaluated for security risks. If approved, the device is whitelisted by its hardware ID (VID/PID) and the policy is updated to allow it for that specific user or group. This ensures that we maintain control while supporting necessary business functions.
+
+### Related Concepts
+- Section 2.3: Configuration Management (GPO/MDM)
+- Section 3.2: Data Loss Prevention (DLP)
+- Section 2.5: CIS/STIG/DISA Baseline Benchmarks
