@@ -113,3 +113,41 @@ Operationalizing these procedures requires a robust, end-to-end process. Adminis
 - Section 2.8: Backup & restore strategies
 - Section 2.8: Disaster recovery planning for endpoint fleets
 - Section 2.6: Application packaging & deployment models
+
+## 4. Disaster Recovery Planning for Endpoint Fleets
+
+### Technical Definition
+Disaster recovery (DR) planning for endpoint fleets is the strategic framework for maintaining business continuity when a significant portion of the endpoint environment is compromised, unavailable, or destroyed. Unlike server-side directory recovery (as discussed in Section 1.6), which focuses on restoring the identity and infrastructure backbone, endpoint fleet DR focuses on the rapid, mass-scale restoration of user productivity. This involves defining RTOs and RPOs for the entire fleet, establishing automated provisioning pipelines, and creating "break-glass" procedures for mass-reimaging or re-provisioning devices during systemic events like ransomware outbreaks or regional infrastructure failures.
+
+### Underlying Mechanism
+The mechanism for fleet-wide DR relies on the orchestration of automated provisioning and management tools. This includes leveraging cloud-native services like Windows Autopilot for rapid, zero-touch deployment, combined with MDM/UEM platforms to push security policies, applications, and configurations to thousands of devices simultaneously. In a DR scenario, the system uses pre-defined "recovery profiles" that bypass standard onboarding workflows, prioritizing the restoration of critical business applications and security baselines. The process often involves mass-wiping devices (via remote commands) and triggering a re-enrollment flow that pulls the latest, verified configuration from the cloud, ensuring that the fleet is restored to a known-good, secure state without requiring manual intervention.
+
+[DIAGRAM: Architecture diagram showing the mass-scale recovery workflow: trigger, wipe, re-provisioning, and policy enforcement]
+
+### Why It Exists
+Fleet-wide DR planning exists to ensure that the organization can survive and recover from catastrophic events that impact a large number of endpoints. In a modern, distributed enterprise, the endpoint fleet is the primary interface for business operations; if the fleet is unavailable, the business is effectively paralyzed. DR planning provides a structured, tested, and repeatable process for restoring this capability, minimizing the impact of disasters on business operations and ensuring that the organization can meet its regulatory and operational commitments.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, endpoint fleet DR is a critical component of the bank's operational resilience strategy, often mandated by regulations like DORA and FFIEC. Banks must be able to demonstrate that they can recover their entire endpoint fleet within a defined timeframe, even in the face of sophisticated cyberattacks or regional disasters. Architects must design these plans to be highly resilient, with redundant provisioning infrastructure, air-gapped recovery configurations, and regular, large-scale "fire drills" to test the recovery process. This is a high-stakes exercise that requires deep coordination between IT, security, and business stakeholders.
+
+### Operational Considerations
+Operationalizing fleet-wide DR requires a disciplined, proactive approach. Administrators must develop comprehensive DR playbooks, conduct regular tabletop exercises, and ensure that the provisioning infrastructure is always ready for a mass-scale recovery event. Monitoring is critical; administrators must track the health and readiness of the provisioning infrastructure, identify and resolve any bottlenecks, and provide reporting on the fleet's recovery capability. Furthermore, administrators must ensure that they have a clear, secure process for initiating a mass-recovery event, with strict authentication and authorization requirements for any support staff performing these actions.
+
+[CLI: PowerShell command to trigger a mass-wipe and re-provisioning command for a specific device group]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that fleet-wide DR is just a "larger version" of individual device recovery. In reality, mass-scale recovery introduces significant challenges, such as network congestion, infrastructure capacity limits, and the need for complex orchestration, which require a completely different approach. Another error is assuming that DR planning is a "one-time" activity; it must be a continuous process, with regular testing and updates to reflect changes in the fleet and the threat landscape.
+
+### Interview Angle
+1. Question: How do you design a fleet-wide DR plan that can handle a mass-scale ransomware outbreak?
+   Answer: We design our DR plan with a focus on rapid, automated re-provisioning. We use cloud-native tools like Autopilot to push a "clean" configuration to all devices, and we implement strict network segmentation to prevent the spread of ransomware during the recovery process. We also maintain air-gapped backups of our critical configurations and policies, ensuring that we can restore the fleet even if our primary management infrastructure is compromised.
+2. Question: What are the key considerations when testing a fleet-wide DR plan for a Tier-1 bank?
+   Answer: The key considerations are realism, scalability, and impact. We conduct regular, large-scale "fire drills" that simulate a real-world disaster, testing our ability to recover a significant portion of the fleet within our defined RTO. We also carefully manage the impact of these tests on business operations, ensuring that we can recover without causing unnecessary disruption.
+3. Question: How do you handle the challenge of network capacity when re-provisioning a large number of endpoints simultaneously?
+   Answer: We use a phased approach, prioritizing the restoration of critical business functions and essential workstations. We also leverage peer-to-peer content distribution technologies (e.g., Delivery Optimization) to reduce the load on our network infrastructure, ensuring that we can distribute the necessary updates and configurations without overwhelming our bandwidth.
+
+### Related Concepts
+- Section 1.6: Forest & Domain Disaster Recovery
+- Section 2.8: Backup & restore strategies
+- Section 2.8: Autopilot Reset / fresh start procedures
