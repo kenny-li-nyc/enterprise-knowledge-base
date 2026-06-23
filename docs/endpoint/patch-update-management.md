@@ -189,3 +189,41 @@ Operationalizing OOB patching requires a pre-defined, well-rehearsed "emergency 
 - Section 2.4: Patch ring/deployment ring strategy
 - Section 3.2: Vulnerability Management and EDR Integration
 - Section 3.3: Incident Response and Disaster Recovery
+
+## 6. Update Rollback & Known-Issue Rollback (KIR)
+
+### Technical Definition
+Update rollback and Known-Issue Rollback (KIR) are critical recovery mechanisms designed to restore system stability when an update introduces unforeseen defects. A full update rollback involves reverting the operating system or application to its previous state by uninstalling the problematic update package entirely. In contrast, Known-Issue Rollback (KIR) is a surgical, cloud-delivered capability that allows Microsoft to disable a specific, problematic feature or code path within an update without requiring the uninstallation of the entire update package, thereby preserving the security fixes while resolving the functional regression.
+
+### Underlying Mechanism
+Full update rollback typically leverages OS-level mechanisms such as System Restore points, component-based servicing (CBS) uninstallation, or the removal of specific update packages via the Windows Update Agent. KIR operates differently: it utilizes a cloud-based policy delivery mechanism that pushes a specific "Known Issue" policy to the endpoint. This policy toggles a feature flag or registry key that instructs the OS to disable the specific, buggy code path. Because this is a targeted change, it is highly efficient and does not require a full system reboot or the removal of the entire update, making it an ideal solution for non-security-related regressions.
+
+[DIAGRAM: Comparison matrix showing the architectural differences between a full update rollback and a surgical Known-Issue Rollback (KIR)]
+
+### Why It Exists
+These mechanisms exist to provide a safety net for the inherent risks of software updates. Despite rigorous testing, complex environments can expose edge cases that lead to regressions. Full rollback provides a "nuclear option" for catastrophic failures, while KIR provides a precise, low-impact solution for targeted bugs. Together, they enable organizations to maintain a high velocity of patching while minimizing the operational impact of potential update-related issues, ensuring that the business can recover quickly from unforeseen defects.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, where system availability is critical, the ability to quickly mitigate update-related issues is paramount. Full rollbacks are often viewed as a last resort due to the potential for data loss or system instability. KIR is highly valued in these environments because it allows the bank to resolve a specific issue without reverting the entire security update, thereby maintaining the overall security posture while restoring business functionality. Architects must ensure that their management platforms are configured to receive and apply KIR policies automatically, as this is often the fastest way to resolve widespread, non-security-related regressions.
+
+### Operational Considerations
+Operationalizing rollback and KIR requires a clear, well-defined incident response process. Administrators must be able to quickly identify when an update is causing issues, determine whether a full rollback or a KIR is the appropriate response, and execute the recovery plan with minimal disruption. Monitoring is critical; administrators must track the success of these recovery actions and ensure that the system returns to a stable state. Furthermore, there must be a clear communication strategy to inform stakeholders of the issue and the recovery plan, ensuring transparency and accountability throughout the process.
+
+[CLI: PowerShell command to check the status of applied KIR policies and verify if a specific update has been rolled back]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that rollback and KIR are substitutes for rigorous testing. In reality, they are recovery mechanisms, not a replacement for a robust validation pipeline. Another error is assuming that KIR is a permanent fix; it is a temporary mitigation, and the underlying issue must still be addressed by the vendor in a future update.
+
+### Interview Angle
+1. Question: How do you decide between a full update rollback and a Known-Issue Rollback (KIR)?
+   Answer: The decision is based on the severity and scope of the issue. If the issue is catastrophic and affects the entire system, a full rollback may be necessary. If the issue is targeted and affects a specific feature, KIR is the preferred, surgical solution that minimizes disruption while maintaining the overall security posture.
+2. Question: What are the risks of performing a full update rollback in a production environment?
+   Answer: The primary risk is system instability and the potential for data loss or corruption. Mitigation involves performing rollbacks in a controlled manner, using snapshots or backups where possible, and thoroughly testing the rollback process in a staging environment before executing it in production.
+3. Question: How do you ensure that KIR policies are applied effectively across the entire fleet?
+   Answer: Effectiveness is ensured by integrating KIR policy delivery into the existing MDM or GPO infrastructure, ensuring that all devices receive the policy automatically. Regular audits of the KIR status on endpoints are essential to verify that the mitigation has been applied correctly and that the system is stable.
+
+### Related Concepts
+- Section 2.4: OS Update Mechanics (WSUS, WUfB)
+- Section 2.4: Patch ring/deployment ring strategy
+- Section 3.3: Incident Response and Disaster Recovery
