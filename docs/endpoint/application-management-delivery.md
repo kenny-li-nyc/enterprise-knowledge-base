@@ -189,3 +189,41 @@ Operationalizing browser management requires a disciplined, iterative approach. 
 - Section 2.3: Configuration Management (GPO/MDM)
 - Section 2.6: Application packaging & deployment models
 - Section 2.6: App allowlisting/denylisting (WDAC, AppLocker)
+
+## 6. Legacy/Unsupported Application Handling
+
+### Technical Definition
+Legacy and unsupported application handling refers to the architectural strategy for maintaining, isolating, and securing software that has reached end-of-life (EOL) or end-of-support (EOS) status but remains critical to business operations. This discipline involves implementing compensating controls to mitigate the inherent security risks of unpatched binaries, outdated runtime environments (e.g., legacy Java, .NET Framework 2.0/3.5), and insecure communication protocols. The goal is to extend the operational life of these systems while minimizing the attack surface they present to the broader enterprise environment.
+
+### Underlying Mechanism
+The mechanism for handling legacy applications centers on isolation and virtualization. Rather than allowing these applications to run natively on the host OS, architects employ technologies such as application virtualization (e.g., App-V, MSIX App Attach) or full desktop virtualization (VDI) to encapsulate the application and its dependencies. This creates a "sandbox" that limits the application's ability to interact with the host file system, registry, or network. As noted in Section 2.3, the policy delivery vehicles (GPO/MDM) are used to push the isolation configurations and security baselines to these isolated environments, ensuring that the legacy application remains within a defined, controlled boundary. Furthermore, as discussed in Section 2.5, these legacy applications must be run with the principle of least privilege, often requiring JIT elevation or LAPS to manage the local administrative context if the application requires it, while simultaneously applying ASR rules to block common exploitation vectors.
+
+[DIAGRAM: Architecture diagram showing legacy app isolation via virtualization/containerization and network segmentation]
+
+### Why It Exists
+Legacy application handling exists because the cost and complexity of refactoring or replacing core line-of-business (LOB) systems often outweigh the immediate risk of running them. In banking, many core transaction processing systems rely on decades-old codebases that cannot be easily modernized. This discipline provides a structured framework for managing these "technical debt" items, ensuring that they do not become the weak link in the enterprise security posture while the organization works toward a long-term modernization or decommissioning strategy.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, legacy application handling is a high-stakes exercise in risk management. Banks are frequently audited on their ability to secure EOL software, and regulators require documented compensating controls for any system that cannot be patched. Architects must design these environments with a "zero-trust" mindset, assuming that the legacy application is inherently vulnerable. This often involves air-gapping the application from the internet, restricting its network access to specific, known endpoints, and implementing enhanced monitoring to detect anomalous behavior that could indicate exploitation.
+
+### Operational Considerations
+Operationalizing legacy application handling requires a rigorous, risk-based approach. Administrators must maintain a comprehensive inventory of all EOL software, categorize it by risk level, and define specific isolation and monitoring requirements for each. This involves regular reviews of the "sunset" plan for each application, ensuring that the organization is actively working toward decommissioning or replacement. Monitoring is critical; administrators must implement enhanced logging and alerting for these applications, focusing on detecting unauthorized network connections, file system modifications, or privilege escalation attempts.
+
+[CLI: PowerShell command to check for legacy runtime versions or compatibility shim status on an endpoint]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "virtualizing" a legacy application is a complete security solution. In reality, virtualization is only one layer of defense; it must be combined with network segmentation, strict identity controls, and enhanced monitoring to be effective. Another error is assuming that legacy applications can be managed with the same operational processes as modern, supported software; they require specialized handling, dedicated resources, and a higher level of scrutiny.
+
+### Interview Angle
+1. Question: How do you justify the continued use of EOL software in a Tier-1 banking environment?
+   Answer: We justify it through a formal risk acceptance process, where the business value of the application is weighed against the security risk. We then implement a comprehensive set of compensating controls—such as network isolation, application virtualization, and enhanced monitoring—to mitigate the risk to an acceptable level, while simultaneously maintaining a clear, funded roadmap for decommissioning or replacement.
+2. Question: What are the key considerations when designing an isolation strategy for a legacy application?
+   Answer: The key considerations are the application's dependencies, its network requirements, and the potential impact of isolation on its functionality. We prioritize technologies that provide the highest level of isolation with the least impact on user experience, such as containerization or VDI, and we always validate the isolation strategy in a staging environment before production deployment.
+3. Question: How do you handle the challenge of monitoring legacy applications for security threats?
+   Answer: We implement enhanced logging and alerting specifically for these applications, focusing on detecting anomalous behavior that could indicate exploitation. This includes monitoring for unauthorized network connections, file system modifications, and privilege escalation attempts, and we integrate these alerts into our centralized security operations center (SOC) for rapid response.
+
+### Related Concepts
+- Section 2.5: Endpoint Hardening & Local Admin
+- Section 2.3: Configuration Management (GPO/MDM)
+- Section 2.6: Application packaging & deployment models
