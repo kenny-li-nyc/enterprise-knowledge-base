@@ -75,3 +75,41 @@ Operationalizing third-party patching requires a high degree of automation. Admi
 - Section 2.3: Configuration Management (GPO/MDM)
 - Section 3.2: Vulnerability Management and EDR Integration
 - Section 2.4: Patch ring/deployment ring strategy
+
+## 3. Patch Ring/Deployment Ring Strategy
+
+### Technical Definition
+A patch ring or deployment ring strategy is a structured, phased rollout methodology where updates are deployed to progressively larger and more critical groups of endpoints. Instead of a "big bang" deployment, which carries significant risk of widespread disruption, the strategy segments the fleet into distinct rings—typically ranging from a small pilot group of IT and development systems to a broad production group, and finally to critical, high-value infrastructure. This approach allows for the validation of updates in controlled environments before they are exposed to the entire organization, ensuring that any issues are identified and mitigated early in the deployment lifecycle.
+
+### Underlying Mechanism
+The mechanism relies on the policy delivery vehicles (MDM or WSUS) to assign devices to specific deployment groups or "rings." Each ring is configured with distinct update policies, such as deferral periods, deadline enforcement, and target release versions. For example, the "Pilot" ring might receive updates immediately upon release, while the "Broad" ring receives them after a 7-day deferral, and the "Critical" ring after a 14-day deferral. The management system monitors the success and failure rates of each ring; if a ring reports an unacceptable number of failures, the deployment to subsequent rings is automatically paused, preventing the propagation of a problematic update.
+
+[DIAGRAM: Flowchart illustrating the progression of an update through Pilot, Fast, Broad, and Critical deployment rings]
+
+### Why It Exists
+Deployment rings exist to manage the "blast radius" of updates. In a large enterprise, a single buggy update can cause thousands of devices to crash, leading to massive operational disruption and financial loss. By segmenting the fleet, organizations can isolate potential issues to a small, non-critical subset of devices, allowing for rapid identification and remediation without impacting the broader business. This strategy is a fundamental component of modern, resilient IT operations, enabling organizations to maintain a high velocity of patching while minimizing the risk of catastrophic failure.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, deployment rings are a critical control for maintaining the stability of trading floors, retail banking systems, and other high-value infrastructure. These environments are often designated as "Critical" rings, receiving updates only after they have been thoroughly validated in lower-tier rings. The audit and compliance angle is significant: banks must demonstrate that they have a controlled, risk-managed process for deploying updates, and deployment rings provide the necessary evidence of this control. Architects must design these rings to be granular, ensuring that the "Critical" ring is truly isolated and that the validation process is rigorous and data-driven.
+
+### Operational Considerations
+Operationalizing deployment rings requires a high degree of automation and monitoring. Administrators must define clear criteria for "promoting" an update from one ring to the next, such as a minimum success rate or a lack of reported issues. Monitoring is critical; administrators must track the health of each ring in real-time, using dashboards to identify and investigate failures. Furthermore, there must be a clear process for "pausing" or "rolling back" a deployment if an issue is detected, ensuring that the organization can respond quickly to any unexpected behavior.
+
+[CLI: PowerShell command to check the current deployment ring assignment and update status for a specific device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that deployment rings are a "set and forget" configuration. In reality, they require ongoing maintenance, as the composition of the rings must be updated to reflect changes in the fleet and the business. Another error is assuming that skipping rings is a valid way to "speed up" patching; this defeats the purpose of the strategy and significantly increases the risk of widespread disruption.
+
+### Interview Angle
+1. Question: How do you design a deployment ring strategy that balances the need for rapid security patching with the requirement for stability?
+   Answer: The strategy should be risk-based. Use short deferral periods for the Pilot and Fast rings to ensure rapid security patching, and longer deferral periods for the Broad and Critical rings to allow for thorough validation. This tiered approach ensures that security updates are deployed quickly where possible, while stability is maintained where necessary.
+2. Question: What are the key metrics you would use to determine if an update is "safe" to promote to the next ring?
+   Answer: Key metrics include the percentage of successful installations, the number of reported issues or support tickets, and the performance impact on the device (e.g., CPU/memory usage). These metrics should be aggregated and analyzed to provide a clear, data-driven decision on whether to promote the update.
+3. Question: How do you handle a situation where an update passes the Pilot ring but causes issues in the Broad ring?
+   Answer: The deployment to subsequent rings must be immediately paused. The issue should be investigated, and if necessary, the update should be rolled back in the Broad ring. The Pilot ring's validation criteria should then be reviewed and updated to ensure that the issue is caught in the future.
+
+### Related Concepts
+- Section 2.4: OS Update Mechanics (WSUS, WUfB)
+- Section 2.4: Patch compliance reporting & metrics
+- Section 2.3: Configuration Management (GPO/MDM)
