@@ -37,3 +37,41 @@ Operationalizing VPN client management requires a robust, end-to-end process. Ad
 - Section 2.2: Endpoint Identity & Trust
 - Section 1.9: Identity Federation & Claims
 - Section 2.7: Always-On VPN / DirectAccess
+
+## 2. Always-On VPN / DirectAccess
+
+### Technical Definition
+Always-On VPN (AOVPN) and DirectAccess are advanced remote connectivity paradigms designed to provide seamless, transparent access to the corporate network as soon as the endpoint detects an internet connection. Unlike traditional VPNs that require manual user initiation, these technologies establish connectivity automatically in the background. AOVPN utilizes IKEv2/IPsec tunnels, while DirectAccess relies on IPv6 transition technologies (such as IP-HTTPS) to create a persistent, bidirectional connection between the client and the enterprise gateway, effectively treating the remote device as if it were physically connected to the internal network.
+
+### Underlying Mechanism
+The mechanism for AOVPN involves two distinct tunnel types: a "machine tunnel" that establishes connectivity before user login (enabling GPO/MDM policy updates and authentication), and a "user tunnel" that initiates upon user authentication. These tunnels are managed by the Windows Remote Access service and leverage the device's identity certificates to authenticate the tunnel establishment. DirectAccess, conversely, uses a more complex set of IPv6 transition protocols to encapsulate traffic, requiring specific infrastructure components like Network Location Servers (NLS) to determine if the client is inside or outside the corporate network. As noted in Section 2.2, the device's compliance state is verified during the tunnel negotiation, ensuring that only authorized devices can access the network. Furthermore, as discussed in Section 1.9, the user tunnel integrates with the organization's identity provider to handle the authentication handshake and obtain the necessary authorization tokens for the session.
+
+[DIAGRAM: Architecture diagram showing the separation of machine and user tunnels in an Always-On VPN configuration]
+
+### Why It Exists
+Always-On connectivity exists to eliminate the "connect-to-work" friction that plagues traditional VPNs, significantly improving user productivity and the reliability of endpoint management. By ensuring that the device is connected to the corporate network even when the user is not logged in, organizations can ensure that security policies, software updates, and configuration changes are applied in real-time, regardless of the user's location. This is essential for maintaining a consistent security posture across a distributed fleet and for ensuring that remote endpoints remain compliant with enterprise standards.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, Always-On connectivity is a foundational requirement for modern endpoint management, enabling the continuous enforcement of security policies and the rapid deployment of critical patches. Banks must implement these solutions with extreme care, ensuring that the "always-on" nature of the connection does not create an unmanaged attack vector. This involves implementing strict device compliance checks, ensuring that only managed, patched, and secure endpoints can establish a connection, and using robust, FIPS 140-3 compliant encryption for all tunnels. Architects must also design these solutions to be highly available and scalable, ensuring that they can support the bank's entire remote workforce without performance degradation.
+
+### Operational Considerations
+Operationalizing Always-On connectivity requires a disciplined, iterative approach. Administrators must manage the entire lifecycle of the AOVPN/DirectAccess infrastructure, from deployment and configuration to monitoring and troubleshooting. This involves using automated deployment tools to push the VPN configuration to the fleet, ensuring that all clients are correctly configured and that the machine and user tunnels are functioning as expected. Monitoring is critical; administrators must track the status of the tunnels, identify and resolve any issues, and provide reporting on the usage and performance of the connectivity infrastructure. Furthermore, administrators must ensure that they have a clear process for handling connectivity-related support requests, providing users with the necessary tools and guidance to troubleshoot common issues.
+
+[CLI: PowerShell command to check the status of the Always-On VPN machine and user tunnels on a Windows device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "Always-On" means the device is always "inside" the network, bypassing security controls. In reality, the device is still subject to all enterprise security policies, including firewalls, EDR, and application control, regardless of its location. Another error is assuming that AOVPN is a simple "drop-in" replacement for traditional VPNs; it requires a significant investment in infrastructure, configuration, and testing to ensure that it is secure, reliable, and performant.
+
+### Interview Angle
+1. Question: How do you manage the security risks associated with an "Always-On" connection that is active before the user logs in?
+   Answer: We mitigate this risk by implementing strict device compliance checks, ensuring that only managed, patched, and secure endpoints can establish a machine tunnel. We also use certificate-based authentication for the machine tunnel, ensuring that only authorized devices can connect, and we apply granular firewall rules to restrict the traffic that can be sent over the machine tunnel.
+2. Question: What are the key considerations when transitioning from DirectAccess to Always-On VPN?
+   Answer: The key considerations are infrastructure compatibility, protocol support, and user experience. We evaluate the existing DirectAccess infrastructure, identify the necessary changes to support AOVPN, and develop a phased migration plan that minimizes disruption to users. We also prioritize the use of modern, robust protocols like IKEv2 and ensure that the new solution meets all security and compliance requirements.
+3. Question: How do you handle the challenge of troubleshooting Always-On VPN connectivity issues for remote users?
+   Answer: We provide users with a self-service troubleshooting tool that can diagnose common connectivity issues, such as network configuration or certificate errors. For more complex issues, we use centralized monitoring and logging to identify the root cause, and we provide our support teams with the necessary training and documentation to resolve these issues efficiently.
+
+### Related Concepts
+- Section 2.2: Endpoint Identity & Trust
+- Section 1.9: Identity Federation & Claims
+- Section 2.7: VPN client management (IKEv2, SSL VPN)
