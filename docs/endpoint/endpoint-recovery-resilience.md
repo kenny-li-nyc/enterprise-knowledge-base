@@ -151,3 +151,41 @@ Operationalizing fleet-wide DR requires a disciplined, proactive approach. Admin
 - Section 1.6: Forest & Domain Disaster Recovery
 - Section 2.8: Backup & restore strategies
 - Section 2.8: Autopilot Reset / fresh start procedures
+
+## 5. Self-healing/auto-remediation scripts
+
+### Technical Definition
+Self-healing and auto-remediation scripts are automated, agent-based routines designed to detect and resolve configuration drift, performance degradation, or security policy violations on an endpoint without human intervention. These scripts act as a "first responder" for common operational issues, ensuring that endpoints remain in a compliant and performant state. By continuously monitoring system health and applying corrective actions, these scripts reduce the burden on IT support teams and minimize the impact of configuration issues on user productivity.
+
+### Underlying Mechanism
+The mechanism relies on monitoring agents (such as Intune Remediation, custom WMI event consumers, or scheduled tasks) that execute PowerShell scripts when specific conditions are met. These scripts perform a "detection" phase, where they query the system state (e.g., checking a registry key, verifying a service status, or validating a file hash), and a "remediation" phase, where they apply the necessary corrective actions if the system is found to be non-compliant. These scripts are often triggered by system events, such as a service failure or a configuration change, or they run on a recurring schedule to ensure continuous compliance. The execution of these scripts is logged and reported to a central management console, providing an audit trail of all remediation actions.
+
+[DIAGRAM: Flowchart illustrating the detection and remediation loop: monitoring, condition check, script execution, and reporting]
+
+### Why It Exists
+Self-healing scripts exist to address the problem of configuration drift and the operational overhead of manually resolving common endpoint issues. In a large, distributed fleet, it is impossible for IT support teams to manually monitor and fix every configuration issue. Auto-remediation provides a scalable, automated way to maintain the health and security of the fleet, ensuring that endpoints are always in a known-good state and reducing the number of support tickets related to common, preventable issues.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, self-healing and auto-remediation are critical components of the bank's operational resilience strategy. Banks must ensure that all endpoints are compliant with security baselines (e.g., ensuring that ASR rules are enabled, antivirus services are running, and critical patches are applied) at all times. Auto-remediation provides a powerful tool for enforcing these baselines, ensuring that any deviation is automatically corrected. Architects must design these scripts to be secure, auditable, and thoroughly tested, ensuring that they do not introduce new vulnerabilities or cause operational disruption. This includes implementing strict code signing and version control for all remediation scripts.
+
+### Operational Considerations
+Operationalizing self-healing scripts requires a disciplined, iterative approach. Administrators must develop, test, and deploy these scripts with the same rigor as any other software. This involves using a centralized management platform to deploy and monitor the scripts, ensuring that they are correctly configured and that they are not causing unintended side effects. Monitoring is critical; administrators must track the success and failure rates of remediation actions, identify and resolve any issues, and provide reporting on the health and compliance of the fleet. Furthermore, administrators must ensure that they have a clear process for handling remediation failures, providing support teams with the necessary tools and guidance to investigate and resolve these issues.
+
+[CLI: PowerShell command to query the status of a remediation script and verify its last execution result]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that auto-remediation is a "set and forget" solution. In reality, it requires ongoing maintenance, as the scripts must be updated to reflect changes in the environment and the business. Another error is assuming that auto-remediation replaces the need for root-cause analysis; it is a tool for maintaining compliance, but it does not address the underlying issues that cause configuration drift in the first place.
+
+### Interview Angle
+1. Question: How do you ensure that auto-remediation scripts are secure and do not introduce new vulnerabilities?
+   Answer: We implement strict code signing and version control for all remediation scripts, ensuring that only authorized and tested scripts can be executed on our endpoints. We also use a centralized management platform to deploy and monitor the scripts, and we conduct regular security reviews of our remediation library.
+2. Question: What are the key considerations when designing a self-healing strategy for a Tier-1 bank?
+   Answer: The key considerations are security, auditability, and reliability. The strategy must be secure, with strict access controls and code signing; it must be auditable, with every remediation action logged and reported; and it must be reliable, with thorough testing and validation to ensure that it does not cause operational disruption.
+3. Question: How do you handle the challenge of troubleshooting remediation scripts that fail or cause unintended side effects?
+   Answer: We use centralized monitoring and logging to track the execution of our remediation scripts, identifying any failures or unexpected behavior. We also provide our support teams with the necessary training and documentation to investigate and resolve these issues, and we have a clear process for rolling back any problematic scripts.
+
+### Related Concepts
+- Section 2.3: Configuration Management (GPO/MDM)
+- Section 2.6: Application packaging & deployment models
+- Section 2.8: Disaster recovery planning for endpoint fleets
