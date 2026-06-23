@@ -151,3 +151,41 @@ Operationalizing a self-service catalog requires a robust, end-to-end process fo
 - Section 2.6: Application packaging & deployment models
 - Section 2.3: Configuration Management (GPO/MDM)
 - Section 2.6: Software inventory & license compliance tracking
+
+## 5. Browser & Extension Management
+
+### Technical Definition
+Browser and extension management is the discipline of governing the configuration, security posture, and functional capabilities of web browsers within the enterprise. This includes enforcing standardized browser settings (e.g., homepage, proxy settings, security zones), managing the installation and update lifecycle of browser extensions, and controlling access to web-based resources. In a modern enterprise, this often involves managing multiple browser engines (e.g., Chromium-based Edge, Chrome) and ensuring that browser-based applications are isolated from the host operating system and protected against malicious web content.
+
+### Underlying Mechanism
+Browser management relies on the application of administrative templates (ADMX/ADML) or cloud-based policy profiles that modify the browser's configuration files or registry keys. These policies control features such as extension allowlisting, site-to-app assignment, and security settings like "SmartScreen" or "Safe Browsing." For extensions, the browser's management interface checks against a defined policy (e.g., "ExtensionInstallAllowlist") to determine which extensions are permitted to be installed from the official store or a local repository. As noted in Section 2.3, these policies are delivered via the organization's policy delivery vehicles (GPO/MDM), ensuring that browser configurations are applied consistently across the fleet.
+
+[DIAGRAM: Sequence diagram showing the browser policy enforcement process, from policy delivery to extension validation and configuration application]
+
+### Why It Exists
+Browser management exists to mitigate the significant security risks associated with web browsing, which is the primary vector for phishing, malware delivery, and data exfiltration. By standardizing browser configurations, organizations can ensure that security features are enabled, unauthorized extensions are blocked, and users are protected from malicious websites. Furthermore, browser management is essential for ensuring compatibility with web-based line-of-business applications, which often require specific browser settings or extensions to function correctly.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, browser management is a critical security control, as the browser is the primary interface for both internal and external banking applications. Banks must implement strict policies that disable unnecessary features, block unauthorized extensions, and enforce secure browsing practices. This is often a requirement for compliance with frameworks like PCI-DSS and other regulatory standards. Architects must design browser policies that are granular, allowing for the necessary flexibility for developers and power users while maintaining a strict security boundary for the general workstation fleet.
+
+### Operational Considerations
+Operationalizing browser management requires a disciplined, iterative approach. Administrators must move away from manual, "hands-on" management and toward a model where browser policies are automatically generated, tested in a staging environment, and deployed to production. Monitoring is critical; administrators must track the success and failure rates of policy application, identify and resolve any issues, and provide reporting on the browser configuration and extension inventory across the enterprise. Furthermore, because browser management can be complex to manage, administrators must ensure that they have a clear process for updating policies and handling exceptions, ensuring that the security posture remains effective without causing operational disruption.
+
+[CLI: PowerShell command to query the current browser policy status and installed extensions on a Windows device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that browser management is just about setting a homepage or a proxy. In reality, it is a comprehensive security discipline that includes managing extensions, controlling access to web resources, and enforcing security settings. Another error is assuming that browser management is a "set and forget" configuration; it requires ongoing maintenance, as browser versions are constantly evolving and the threat landscape is dynamic.
+
+### Interview Angle
+1. Question: How do you manage the operational friction caused by a strict browser extension allowlisting policy?
+   Answer: We minimize friction by providing a self-service portal for requesting new extensions, which is then automatically vetted, tested, and added to the allowlist. We also use "Audit" mode for new policies to identify and whitelist legitimate business extensions before switching to "Enforcement" mode.
+2. Question: What are the key considerations when designing a browser management strategy for a Tier-1 bank?
+   Answer: The key considerations are security, compatibility, and manageability. The strategy must be fully automated, with robust policy enforcement and monitoring, and every browser configuration must be documented and approved through the bank's change management process. We also prioritize the use of modern, secure browsers like Chromium-based Edge.
+3. Question: How do you handle the challenge of managing browser-based applications that require different browser versions or settings?
+   Answer: We use browser-based virtualization or containerization technologies to isolate these applications, ensuring that they can run in their required environment without compromising the security of the host browser or the rest of the system. We also use policy-based site assignment to automatically route users to the correct browser or profile for each application.
+
+### Related Concepts
+- Section 2.3: Configuration Management (GPO/MDM)
+- Section 2.6: Application packaging & deployment models
+- Section 2.6: App allowlisting/denylisting (WDAC, AppLocker)
