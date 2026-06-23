@@ -75,3 +75,41 @@ Operationalizing backup and restore strategies requires a disciplined, automated
 - Section 2.8: BitLocker Recovery Key Management & Escrow
 - Section 1.6: Forest & Domain Disaster Recovery
 - Section 2.8: Autopilot Reset / fresh start procedures
+
+## 3. Autopilot Reset / Fresh Start Procedures
+
+### Technical Definition
+Autopilot Reset and Fresh Start are automated device reprovisioning workflows that return a Windows device to a "business-ready" state. Autopilot Reset is a local, user-initiated or admin-initiated action that wipes user data and settings while preserving the device's enrollment in MDM and its identity in Entra ID. Fresh Start is a more comprehensive reset that removes all apps and settings, often used to resolve deep system corruption or prepare a device for a new user, while also maintaining the device's management enrollment.
+
+### Underlying Mechanism
+These procedures leverage the Windows Recovery Environment (WinRE) and the MDM management agent. When triggered, the OS initiates a wipe of the user profile and application data while maintaining the device's enrollment token. The MDM agent then re-applies the configuration profile, policies, and applications defined in the Autopilot deployment profile. This process interacts with the TPM to ensure that the device identity remains intact, allowing the device to re-join the domain or Entra ID without manual intervention. The process effectively resets the OS to a clean state while keeping the device "known" to the management infrastructure, ensuring that it can immediately receive its assigned configuration upon reboot.
+
+[DIAGRAM: Flowchart illustrating the Autopilot Reset process: trigger, data wipe, MDM re-enrollment, and policy re-application]
+
+### Why It Exists
+These procedures exist to minimize the time and effort required to repurpose devices or recover from system-level issues. In a large enterprise, manual re-imaging is costly and slow. Automated reset procedures allow IT to quickly return a device to a compliant, managed state, reducing downtime and improving the efficiency of the device lifecycle management. This is particularly important for remote workforces where physical access to the device is not possible.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, these procedures are essential for secure device repurposing and rapid recovery. Banks must ensure that all data is securely erased before a device is reassigned, complying with data privacy regulations. Architects must design these workflows to be fully automated and auditable, ensuring that every reset is logged and that the device is returned to a known-good, compliant state. This is a critical component of the bank's operational resilience strategy, enabling rapid recovery from device-level failures or security incidents.
+
+### Operational Considerations
+Operationalizing these procedures requires a robust, end-to-end process. Administrators must define the Autopilot profiles, configure the reset settings, and ensure that the MDM agent is correctly configured to re-apply policies. Monitoring is critical; administrators must track the success and failure rates of reset procedures, identify and resolve any issues, and provide reporting on the device lifecycle. Furthermore, administrators must ensure that they have a clear, secure process for initiating these resets, with strict authentication and authorization requirements for any support staff performing them.
+
+[CLI: PowerShell command to trigger an Autopilot Reset or verify the status of a pending reset operation]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that Autopilot Reset is a replacement for a full re-image. In reality, it is a targeted reset that preserves the device's identity and enrollment, which is not suitable for all recovery scenarios, such as when the OS itself is severely corrupted. Another error is assuming that these procedures are "set and forget"; they require ongoing maintenance, as the Autopilot profiles and MDM policies must be kept up-to-date.
+
+### Interview Angle
+1. Question: How do you ensure that all user data is securely erased during an Autopilot Reset?
+   Answer: We rely on the built-in Windows reset functionality, which performs a secure wipe of the user data partitions. We also enforce full-disk encryption (BitLocker) on all devices, which ensures that even if data is not fully overwritten, it remains encrypted and inaccessible.
+2. Question: What are the key considerations when designing an automated device reset strategy for a Tier-1 bank?
+   Answer: The key considerations are security, auditability, and speed. The strategy must be fully automated, with robust data erasure verification, and every reset must be documented and approved through the bank's change management process. We also prioritize the use of modern, cloud-native provisioning tools like Autopilot to ensure that devices are returned to a compliant state as quickly as possible.
+3. Question: How do you handle the challenge of troubleshooting failed Autopilot Reset procedures?
+   Answer: We use centralized monitoring and logging to track the status of reset procedures, identifying any failures and providing detailed error reports. We also provide our support teams with the necessary training and documentation to troubleshoot common issues, such as network connectivity or policy application errors.
+
+### Related Concepts
+- Section 2.8: Backup & restore strategies
+- Section 2.8: Disaster recovery planning for endpoint fleets
+- Section 2.6: Application packaging & deployment models
