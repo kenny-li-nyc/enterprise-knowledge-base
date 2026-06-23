@@ -75,3 +75,41 @@ Operationalizing ASR rules requires a disciplined, iterative approach. Administr
 - Section 2.3: Configuration Management (GPO/MDM)
 - Section 3.2: EDR and Threat Detection
 - Section 2.5: CIS/STIG/DISA Baseline Benchmarks
+
+## 3. Local Admin Rights Management (LAPS, Just-in-Time Elevation)
+
+### Technical Definition
+Local admin rights management is the practice of removing persistent administrative privileges from standard user accounts and implementing controlled, audited mechanisms for elevation. This includes the Local Administrator Password Solution (LAPS) for managing unique, randomized local administrator passwords across the fleet, and Just-In-Time (JIT) elevation for granting temporary, scoped administrative access to users when required for specific tasks. This approach is central to the principle of least privilege, ensuring that users operate with the minimum level of access necessary to perform their job functions, thereby reducing the risk of privilege escalation and lateral movement.
+
+### Underlying Mechanism
+LAPS works by generating a random password for the local administrator account on each machine, which is then encrypted and stored in a specific attribute in Active Directory (e.g., `ms-Mcs-AdmPwd` or the modern `msLAPS` attributes, as discussed in Section 1.4). JIT elevation typically involves an agent-based or policy-based request-approval workflow where a user requests elevation, and upon approval, the system grants temporary membership to the local Administrators group or provides a temporary token. As noted in Section 2.3, the policy delivery vehicles (GPO/MDM) are used to configure the LAPS client or the JIT agent on the endpoint, ensuring that the management policies are applied consistently across the fleet.
+
+[DIAGRAM: Sequence diagram showing the LAPS password rotation process and the JIT elevation request-approval workflow]
+
+### Why It Exists
+Persistent local admin rights are a primary vector for lateral movement and privilege escalation. If a user is compromised while running as an administrator, the attacker gains full control over the endpoint and can easily move laterally to other systems. Removing these rights forces attackers to find alternative, more difficult paths to escalate privileges, significantly increasing the cost and complexity of an attack. LAPS and JIT elevation provide a secure, manageable way to handle the necessary administrative tasks without granting permanent, high-level access to standard users.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, "Zero Standing Privileges" (ZSP) is the goal. LAPS is the baseline for managing the local admin account, ensuring that if one machine is compromised, the password cannot be used to compromise others. JIT elevation is used for power users or developers who occasionally need admin rights, ensuring that these rights are temporary, audited, and tied to a specific business justification. This aligns with FFIEC and NIST requirements for least privilege and provides a clear audit trail for all administrative actions, which is essential for regulatory compliance.
+
+### Operational Considerations
+Operationalizing LAPS requires ensuring that the LAPS client is installed and configured on all endpoints and that the AD schema is correctly extended to support the password attributes. JIT elevation requires a robust request-approval workflow and integration with the organization's identity management system. Monitoring is critical; administrators must audit all elevation requests and password retrievals to detect anomalous behavior. Furthermore, administrators must manage the lifecycle of these administrative rights, ensuring that they are revoked immediately after the task is completed.
+
+[CLI: PowerShell command to retrieve the current LAPS password for a specific computer account]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that LAPS is a replacement for JIT elevation. In reality, LAPS manages the *local* admin account, while JIT manages *user* elevation. Another error is assuming that removing local admin rights is sufficient; it must be coupled with robust application control (e.g., WDAC) to prevent users from running unauthorized software that could potentially exploit vulnerabilities to gain higher privileges.
+
+### Interview Angle
+1. Question: How do you implement a "Zero Standing Privileges" model for local admin rights in a large banking environment?
+   Answer: We use LAPS to secure the local admin account and implement a JIT elevation solution for users who require administrative access. All elevation requests are tied to a business justification, audited, and automatically revoked after a set period.
+2. Question: What are the risks of using a single, shared local administrator password across the fleet?
+   Answer: The risk is "pass-the-hash" attacks, where an attacker can compromise one machine and use the shared password to gain administrative access to every other machine in the fleet. LAPS mitigates this by ensuring every machine has a unique, randomized password.
+3. Question: How do you handle the operational friction caused by removing local admin rights?
+   Answer: We minimize friction by providing a self-service JIT elevation portal for common tasks and by ensuring that the vast majority of applications can run without administrative privileges. We also invest in robust application packaging to ensure that software updates and installations are handled centrally.
+
+### Related Concepts
+- Section 1.4: Active Directory Schema and Attribute Management
+- Section 2.3: Configuration Management (GPO/MDM)
+- Section 3.1: Privileged Access Management (PAM)
