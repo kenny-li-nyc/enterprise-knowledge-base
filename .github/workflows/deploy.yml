@@ -24,7 +24,7 @@ jobs:
         run: |
           pip install mkdocs
           # If you use the Material theme, uncomment the line below:
-          # pip install mkdocs-material 
+          pip install mkdocs-material 
 
       - name: Deploy to GitHub Pages
         run: mkdocs gh-deploy --force
