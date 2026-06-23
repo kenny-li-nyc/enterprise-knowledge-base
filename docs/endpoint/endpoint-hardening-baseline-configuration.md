@@ -227,3 +227,41 @@ Operationalizing drift auditing requires a balance between automated remediation
 - Section 2.3: Configuration Management (GPO/MDM)
 - Section 2.5: CIS/STIG/DISA Baseline Benchmarks
 - Section 2.3: Policy reporting & compliance dashboards
+
+## 7. Endpoint Health Attestation Reporting
+
+### Technical Definition
+Endpoint health attestation reporting is the process of collecting, analyzing, and visualizing the integrity state of an endpoint as verified by hardware-rooted trust mechanisms, such as the Trusted Platform Module (TPM) and Secure Boot. It provides a verifiable, cryptographic claim that the device booted into a trusted state and has not been compromised by firmware-level or kernel-level threats. This reporting is essential for ensuring that only devices with a verified, "clean" boot integrity can access sensitive banking resources, providing a critical layer of assurance beyond standard configuration compliance.
+
+### Underlying Mechanism
+The mechanism relies on the Device Health Attestation (DHA) service or similar cloud-based attestation providers. During the boot process, the device performs "Measured Boot," where each component is hashed and recorded in the TPM's Platform Configuration Registers (PCRs). When an attestation request is made, the device sends a signed quote of these PCRs to the attestation service. The service validates these measurements against a known-good baseline and issues a health certificate or claim. This claim is then ingested by management platforms (e.g., Intune, MECM) and visualized in compliance dashboards, providing administrators with a real-time view of the boot integrity of the entire fleet.
+
+[DIAGRAM: Sequence diagram showing the Measured Boot process, the TPM signing the PCRs, and the attestation service issuing a health certificate]
+
+### Why It Exists
+Endpoint health attestation reporting exists to provide cryptographic proof of device integrity. Traditional software-based security agents can be blinded or bypassed by rootkits that gain control of the boot process or the kernel. By rooting trust in hardware (TPM) and enforcing integrity checks at the earliest possible stage of the boot process (Secure Boot), organizations can ensure that the endpoint is in a known-good state before the OS even loads. Attestation reporting bridges the gap between "is the device configured correctly?" (compliance) and "is the device actually trustworthy?" (integrity).
+
+### Enterprise / Banking Reality
+In Tier-1 banking, endpoint health attestation is a critical requirement for accessing the most sensitive transactional systems. Banks use this reporting to gate access to core banking applications; if a device fails attestation (e.g., due to an unauthorized firmware modification), it is automatically blocked from accessing the banking network, regardless of the user's credentials or compliance status. This is a key requirement for DORA (Digital Operational Resilience Act) and similar mandates, which require organizations to demonstrate the integrity and resilience of their digital infrastructure.
+
+### Operational Considerations
+Operationalizing health attestation reporting requires careful management of the "known-good" baselines. If a firmware update changes the boot measurements, the attestation service must be updated to recognize the new baseline, or the entire fleet will fail attestation. This requires tight integration between the patch management process and the attestation service. Administrators must also monitor for "attestation failures" as a potential indicator of a compromised device or a failed update, and ensure that there is a clear remediation path for devices that fail to attest.
+
+[CLI: PowerShell command to query the current TPM PCR values and verify the device's attestation status]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that attestation is a "set and forget" configuration. In reality, it requires continuous maintenance of the baseline measurements. Another error is assuming that attestation protects against all forms of compromise; it only verifies the integrity of the boot process and firmware, not the security of the applications running on top of the OS.
+
+### Interview Angle
+1. Question: How does attestation differ from standard compliance reporting?
+   Answer: Compliance reporting focuses on the *configuration* and *state* of the OS and applications (e.g., is the firewall on?), while attestation reporting focuses on the *integrity* of the hardware and boot process (e.g., has the firmware been tampered with?).
+2. Question: How do you handle a situation where a legitimate firmware update causes a fleet of devices to fail attestation?
+   Answer: The process must include a "pre-flight" phase where new firmware baselines are validated in a test environment and then pushed to the attestation service before the firmware is deployed to the production fleet.
+3. Question: Why is attestation considered a "higher" form of trust than standard compliance?
+   Answer: Attestation is rooted in hardware and the boot process, making it much harder to spoof than software-based compliance signals, which can be manipulated by a compromised kernel.
+
+### Related Concepts
+- Section 2.2: Device Attestation & Health Certificates
+- Section 2.5: Baseline drift auditing & remediation
+- Section 3.1: Secure Boot and Measured Boot Architecture
