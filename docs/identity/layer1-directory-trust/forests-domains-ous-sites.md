@@ -42,13 +42,11 @@ graph TB
     DC1 ===|hosts GC role| GC
 ```
 
-This keeps your original concept (Schema/Config replication + GC) but labels the arrows so a reader doesn't have to guess what each connection means, and uses a single labeled GC node instead of two unexplained dotted lines.
-
 ### Why It Exists
 The forest exists to provide a unified namespace and a shared security context while allowing for the delegation of administrative control. Historically, it was designed to allow organizations to merge disparate IT environments into a single, manageable directory service. It provides a mechanism to enforce a consistent security policy (via Group Policy Objects) and a unified identity store, ensuring that a user's identity is consistent regardless of which domain they authenticate against. It serves as the primary mechanism for managing the "Identity Perimeter" of an organization.
 
 ### Enterprise / Banking Reality
-In a Tier-1 banking environment, the Forest is treated as the "Tier 0" security boundary. The design philosophy is almost exclusively "Single Forest, Single Domain" (or a very limited number of forests for specific, isolated use cases like M&A or extreme regulatory isolation). 
+In an enterprise environment, the Forest is treated as the "Tier 0" security boundary. The design philosophy is almost exclusively "Single Forest, Single Domain" (or a very limited number of forests for specific, isolated use cases like M&A or extreme regulatory isolation). 
 
 From an audit and compliance perspective (e.g., SOX, PCI-DSS), the Forest is the scope of the "Identity Perimeter." If an attacker compromises the Forest (e.g., gains Enterprise Admin or Domain Admin in a forest-root domain), they have effectively compromised the entire identity infrastructure. Therefore, banking architectures implement strict "Tiered Administration" models where Forest-level administrative accounts are restricted to highly secure, hardened workstations (PAWs - Privileged Access Workstations) and are never used to log into lower-tier systems.
 
@@ -208,7 +206,31 @@ An Active Directory Site is a logical representation of the physical network top
 ### Underlying Mechanism
 The site topology is stored in the Configuration Partition of the Active Directory database. The Knowledge Consistency Checker (KCC) uses this information to build the replication topology. Sites are connected by "Site Links," which define the cost, schedule, and frequency of replication between sites. When a client attempts to authenticate, it queries DNS for a Domain Controller in its current site. If no DC is available in the local site, the client will fail over to a DC in the next closest site based on the site link costs.
 
-[DIAGRAM: A visual representation of sites, subnets, and site links showing how replication traffic is managed]
+```mermaid
+flowchart TB
+    subgraph SiteNY["Site: New York"]
+        SubnetNY["Subnet: 10.10.0.0/16"]
+        DC_NY1["DC-NY-01"]
+        DC_NY2["DC-NY-02"]
+    end
+ 
+    subgraph SiteLON["Site: London"]
+        SubnetLON["Subnet: 10.20.0.0/16"]
+        DC_LON1["DC-LON-01"]
+    end
+ 
+    subgraph SiteSIN["Site: Singapore"]
+        SubnetSIN["Subnet: 10.30.0.0/16"]
+        DC_SIN1["DC-SIN-01"]
+    end
+ 
+    DC_NY1 ===|"Site Link: NY-LON\nCost: 100, Schedule: 24x7"| DC_LON1
+    DC_LON1 ===|"Site Link: LON-SIN\nCost: 150, Schedule: Off-peak"| DC_SIN1
+    DC_NY1 -.->|"Site Link Bridge\n(transitive cost: 250)"| DC_SIN1
+ 
+    Client["Client in 10.10.5.x"] -->|"DNS query: nearest DC\nresolved via subnet-to-site mapping"| SubnetNY
+    SubnetNY --> DC_NY1
+```
 
 ### Why It Exists
 Sites exist to solve the problem of managing replication traffic in a distributed network. Without sites, Active Directory would not know the physical location of its Domain Controllers or clients, leading to inefficient replication and slow authentication times. By defining sites, administrators can control how and when replication occurs, ensuring that bandwidth-intensive replication traffic does not saturate slow WAN links and that users have a fast, reliable authentication experience.
@@ -225,7 +247,16 @@ In a Tier-1 banking environment, site design is critical for global operations. 
 ### Operational Considerations
 Day-to-day operations involve managing subnets and site links. If a new office is opened, it must be added to the appropriate site. If a network link goes down, the site topology must be updated to ensure that replication continues. Monitoring replication latency between sites is essential to ensure that the directory remains consistent across the global enterprise.
 
-[CLI: Command to list sites and their associated subnets]
+```powershell
+# List all defined sites
+Get-ADReplicationSite -Filter * | Select-Object Name, Description
+ 
+# List all subnets and the site each one is associated with
+Get-ADReplicationSubnet -Filter * | Select-Object Name, Site
+ 
+# List site links and their cost/schedule configuration
+Get-ADReplicationSiteLink -Filter * | Select-Object Name, Cost, ReplicationFrequencyInMinutes, SitesIncluded
+```
 
 ### Common Misconceptions
 !!! warning "Common Misconceptions"
@@ -264,7 +295,12 @@ In modern Tier-1 banking, the "Multiple Domain" pattern is almost universally co
 ### Operational Considerations
 Managing a multi-domain environment is complex and resource-intensive. It requires managing multiple sets of Group Policy Objects (GPOs), complex trust relationships, and fragmented administrative teams. Monitoring and troubleshooting authentication issues across domain boundaries can be difficult, and ensuring consistent security policies across the entire forest is a constant challenge.
 
-[CLI: Command to list all trusts in the current domain]
+```powershell
+# List all trusts in the current domain — useful when auditing a legacy
+# multi-domain environment to understand how many trust relationships
+# exist as a result of the historical domain-per-region/BU pattern
+Get-ADTrust -Filter * | Select-Object Name, Direction, TrustType, ForestTransitive
+```
 
 ### Common Misconceptions
 !!! warning "Common Misconceptions"
@@ -294,7 +330,37 @@ The "Modern Single-Domain Design Philosophy" is an architectural standard that a
 ### Underlying Mechanism
 This design relies on the inherent capabilities of modern Active Directory, such as Fine-Grained Password Policies (FGPP), which allow for different password policies within a single domain, and robust delegation models using OUs. By keeping all objects in one domain, the Global Catalog (GC) contains all objects, simplifying searches and authentication. Replication is optimized through well-designed Sites, rather than by partitioning the directory into multiple domains.
 
-[DIAGRAM: A visual representation of a single-domain architecture showing OUs for delegation and sites for replication]
+```mermaid
+flowchart TB
+    subgraph Forest["Single Forest / Single Domain"]
+        Root["contoso.com"]
+ 
+        subgraph OUs["OU Structure (Administrative Delegation)"]
+            OU_NA["OU: North America"]
+            OU_EU["OU: Europe"]
+            OU_Apps["OU: Application Tier"]
+            OU_Tier0["OU: Tier 0 Admin Accounts"]
+        end
+ 
+        Root --> OU_NA
+        Root --> OU_EU
+        Root --> OU_Apps
+        Root --> OU_Tier0
+    end
+ 
+    subgraph Sites["Site Topology (Replication Optimization)"]
+        Site_NY["Site: New York"]
+        Site_LON["Site: London"]
+        Site_SIN["Site: Singapore"]
+    end
+ 
+    OU_NA -.->|"Users/computers physically located in"| Site_NY
+    OU_EU -.->|"Users/computers physically located in"| Site_LON
+    OU_Apps -.->|"Users/computers physically located in"| Site_SIN
+ 
+    Note["No domain boundaries, no inter-domain trusts.\nDelegation via OU + ACLs. Replication via Sites."]
+    Note -.-> Forest
+```
 
 ### Why It Exists
 This philosophy exists to address the security and operational challenges of legacy multi-domain environments. It reduces the attack surface by eliminating inter-domain trusts, which are common vectors for lateral movement. It simplifies administration by centralizing GPO management, reducing the number of trust relationships to maintain, and providing a single, consistent identity store for the entire organization.
@@ -305,7 +371,19 @@ In a Tier-1 banking environment, the single-domain design is the gold standard. 
 ### Operational Considerations
 Operational overhead is significantly reduced in a single-domain design. There are no inter-domain trusts to manage, GPO management is centralized, and the replication topology is simpler. Monitoring is focused on the health of the domain controllers and the replication between sites, rather than the health of complex trust relationships.
 
-[CLI: Command to verify the single-domain structure and site configuration]
+```powershell
+# Confirm the forest contains only a single domain
+(Get-ADForest).Domains
+ 
+# Confirm there are no legacy cross-domain trusts left over from a
+# prior multi-domain design (an empty result confirms single-domain hygiene)
+Get-ADTrust -Filter *
+ 
+# Verify site assignment health — confirms replication is being managed
+# via sites rather than via domain partitioning
+Get-ADReplicationSite -Filter * | Select-Object Name
+Get-ADReplicationSubnet -Filter * | Select-Object Name, Site
+```
 
 ### Common Misconceptions
 !!! warning "Common Misconceptions"

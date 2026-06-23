@@ -77,4 +77,19 @@ nav:
           - "Forest Services": identity/layer1-directory-trust/forest-services.md
   - Endpoint:
       - Overview: endpoint/index.md
+
+      # Lifecycle & Identity
       - "Device Lifecycle & Provisioning": endpoint/device-lifecycle-provisioning.md
+      - "Endpoint Identity & Trust": endpoint/endpoint-identity-trust.md
+
+      # Configuration & Maintenance
+      - "Configuration Management & Policy Enforcement": endpoint/configuration-management-policy-enforcement.md
+      - "Patch & Update Management": endpoint/patch-update-management.md
+      - "Endpoint Hardening & Baseline Configuration": endpoint/endpoint-hardening-baseline-configuration.md
+
+      # Application & Access
+      - "Application Management & Delivery": endpoint/application-management-delivery.md
+      - "Remote Access & Connectivity": endpoint/remote-access-connectivity.md
+
+      # Resilience
+      - "Endpoint Recovery & Resilience": endpoint/endpoint-recovery-resilience.md
