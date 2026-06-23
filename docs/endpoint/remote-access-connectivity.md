@@ -189,3 +189,41 @@ Operationalizing split tunneling and DNS requires a disciplined, policy-driven a
 - Section 2.7: VPN client management (IKEv2, SSL VPN)
 - Section 2.7: ZTNA/SASE Client Agents
 - Section 2.7: Always-On VPN / DirectAccess
+
+## 6. Remote Troubleshooting & Support Tooling (RDP, Remote Assist)
+
+### Technical Definition
+Remote troubleshooting and support tooling encompasses the technologies and protocols used by IT support staff to remotely access, diagnose, and resolve issues on endpoint devices. This includes native protocols like Remote Desktop Protocol (RDP), built-in assistance tools like Windows Quick Assist, and third-party remote support agents (e.g., TeamViewer, BeyondTrust). The discipline focuses on providing secure, auditable, and controlled remote access, ensuring that support staff can effectively assist users while maintaining the security and integrity of the endpoint and the enterprise network.
+
+### Underlying Mechanism
+The mechanism for remote support tools varies depending on the technology. RDP operates by establishing a graphical session between the support workstation and the target endpoint, typically over port 3389, which requires careful firewall configuration and authentication. Modern remote assistance tools often use a relay-based architecture, where both the support workstation and the target endpoint connect to a centralized cloud service, which then bridges the connection. This approach is generally more secure and firewall-friendly than direct RDP. As noted in Section 2.5, these tools must be used in conjunction with JIT elevation and LAPS to ensure that support staff only have the necessary privileges for the duration of the support session. Furthermore, as discussed in Section 2.7, these tools must be integrated with the organization's identity and access management systems to ensure that every remote support session is authenticated, authorized, and logged.
+
+[DIAGRAM: Architecture diagram showing the remote support session flow, from the support workstation to the endpoint via a secure relay]
+
+### Why It Exists
+Remote troubleshooting and support tooling exists to enable IT support teams to efficiently resolve issues on remote endpoints, reducing downtime and improving user productivity. In a distributed workforce, it is impossible for IT support staff to physically access every device. These tools provide a secure and efficient way to diagnose and resolve issues, ensuring that users can get the help they need, regardless of their location. However, these tools also represent a significant security risk if not properly managed, as they can be used to gain unauthorized access to endpoints and sensitive data.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, remote troubleshooting and support tooling is a high-risk area that requires strict governance. Banks must implement robust controls to ensure that remote support sessions are secure, auditable, and limited to authorized personnel. This includes enforcing multi-factor authentication for all support sessions, implementing session recording and logging, and ensuring that all remote support tools are hardened and patched. Architects must design these solutions with a "zero-trust" mindset, assuming that the remote support tool could be compromised. This often involves restricting the use of these tools to specific, vetted support staff and ensuring that they are only used for authorized support requests.
+
+### Operational Considerations
+Operationalizing remote troubleshooting and support tooling requires a disciplined, policy-driven approach. Administrators must maintain a comprehensive inventory of all remote support tools, ensure that they are correctly configured, and implement strict access controls. Monitoring is critical; administrators must track all remote support sessions, identify any unauthorized or suspicious activity, and provide reporting on the usage and performance of the remote support infrastructure. Furthermore, administrators must ensure that they have a clear process for handling support requests, providing users with the necessary tools and guidance to initiate a secure support session.
+
+[CLI: PowerShell command to check the status of remote support agents and verify the configuration of remote access settings on a Windows device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that RDP is a secure remote support tool for general use. In reality, RDP is a powerful protocol that should be restricted to specific, authorized use cases and protected with strong authentication and network-level security. Another error is assuming that remote support tools are "set and forget" solutions; they require ongoing maintenance, as they are a frequent target for attackers and must be kept up-to-date and secure.
+
+### Interview Angle
+1. Question: How do you mitigate the security risks associated with remote support tools in a Tier-1 banking environment?
+   Answer: We mitigate these risks by implementing strict access controls, enforcing multi-factor authentication for all support sessions, and implementing session recording and logging. We also restrict the use of these tools to specific, vetted support staff and ensure that they are only used for authorized support requests.
+2. Question: What are the key considerations when designing a remote support strategy for a Tier-1 bank?
+   Answer: The key considerations are security, auditability, and usability. The strategy must be secure, with granular access controls and audit logging; it must be auditable, with every session recorded and logged; and it must be designed to be easy for users to initiate a secure support session.
+3. Question: How do you handle the challenge of monitoring and reporting on remote support sessions?
+   Answer: We use centralized monitoring and logging to track all remote support sessions, identifying any unauthorized or suspicious activity. This data is then used to refine our policies and improve the overall security posture of the bank.
+
+### Related Concepts
+- Section 2.5: Endpoint Hardening & Local Admin
+- Section 2.7: VPN client management (IKEv2, SSL VPN)
+- Section 2.7: ZTNA/SASE Client Agents
