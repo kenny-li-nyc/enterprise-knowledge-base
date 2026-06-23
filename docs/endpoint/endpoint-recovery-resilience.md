@@ -37,3 +37,41 @@ Operationalizing BitLocker recovery key management requires a disciplined, autom
 - Section 1.4: Directory Schema & Extension
 - Section 1.6: Forest & Domain Disaster Recovery
 - Section 2.8: Backup & restore strategies
+
+## 2. Backup & Restore Strategies (User Data vs. Full Image)
+
+### Technical Definition
+Backup and restore strategies define the methodology for protecting endpoint data, distinguishing between user-centric data protection and full-system state recovery. User data backup focuses on the continuous synchronization and versioning of personal files, documents, and application settings (e.g., via OneDrive Known Folder Move or enterprise file sync-and-share solutions). Full image backup, or bare-metal recovery, involves capturing the entire disk state, including the operating system, installed applications, and system configurations, to enable rapid restoration of a device to a known-good state.
+
+### Underlying Mechanism
+User data backup typically leverages cloud-based synchronization agents that monitor specific directories and upload changes in real-time to a secure cloud repository. These agents utilize delta-sync mechanisms to minimize bandwidth consumption. Full image backup relies on Volume Shadow Copy Service (VSS) snapshots to create a point-in-time, consistent view of the entire disk, which is then compressed and stored on a network share or dedicated backup appliance. During a restore, the system uses a pre-boot execution environment (PXE) or a recovery media to re-image the disk, overwriting the existing OS and data partitions. As noted in Section 1.6, while server-side directory recovery involves complex system state restoration, client-side full image recovery is a distinct, decoupled process focused on fleet continuity rather than directory integrity.
+
+[DIAGRAM: Comparison table showing the differences between user data backup and full image backup in terms of RTO, RPO, and use cases]
+
+### Why It Exists
+These strategies exist to ensure business continuity and data resilience in the face of hardware failure, ransomware attacks, or accidental data loss. User data backup provides a granular, low-impact way to recover individual files, which is the most common recovery scenario. Full image backup provides a comprehensive, "nuclear option" for recovering from catastrophic system failures or widespread malware infections, where the integrity of the OS itself is in question. By combining both approaches, organizations can achieve a balanced recovery strategy that minimizes downtime and data loss.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, backup and restore strategies are governed by strict regulatory requirements, such as DORA and FFIEC standards, which mandate specific Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO). Banks must ensure that all critical user data is backed up continuously and that full image backups are available for rapid recovery of essential workstations. Architects must design these systems to be highly available, auditable, and integrated with the bank's broader security infrastructure, ensuring that backups are immutable and protected against ransomware. This includes regular testing of restore procedures to ensure that the bank can meet its recovery commitments during a disaster.
+
+### Operational Considerations
+Operationalizing backup and restore strategies requires a disciplined, automated approach. Administrators must manage the entire lifecycle of the backup process, from configuration and monitoring to testing and restoration. This involves using automated deployment tools to push backup agents to the fleet, ensuring that all devices are correctly configured and that backups are occurring as expected. Monitoring is critical; administrators must track the status of backups, identify and resolve any issues, and provide reporting on the backup success rate. Furthermore, administrators must ensure that they have a clear, secure process for restoring data, with strict authentication and authorization requirements for any support staff performing restores.
+
+[CLI: PowerShell command to trigger a manual backup of user data or verify the status of the latest system image backup]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "full image" backup is the only strategy needed for endpoint resilience. In reality, full image backups are often too slow and resource-intensive for daily use, and they do not provide the granular file-level recovery that users need. Another error is assuming that backups are "set and forget"; they must be regularly tested to ensure that the data is actually recoverable and that the restore process works as expected.
+
+### Interview Angle
+1. Question: How do you determine the appropriate balance between user data backup and full image backup for a Tier-1 banking fleet?
+   Answer: We prioritize user data backup for daily operations, as it provides the fastest recovery for the most common data loss scenarios. We use full image backup for critical workstations and as a disaster recovery measure, ensuring that we can rapidly restore a device to a known-good state in the event of a catastrophic failure.
+2. Question: What are the key considerations when designing a backup and restore strategy that meets DORA or FFIEC regulatory requirements?
+   Answer: The key considerations are RTO/RPO compliance, data immutability, and auditability. We ensure that our backup strategy meets the bank's defined recovery objectives, that backups are protected against tampering (e.g., via immutable storage), and that every backup and restore operation is logged and audited.
+3. Question: How do you handle the challenge of restoring a large number of endpoints simultaneously in the event of a widespread ransomware outbreak?
+   Answer: We use a combination of automated, network-based imaging and cloud-based provisioning (e.g., Autopilot) to rapidly re-image and re-provision the fleet. We also prioritize the restoration of critical business functions, ensuring that the most essential workstations are back online first, while the rest of the fleet is restored in a phased approach.
+
+### Related Concepts
+- Section 2.8: BitLocker Recovery Key Management & Escrow
+- Section 1.6: Forest & Domain Disaster Recovery
+- Section 2.8: Autopilot Reset / fresh start procedures
