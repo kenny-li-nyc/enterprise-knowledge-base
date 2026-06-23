@@ -151,3 +151,41 @@ Operationalizing conditional network access requires a disciplined, iterative ap
 - Section 2.2: Endpoint Identity & Trust
 - Section 1.9: Identity Federation & Claims
 - Section 2.7: ZTNA/SASE Client Agents
+
+## 5. Split Tunneling & DNS Considerations
+
+### Technical Definition
+Split tunneling is a network configuration that allows a remote endpoint to simultaneously access the corporate network (via a secure VPN tunnel) and the public internet (directly via the local ISP). DNS considerations in this context refer to the strategy for resolving domain names: ensuring that internal corporate resources are resolved via secure, internal DNS servers (preventing DNS leakage), while public internet resources are resolved via public or ISP-provided DNS. This discipline is critical for balancing network performance and user experience with the stringent security requirements of a Tier-1 banking environment.
+
+### Underlying Mechanism
+The mechanism relies on the manipulation of the endpoint's routing table and DNS client configuration. When split tunneling is enabled, the VPN client injects specific routes into the routing table for corporate subnets, forcing that traffic through the virtual tunnel adapter, while leaving the default route (0.0.0.0/0) pointing to the local network interface for internet traffic. DNS resolution is managed through a "split-DNS" configuration, where the client is configured with a DNS suffix search list and conditional forwarders. The DNS client is instructed to query internal DNS servers for specific internal domains (e.g., *.bank.internal) and public DNS servers for all other queries. As noted in Section 2.7.1, the VPN client agent is responsible for maintaining these routes and DNS settings, ensuring that they are applied correctly upon tunnel establishment and reverted upon disconnection.
+
+[DIAGRAM: Network topology diagram showing split tunneling: corporate traffic routed through the VPN tunnel, internet traffic routed directly]
+
+### Why It Exists
+Split tunneling exists primarily to optimize network performance and reduce the load on corporate VPN concentrators. In a modern enterprise, a significant portion of traffic is destined for cloud-based SaaS applications (e.g., Microsoft 365, Zoom, Salesforce). Routing this traffic through a centralized VPN gateway ("hairpinning") introduces unnecessary latency, degrades user experience, and consumes expensive corporate bandwidth. By allowing this traffic to bypass the VPN, organizations can improve performance while maintaining secure access to internal resources. DNS considerations are critical to ensure that this split-path architecture does not inadvertently expose internal network information or allow for DNS hijacking.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, split tunneling is a high-risk configuration that requires rigorous governance. While it offers performance benefits, it also expands the attack surface by allowing the endpoint to communicate directly with the internet while connected to the corporate network. Banks typically implement "forced tunneling" for high-security segments, while allowing split tunneling only for specific, vetted SaaS applications. Architects must design these policies to be granular, ensuring that only authorized traffic is allowed to bypass the VPN. Furthermore, DNS leakage is a major security concern; banks must ensure that all DNS queries for internal resources are encrypted and routed through internal DNS servers, preventing attackers from intercepting or spoofing internal service lookups.
+
+### Operational Considerations
+Operationalizing split tunneling and DNS requires a disciplined, policy-driven approach. Administrators must maintain a comprehensive list of authorized SaaS applications and their associated IP ranges/domains, ensuring that the routing and DNS policies are kept up-to-date. Monitoring is critical; administrators must track the traffic patterns of remote users, identify any unauthorized traffic bypassing the VPN, and monitor for DNS leakage. Furthermore, administrators must ensure that they have a clear process for handling connectivity-related support requests, providing users with the necessary tools and guidance to troubleshoot common issues.
+
+[CLI: PowerShell command to display the current routing table and DNS client configuration on a Windows device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that split tunneling is inherently insecure. In reality, it is a trade-off between performance and security; when implemented with granular policies and robust endpoint security (e.g., EDR, local firewalls), it can be a secure and efficient solution. Another error is assuming that DNS leakage is only a privacy issue; it is a significant security risk that can lead to DNS hijacking, reconnaissance, and the exposure of internal network structure.
+
+### Interview Angle
+1. Question: How do you mitigate the security risks associated with split tunneling in a Tier-1 banking environment?
+   Answer: We mitigate these risks by implementing granular split-tunneling policies that only allow authorized SaaS traffic to bypass the VPN. We also enforce strict endpoint security controls, such as EDR and local firewalls, on all remote devices, ensuring that they are protected even when they are not connected to the corporate network.
+2. Question: What are the key considerations when designing a split-DNS strategy for a remote workforce?
+   Answer: The key considerations are security, reliability, and performance. We ensure that all internal DNS queries are routed through secure, internal DNS servers, and we use conditional forwarders to ensure that public DNS queries are resolved efficiently. We also implement DNSSEC where possible to prevent DNS spoofing and hijacking.
+3. Question: How do you handle the challenge of monitoring for DNS leakage in a remote environment?
+   Answer: We use centralized monitoring and logging to track DNS queries from remote endpoints, identifying any queries for internal resources that are being sent to public DNS servers. We also use endpoint-based security agents to detect and block unauthorized DNS traffic, ensuring that all internal DNS queries are routed through the appropriate channels.
+
+### Related Concepts
+- Section 2.7: VPN client management (IKEv2, SSL VPN)
+- Section 2.7: ZTNA/SASE Client Agents
+- Section 2.7: Always-On VPN / DirectAccess
