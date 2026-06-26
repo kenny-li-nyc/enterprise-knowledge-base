@@ -113,3 +113,41 @@ Operationalizing JIT and JEA requires a disciplined, policy-driven approach. Adm
 - Section 1.8: Directory Authorization & Scoping
 - Section 2.5: Endpoint Security & LAPS Client Mechanics
 - Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
+
+## 4. Privileged Account Lifecycle (Break-Glass Accounts, Service Account Governance)
+
+### Technical Definition
+The privileged account lifecycle encompasses the end-to-end management of highly sensitive identities, specifically focusing on "break-glass" (emergency access) accounts and service account governance. Break-glass accounts are highly privileged, non-federated accounts designed for emergency access to the identity control plane when standard authentication mechanisms fail. Service account governance involves the systematic identification, securing, and rotation of non-human identities used by applications and automated processes to interact with the directory and other privileged resources.
+
+### Underlying Mechanism
+Break-glass accounts are typically configured with long, complex passwords stored in physical safes or secure hardware modules, bypassing standard MFA to ensure access during identity provider outages. They are monitored with extreme scrutiny, with any usage triggering immediate, high-priority alerts. Service account governance utilizes Managed Service Accounts (MSAs) or Group Managed Service Accounts (gMSAs) to automate password rotation and eliminate the need for static, long-lived credentials. These accounts are scoped to the minimum necessary permissions, often using the delegation frameworks described in Section 1.8, and are monitored for anomalous behavior. The lifecycle management process involves regular audits to identify unused or over-privileged accounts, ensuring that the attack surface is minimized.
+
+[DIAGRAM: Flowchart illustrating the lifecycle of a break-glass account and the automated rotation of a gMSA]
+
+### Why It Exists
+This lifecycle management exists to prevent catastrophic lockout scenarios and to mitigate the risk of long-term credential compromise. Break-glass accounts are the ultimate safety net, ensuring that the organization can regain control of its identity infrastructure during a total failure. Service account governance is critical because service accounts are often the "weakest link" in an enterprise, frequently having excessive permissions and static, unrotated passwords that are easily harvested by attackers. Proper lifecycle management ensures that these accounts are secure, monitored, and regularly audited.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, privileged account lifecycle management is a core regulatory requirement, often audited under frameworks like SWIFT CSP and FFIEC. Banks must maintain a rigorous, documented process for the creation, usage, and auditing of break-glass accounts, ensuring that they are stored securely and that their usage is immediately investigated. Service account governance is equally critical, with banks requiring automated rotation and strict scoping for all non-human identities. Architects must design these systems to be resilient, ensuring that break-glass accounts are always available when needed, and that service accounts are managed in a way that does not disrupt critical business processes.
+
+### Operational Considerations
+Operationalizing privileged account lifecycle management requires a disciplined, policy-driven approach. Administrators must maintain a strict inventory of all break-glass and service accounts, ensuring that they are correctly configured and that their usage is monitored. Monitoring is critical; administrators must track all activity on these accounts, identify any unauthorized or suspicious behavior, and provide reporting on the compliance of the privileged account lifecycle. Furthermore, administrators must ensure that they have a clear process for handling account-related support requests, providing support staff with the necessary tools and guidance to perform their duties without compromising the security boundary.
+
+[CLI: PowerShell command to audit the status of service accounts and verify the last password rotation date]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that break-glass accounts are "just for emergencies" and can be ignored until needed. In reality, they must be regularly tested and audited to ensure that they are still functional and that the access process is well-understood. Another error is assuming that service accounts are "low risk" because they are not used by humans; they are often the most over-privileged and least monitored accounts in the enterprise, making them a prime target for attackers.
+
+### Interview Angle
+1. Question: How do you ensure that break-glass accounts are secure and available when needed?
+   Answer: We store break-glass credentials in a secure, physical safe or hardware security module, with strict access controls and audit logging. We also conduct regular, scheduled tests of the break-glass process, ensuring that the accounts are functional and that the access procedure is well-understood by the designated emergency response team.
+2. Question: What are the key considerations when designing a service account governance strategy for a Tier-1 bank?
+   Answer: The key considerations are automation, least privilege, and auditability. We prioritize the use of gMSAs to automate password rotation, and we use strict delegation to ensure that service accounts have only the minimum necessary permissions. We also implement continuous monitoring and auditing to detect any anomalous behavior or unauthorized changes to service account configurations.
+3. Question: How do you handle the challenge of identifying and remediating over-privileged service accounts?
+   Answer: We use automated discovery tools to identify all service accounts in the environment, and we analyze their permissions to identify any that are over-privileged. We then work with the application owners to scope these accounts correctly, using the principle of least privilege, and we implement automated monitoring to ensure that they remain within their authorized scope.
+
+### Related Concepts
+- Section 1.8: Directory Authorization & Scoping
+- Section 2.5: Endpoint Security & LAPS Client Mechanics
+- Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
