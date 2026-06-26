@@ -78,4 +78,63 @@ The process begins with the formulation of a specific hypothesis—such as "Are 
 [DIAGRAM: Sequence diagram illustrating the threat hunting lifecycle: Hypothesis generation, data collection, analysis, investigation, and feedback]
 
 ### Why It Exists
-Autom
+Automated security controls are inherently limited by their rulesets and heuristics. Sophisticated adversaries, particularly Advanced Persistent Threats (APTs) targeting financial institutions, often employ "living-off-the-land" techniques that mimic legitimate administrative activity, rendering traditional alerts ineffective. Threat hunting exists to close this visibility gap, forcing attackers to operate in an environment where their presence is actively sought, thereby increasing the cost and complexity of their operations.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, threat hunting is a regulatory imperative, often mandated by frameworks like the FFIEC Cybersecurity Assessment Tool and MAS Technology Risk Management guidelines. The hunting program must be aligned with the bank's crown jewels—such as core banking systems, payment gateways, and privileged access environments. The reality is that hunting must be scalable; manual, ad-hoc queries are insufficient. Banks must invest in automated hunting platforms that allow for the rapid deployment of queries across global infrastructure and the integration of hunting findings back into the automated detection pipeline to prevent future occurrences.
+
+### Operational Considerations
+Operationalizing threat hunting requires a dedicated team of skilled analysts who possess deep knowledge of both the attacker's tradecraft and the bank's internal architecture. The hunting lifecycle must be documented, with hypotheses tracked, results recorded, and successful hunts converted into automated detection rules. Administrators must ensure that the data lake is optimized for high-speed querying and that analysts have the necessary access to forensic tools.
+[CLI: PowerShell command to perform frequency analysis on process execution logs to identify outliers]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that threat hunting is synonymous with alert triage or incident response. In reality, hunting is a proactive, non-alert-driven activity; if you are responding to an alert, you are not hunting. Another error is assuming that hunting can be fully automated; while automation is essential for data collection and initial analysis, the hypothesis generation and final investigation require human intuition and deep contextual understanding of the environment.
+
+### Interview Angle
+1. Question: How do you structure a threat hunting program to ensure it provides measurable value to the organization?
+   Answer: We structure the program around a hypothesis-driven lifecycle, where each hunt is documented with a clear objective, methodology, and outcome. We measure success not just by the number of threats found, but by the number of new automated detection rules generated from hunting findings, which directly improves our defensive posture.
+2. Question: How do you prioritize hunting efforts in a large, complex banking environment?
+   Answer: We prioritize based on risk, focusing our hunting efforts on the bank's most critical assets and high-risk environments, such as SWIFT, trading platforms, and privileged access zones. We also use threat intelligence to inform our hypotheses, ensuring that our hunting efforts are aligned with the tactics, techniques, and procedures (TTPs) currently being used by adversaries targeting the financial sector.
+3. Question: What is the relationship between threat hunting and the SOC's automated detection pipeline?
+   Answer: The relationship is symbiotic. Threat hunting identifies the gaps in our automated detection pipeline, and the findings from successful hunts are used to create new, high-fidelity detection rules. This creates a continuous feedback loop that improves our automated defenses over time, allowing the SOC to focus on higher-level threats.
+
+### Related Concepts
+- Section 3.4: EDR/XDR architecture & telemetry
+- Section 3.4: Incident triage & containment workflows
+
+## 4. Ransomware-specific detection & response patterns
+
+### Technical Definition
+Ransomware-specific detection and response patterns refer to specialized security controls and operational workflows designed to identify, intercept, and mitigate the unique behaviors associated with ransomware attacks. Unlike general malware, ransomware is characterized by rapid, high-volume file system modifications (encryption), the deletion of shadow copies, and the targeting of backup repositories. Detection patterns focus on identifying these specific "encryption loops" and unauthorized access to sensitive data stores, while response patterns prioritize immediate, automated containment to prevent the spread of encryption across the network.
+
+### Underlying Mechanism
+The mechanism relies on behavioral heuristics that monitor file system I/O patterns. Security agents track the rate of file modifications; a sudden spike in file renames or writes, particularly when associated with a process that has no legitimate reason to perform such actions, triggers an immediate alert. Advanced engines also monitor for the deletion of Volume Shadow Copies (VSS) and the modification of master boot records (MBR). When ransomware activity is detected, the EDR agent can automatically terminate the offending process, isolate the host from the network, and, in some cases, roll back file changes if the agent has been configured to maintain a local cache of file versions. This runtime defense is the final barrier before the recovery phase, where, as referenced in Section 2.8, the organization initiates its disaster recovery and backup restoration procedures to return to a known-good state.
+
+[DIAGRAM: Sequence diagram showing the detection of an encryption loop, the automated termination of the process, and the subsequent host isolation]
+
+### Why It Exists
+Ransomware is a uniquely destructive threat that can cripple an organization in minutes. Traditional detection methods often fail to identify ransomware until the encryption process is well underway, by which time significant damage has already occurred. Ransomware-specific detection patterns exist to provide a "tripwire" that can identify and stop the encryption process at the earliest possible stage, minimizing the impact and reducing the reliance on full-scale disaster recovery.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, ransomware is a top-tier threat that requires a dedicated, proactive defense strategy. The reality is that ransomware attacks are often the final stage of a long-running intrusion, so detection must be integrated with broader threat hunting and incident response capabilities. Architects must design for "immutable" backups and ensure that ransomware detection is tightly coupled with automated containment workflows. The design must also account for the potential for ransomware to target the bank's backup infrastructure, necessitating strict access controls and monitoring for backup repositories.
+
+### Operational Considerations
+Operationalizing ransomware detection requires a rigorous approach to policy management and the continuous tuning of detection rules. Administrators must monitor for "false positives" that could disrupt critical banking applications, such as legitimate batch processing jobs that perform high-volume file modifications. The response playbooks must be regularly tested through tabletop exercises and red team simulations to ensure they are effective and do not cause unintended outages.
+[CLI: PowerShell command to check for the status of ransomware protection features and review recent detection logs]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that ransomware protection is solely about having good backups. While backups are essential, they are the last line of defense; ransomware protection is about preventing the encryption from happening in the first place. Another error is assuming that ransomware detection is a "set and forget" solution; it requires continuous tuning and integration with the broader security stack to be effective against evolving ransomware tactics.
+
+### Interview Angle
+1. Question: How do you design a ransomware defense strategy that goes beyond just having backups?
+   Answer: We implement a defense-in-depth strategy that includes proactive threat hunting, behavioral-based ransomware detection, and automated containment workflows. We also implement strict access controls on our backup repositories and use immutable storage to ensure that our backups cannot be encrypted or deleted by ransomware.
+2. Question: What are the key indicators of a ransomware attack that you look for in your EDR telemetry?
+   Answer: We look for rapid, high-volume file modifications, the deletion of Volume Shadow Copies, the modification of master boot records, and the use of known ransomware-associated tools or scripts. We also monitor for unauthorized access to sensitive data stores and the use of administrative tools for lateral movement.
+3. Question: How do you ensure that your ransomware response playbooks do not cause unintended outages in a critical banking environment?
+   Answer: We implement a "fail-safe" design where automated containment is carefully tuned and, for high-criticality assets, requires human-in-the-loop approval. We also maintain a "whitelist" of critical services that are protected from automated isolation, and we regularly test our playbooks through tabletop exercises to ensure they are effective and safe.
+
+### Related Concepts
+- Section 2.8: Endpoint Recovery & Resilience
+- Section 3.4: Incident triage & containment workflows
