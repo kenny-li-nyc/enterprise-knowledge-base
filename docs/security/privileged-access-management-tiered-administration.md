@@ -151,3 +151,41 @@ Operationalizing privileged account lifecycle management requires a disciplined,
 - Section 1.8: Directory Authorization & Scoping
 - Section 2.5: Endpoint Security & LAPS Client Mechanics
 - Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
+
+## 5. Local admin password management (LAPS)
+
+### Technical Definition
+Local Administrator Password Solution (LAPS) is a security framework that automates the management of local administrator account passwords on domain-joined endpoints. It generates a unique, complex, and random password for the local administrator account on each individual machine, stores these passwords securely in Active Directory, and rotates them periodically according to a defined policy. This eliminates the risk of using a single, static local administrator password across the fleet, which is a primary vector for lateral movement and credential harvesting attacks.
+
+### Underlying Mechanism
+The mechanism relies on a client-side extension (CSE) installed on each endpoint that communicates with the domain controller to manage the local administrator password. When the LAPS policy is applied, the CSE generates a new, random password for the local administrator account and pushes it to a protected attribute in the Active Directory object for that computer (e.g., `ms-MCS-AdmPwd`). Access to this attribute is restricted via Access Control Lists (ACLs) to a specific, authorized security group, ensuring that only designated administrators can retrieve the password. As noted in Section 2.5, the endpoint-side enforcement of these policies is managed by the local client, which processes the LAPS policy and ensures the local account is updated. The password rotation is triggered by the policy, and the new password is automatically escrowed to Active Directory, ensuring that the password is always current and secure.
+
+[DIAGRAM: Flowchart illustrating the LAPS password generation, escrow to Active Directory, and retrieval process]
+
+### Why It Exists
+LAPS exists to solve the "static local admin password" problem, which is a critical vulnerability in many enterprise environments. If every machine in the fleet shares the same local administrator password, an attacker who compromises one machine can easily move laterally to any other machine in the network. LAPS mitigates this risk by ensuring that every machine has a unique, random password, making it significantly harder for an attacker to move laterally and compromise the entire fleet.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, LAPS is a foundational security control, often mandated by regulatory frameworks and internal security policies to prevent pass-the-hash and other credential-based attacks. Banks must ensure that LAPS is deployed across the entire endpoint fleet, that the password rotation policy is strictly enforced, and that access to the stored passwords is tightly controlled and audited. Architects must design these systems to be highly resilient, ensuring that the LAPS infrastructure is always available and that the password retrieval process is logged and monitored for unauthorized access.
+
+### Operational Considerations
+Operationalizing LAPS requires a disciplined, policy-driven approach. Administrators must define clear password complexity and rotation policies, establish strict access controls for the stored passwords, and ensure that the LAPS infrastructure is correctly configured to enforce these policies. Monitoring is critical; administrators must track the status of password rotation, identify any failures, and provide reporting on the compliance of the LAPS deployment. Furthermore, administrators must ensure that they have a clear process for handling password retrieval requests, providing support staff with the necessary tools and guidance to retrieve passwords securely.
+
+[CLI: PowerShell command to verify the LAPS policy status and confirm that the local administrator password has been successfully rotated]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that LAPS is a replacement for JIT/PAM. In reality, LAPS is a baseline security control for managing local administrator accounts, while JIT/PAM is a more comprehensive strategy for managing privileged access across the entire enterprise. Another error is assuming that LAPS is a "set and forget" solution; it requires ongoing maintenance, as the password policies must be constantly updated to reflect changes in the threat landscape and the business.
+
+### Interview Angle
+1. Question: How do you handle the challenge of managing LAPS in a large, distributed fleet?
+   Answer: We use automated deployment tools to push the LAPS client and its configuration to the fleet, ensuring that all devices are correctly configured and that the password rotation policy is strictly enforced. We also use centralized monitoring and reporting to track the status of LAPS across the fleet, identifying any devices that fail to rotate their passwords.
+2. Question: What are the key considerations when designing a secure and auditable LAPS password retrieval process for a Tier-1 bank?
+   Answer: The key considerations are authentication, authorization, and auditability. We implement strict multi-factor authentication for any support staff accessing LAPS passwords, and we use role-based access control to ensure that only authorized personnel can retrieve passwords. Every retrieval request is logged and audited, and we conduct regular reviews of these logs to detect any unauthorized access.
+3. Question: How do you handle the challenge of troubleshooting LAPS password rotation failures?
+   Answer: We use centralized monitoring and logging to track the status of LAPS password rotation, identifying any failures and providing detailed error reports. We also provide our support teams with the necessary training and documentation to troubleshoot common issues, such as network connectivity or policy application errors.
+
+### Related Concepts
+- Section 2.5: Endpoint Security & LAPS Client Mechanics
+- Section 1.8: Directory Authorization & Scoping
+- Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
