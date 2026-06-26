@@ -115,3 +115,41 @@ Operationalizing L3 switching requires careful management of SVI configurations 
 - Section 4.1: L2 fundamentals
 - Section 4.2: L3 routing protocols (OSPF, EIGRP, BGP)
 - Section 4.4: First-hop redundancy (HSRP/VRRP/GLBP)
+
+## 4. First-hop redundancy (HSRP/VRRP/GLBP)
+
+### Technical Definition
+First-hop redundancy protocols (FHRPs) are a class of network protocols designed to provide high availability for default gateways. They allow multiple physical routers or multilayer switches to present a single, virtual IP address and virtual MAC address to end hosts. If the primary device fails, the virtual gateway seamlessly transitions to a standby device, ensuring continuous connectivity for clients without requiring manual reconfiguration of default gateway settings on end-user devices.
+
+### Underlying Mechanism
+FHRPs operate by electing an "Active" or "Master" router to handle traffic for the virtual IP, while "Standby" or "Backup" routers monitor the health of the active device. This is achieved through periodic multicast "hello" packets. If the standby device stops receiving these hellos, it assumes the active device has failed and promotes itself to the active role. The transition involves the new active device sending a gratuitous ARP (Address Resolution Protocol) to update the CAM tables of connected switches, ensuring that traffic destined for the virtual MAC address is now forwarded to the new active device's physical port. HSRP (Hot Standby Router Protocol) is Cisco-proprietary, VRRP (Virtual Router Redundancy Protocol) is the open-standard equivalent, and GLBP (Gateway Load Balancing Protocol) extends this concept by providing load balancing across multiple routers by responding to ARP requests with different virtual MAC addresses.
+
+[DIAGRAM: Flowchart illustrating the failover process between an Active and Standby router, including the gratuitous ARP update]
+
+### Why It Exists
+FHRPs exist to eliminate the single point of failure inherent in a static default gateway configuration. In a standard network, if the router serving as the default gateway fails, all hosts on that subnet lose connectivity to external networks. FHRPs provide the necessary redundancy to ensure that the default gateway remains available even in the event of a hardware or link failure, which is critical for maintaining uptime in enterprise environments.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, FHRPs are a fundamental component of our high-availability architecture. We typically deploy HSRP or VRRP in our distribution and core layers to provide redundant gateways for our server and user VLANs. We heavily utilize "tracking objects" to monitor upstream connectivity; if the uplink to the core network fails, the FHRP priority is automatically decremented, forcing a failover to the standby device that still has a healthy uplink. This prevents "black-holing" traffic, where a router remains active but cannot reach the destination. We avoid GLBP in most core environments due to its complexity and the potential for asymmetric routing, preferring deterministic active/standby models.
+
+### Operational Considerations
+Operationalizing FHRPs requires careful tuning of hello and hold timers to balance fast failover with control plane stability. We also ensure that FHRP groups are aligned with the STP root bridge to prevent suboptimal traffic paths. Monitoring is critical; we alert on any state changes (e.g., active-to-standby transitions) as these often indicate underlying physical layer issues.
+[CLI: Command to verify the HSRP/VRRP state and priority of a switch interface]
+[CLI: Command to configure interface tracking to trigger a failover based on uplink status]
+[CLI: Command to display the virtual MAC address and current active router for an FHRP group]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that FHRPs provide load balancing. HSRP and VRRP are strictly active/standby protocols; they do not distribute traffic across multiple routers. Another error is assuming that FHRPs can solve all connectivity issues; they only protect the first hop. If the failure is further upstream in the network, the FHRP will remain active, and traffic will still be dropped.
+
+### Interview Angle
+1. Question: How do you ensure that the FHRP active router is also the STP root bridge for a given VLAN?
+   Answer: We manually configure the priority values for both the FHRP and the STP instance to ensure that the same physical device is the primary for both. This ensures that traffic flows are symmetric and predictable, preventing unnecessary hair-pinning of traffic between switches.
+2. Question: Explain the difference between HSRP, VRRP, and GLBP, and when you would choose one over the other.
+   Answer: HSRP is Cisco-proprietary and widely used in Cisco-centric environments. VRRP is the open-standard equivalent, which is necessary for multi-vendor interoperability. GLBP provides load balancing by distributing traffic across multiple routers, but it introduces significant complexity and potential for asymmetric routing, so we generally avoid it in core banking environments where deterministic traffic paths are required.
+3. Question: What is the impact of setting FHRP timers too aggressively?
+   Answer: Setting timers too aggressively (e.g., sub-second hellos) can lead to "flapping" where the routers constantly switch roles due to transient network congestion or CPU spikes. This can cause significant instability in the network and should be avoided unless absolutely necessary. We prefer to use BFD (Bidirectional Forwarding Detection) for fast failure detection, as it is more efficient and stable than aggressive FHRP timers.
+
+### Related Concepts
+- Section 4.1: L2 fundamentals
+- Section 4.3: Inter-VLAN routing & L3 switching
