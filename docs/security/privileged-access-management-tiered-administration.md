@@ -37,3 +37,41 @@ Operationalizing the tiered model requires a disciplined, policy-driven approach
 - Section 1.8: Directory Authorization & Scoping
 - Section 2.5: Endpoint Security & LAPS Client Mechanics
 - Section 3.1: Privileged Access Workstations (PAWs)
+
+## 2. Privileged Access Workstations (PAWs)
+
+### Technical Definition
+Privileged Access Workstations (PAWs) are dedicated, hardened computing devices used exclusively for administrative tasks. Unlike general-purpose workstations, PAWs are stripped of non-essential software, restricted from internet and email access, and configured with strict security policies to prevent the execution of unauthorized code. They serve as the "clean source" for administrative actions, ensuring that privileged credentials—such as domain admin passwords or cloud global admin tokens—are never exposed to the risks inherent in a standard user environment.
+
+### Underlying Mechanism
+The mechanism relies on hardware-backed security and strict software isolation. PAWs utilize TPM 2.0 for secure boot and device identity, ensuring that the OS has not been tampered with. Network isolation is enforced via host-based firewalls and network-level restrictions, preventing the PAW from communicating with the public internet or non-essential internal segments. Application control is enforced via WDAC or AppLocker, ensuring that only a minimal, pre-approved set of administrative tools can execute. As noted in Section 1.8, the PAW is configured to only interact with the specific administrative interfaces required for its tier, ensuring that structural authorization is maintained. Furthermore, as discussed in Section 2.5, the PAW relies on endpoint-side enforcement mechanisms to ensure that the device remains in a compliant state, preventing the introduction of malicious software or unauthorized configuration changes.
+
+[DIAGRAM: Architecture diagram showing the PAW isolation model, with restricted network access and hardened software configuration]
+
+### Why It Exists
+PAWs exist to mitigate the risk of credential theft, which is the primary vector for most advanced persistent threats (APTs). In a standard workstation environment, an administrator's credentials are vulnerable to keyloggers, memory scraping, and other malware that can be easily introduced via email or web browsing. By using a PAW, the administrator performs their duties on a device that is inherently resistant to these threats, ensuring that their credentials remain secure even if the rest of the enterprise network is compromised.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, PAWs are a critical security control for protecting the identity control plane and other high-value assets. Banks must implement PAWs for all Tier 0 and Tier 1 administrators, ensuring that these accounts are never used on general-purpose workstations. Architects must design these solutions to be highly secure, with strict physical or virtual isolation, and they must be integrated with the bank's broader security infrastructure, including EDR and SIEM, to ensure that any suspicious activity on a PAW is immediately detected and investigated.
+
+### Operational Considerations
+Operationalizing PAWs requires a disciplined, policy-driven approach. Administrators must maintain a strict inventory of all PAWs, ensuring that they are kept up-to-date and compliant with security baselines. Monitoring is critical; administrators must track all activity on PAWs, identify any unauthorized or suspicious behavior, and provide reporting on the compliance of the PAW fleet. Furthermore, administrators must ensure that they have a clear process for handling PAW-related support requests, providing support staff with the necessary tools and guidance to perform their duties without compromising the security boundary.
+
+[CLI: PowerShell command to verify the security configuration and compliance status of a PAW]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that a PAW is just "a laptop for admins." In reality, it is a highly specialized security boundary that must be strictly managed and isolated to be effective. Another error is assuming that PAWs are a "set and forget" solution; they require ongoing maintenance, as the security policies must be constantly updated to reflect changes in the threat landscape and the business.
+
+### Interview Angle
+1. Question: How do you handle the operational friction caused by the strict restrictions on PAWs?
+   Answer: We minimize friction by providing clear, well-documented procedures for administrative tasks and by using automation to streamline the process of performing common administrative actions. We also provide support staff with the necessary training and guidance to work effectively within the PAW environment, ensuring that they understand the importance of the security controls.
+2. Question: What are the key considerations when designing a PAW strategy for a Tier-1 bank?
+   Answer: The key considerations are isolation, security, and manageability. The PAW must be designed to provide the highest level of isolation, with strict network and application controls. It must also be secure, with hardware-backed security and continuous monitoring, and it must be manageable, with automated deployment and configuration management.
+3. Question: How do you handle the challenge of detecting and responding to suspicious activity on a PAW?
+   Answer: We use centralized monitoring and logging to track all activity on PAWs, identifying any unauthorized or suspicious behavior. We also implement automated alerts that trigger an immediate investigation if a security event is detected on a PAW, and we have a clear, pre-defined incident response plan for these events.
+
+### Related Concepts
+- Section 1.8: Directory Authorization & Scoping
+- Section 2.5: Endpoint Security & LAPS Client Mechanics
+- Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
