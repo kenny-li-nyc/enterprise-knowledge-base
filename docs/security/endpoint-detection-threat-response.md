@@ -66,3 +66,39 @@ Operationalizing AV/AM requires a rigorous approach to policy management and exc
    Answer: We implement a tiered detection policy. For critical, latency-sensitive systems, we use optimized, signature-based scanning for known threats and apply behavioral monitoring only to high-risk processes, while offloading intensive analysis to the cloud. We also use performance-aware exclusions that are strictly scoped to specific application directories, ensuring that we maintain security without impacting trading performance.
 2. Question: What is your strategy for managing false positives in a large-scale AV/AM deployment?
    Answer: We use a centralized management console to aggregate detection data and identify patterns of false positives across the fleet. We implement a "detect-only" mode for new or updated policies
+
+## 3. Threat hunting methodology
+
+### Technical Definition
+Threat hunting is a proactive, hypothesis-driven methodology designed to identify and isolate malicious actors who have successfully bypassed automated detection controls. Unlike reactive incident response, which triggers upon an alert, threat hunting assumes a breach has already occurred and systematically searches through endpoint telemetry, network logs, and identity data to uncover hidden indicators of compromise (IoCs) or subtle behavioral anomalies that do not trigger standard alerts.
+
+### Underlying Mechanism
+The process begins with the formulation of a specific hypothesis—such as "Are attackers using WMI for lateral movement within our SWIFT environment?"—based on threat intelligence or observed anomalies. Hunters then query the centralized data lake, utilizing techniques like frequency analysis (stacking) to identify outliers in process execution, network connections, or registry modifications. For example, a hunter might stack all `powershell.exe` executions across the fleet to identify rare command-line arguments or unusual parent-child process relationships. This analysis leverages the rich telemetry ingested by the EDR/XDR platform, correlating endpoint events with identity logs to trace the attacker's path. Once an anomaly is identified, the hunter pivots to deep-dive investigation, analyzing memory dumps or forensic artifacts to confirm malicious intent. This methodology complements the automated prevention layers discussed in Section 3.4.2, focusing on the "unknown unknowns" that evade signature and behavioral engines.
+
+[DIAGRAM: Sequence diagram illustrating the threat hunting lifecycle: Hypothesis generation, data collection, analysis, investigation, and feedback]
+
+### Why It Exists
+Automated security controls are inherently limited by their rulesets and heuristics. Sophisticated adversaries, particularly Advanced Persistent Threats (APTs) targeting financial institutions, often employ "living-off-the-land" techniques that mimic legitimate administrative activity, rendering traditional alerts ineffective. Threat hunting exists to close this visibility gap, forcing attackers to operate in an environment where their presence is actively sought, thereby increasing the cost and complexity of their operations.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, threat hunting is a regulatory imperative, often mandated by frameworks like the FFIEC Cybersecurity Assessment Tool and MAS Technology Risk Management guidelines. The hunting program must be aligned with the bank's crown jewels—such as core banking systems, payment gateways, and privileged access environments. The reality is that hunting must be scalable; manual, ad-hoc queries are insufficient. Banks must invest in automated hunting platforms that allow for the rapid deployment of queries across global infrastructure and the integration of hunting findings back into the automated detection pipeline to prevent future occurrences.
+
+### Operational Considerations
+Operationalizing threat hunting requires a dedicated team of skilled analysts who possess deep knowledge of both the attacker's tradecraft and the bank's internal architecture. The hunting lifecycle must be documented, with hypotheses tracked, results recorded, and successful hunts converted into automated detection rules. Administrators must ensure that the data lake is optimized for high-speed querying and that analysts have the necessary access to forensic tools.
+[CLI: PowerShell command to perform frequency analysis on process execution logs to identify outliers]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that threat hunting is synonymous with alert triage or incident response. In reality, hunting is a proactive, non-alert-driven activity; if you are responding to an alert, you are not hunting. Another error is assuming that hunting can be fully automated; while automation is essential for data collection and initial analysis, the hypothesis generation and final investigation require human intuition and deep contextual understanding of the environment.
+
+### Interview Angle
+1. Question: How do you structure a threat hunting program to ensure it provides measurable value to the organization?
+   Answer: We structure the program around a hypothesis-driven lifecycle, where each hunt is documented with a clear objective, methodology, and outcome. We measure success not just by the number of threats found, but by the number of new automated detection rules generated from hunting findings, which directly improves our defensive posture.
+2. Question: How do you prioritize hunting efforts in a large, complex banking environment?
+   Answer: We prioritize based on risk, focusing our hunting efforts on the bank's most critical assets and high-risk environments, such as SWIFT, trading platforms, and privileged access zones. We also use threat intelligence to inform our hypotheses, ensuring that our hunting efforts are aligned with the tactics, techniques, and procedures (TTPs) currently being used by adversaries targeting the financial sector.
+3. Question: What is the relationship between threat hunting and the SOC's automated detection pipeline?
+   Answer: The relationship is symbiotic. Threat hunting identifies the gaps in our automated detection pipeline, and the findings from successful hunts are used to create new, high-fidelity detection rules. This creates a continuous feedback loop that improves our automated defenses over time, allowing the SOC to focus on higher-level threats.
+
+### Related Concepts
+- Section 3.4: EDR/XDR architecture & telemetry
+- Section 3.4: Incident triage & containment workflows
