@@ -75,3 +75,41 @@ Operationalizing the defense against PtH and PtT requires a multi-layered approa
 - Section 1.7: Authentication Protocols
 - Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
 - Section 3.2: KRBTGT Compromise & Golden/Silver Ticket Attacks
+
+## 3. DCSync / DCShadow & Replication Abuse
+
+### Technical Definition
+DCSync and DCShadow are advanced attack techniques that abuse the Active Directory replication protocol to extract sensitive data or inject malicious changes into the directory. DCSync allows an attacker to impersonate a Domain Controller (DC) and request the replication of sensitive objects, including password hashes, from a legitimate DC. DCShadow allows an attacker to register a rogue DC in the directory and push malicious updates (e.g., modifying group memberships or creating new administrative accounts) that are then replicated to all legitimate DCs, effectively bypassing standard directory change auditing.
+
+### Underlying Mechanism
+These attacks exploit the Directory Replication Service Remote Protocol (MS-DRSR), which is designed to synchronize directory state between DCs, as described in Section 1.3. DCSync leverages the `GetNCChanges` function; an attacker with "Replicating Directory Changes" and "Replicating Directory Changes All" permissions can request the replication of specific objects, including the `unicodePwd` attribute (which contains the NTLM hash). DCShadow is more sophisticated: the attacker uses the same protocol to register a new, unauthorized DC object in the configuration partition. Once registered, the attacker pushes malicious updates to the directory. Because the legitimate DCs believe the attacker's system is a valid DC, they accept these updates as legitimate replication traffic, often bypassing standard security logs that monitor for direct directory modifications.
+
+[DIAGRAM: Sequence diagram showing the DCSync request flow and the DCShadow rogue DC registration and replication injection process]
+
+### Why It Exists
+These techniques exist because the replication protocol is designed for high-trust, high-availability synchronization between DCs. It assumes that any entity capable of initiating replication is a trusted DC. This trust is fundamental to the operation of Active Directory, but it creates a significant security vulnerability if an attacker can gain the necessary permissions to initiate replication or register a new DC. The protocol's design prioritizes consistency and availability over the verification of the replication source, which is the core weakness exploited by these attacks.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, the abuse of the replication protocol is a critical security risk, as it allows attackers to bypass standard directory auditing and extract sensitive data or inject malicious changes without detection. Banks must implement rigorous monitoring for replication-related events, such as the registration of new DC objects or unusual replication requests. Furthermore, the delegation of replication permissions must be strictly controlled and audited, ensuring that only authorized DCs have the necessary rights. This is a key focus for security operations centers (SOCs) and identity governance teams, as these attacks can be used to maintain long-term persistence and escalate privileges within the domain.
+
+### Operational Considerations
+Operationalizing the defense against replication abuse requires a combination of proactive hardening and reactive monitoring. Administrators must ensure that the "Replicating Directory Changes" permissions are restricted to Domain Controllers and a very limited set of authorized service accounts. Monitoring is critical; administrators must implement high-fidelity alerting for replication events, such as Event ID 4662 (Object Access) on sensitive objects or the creation of new DC objects in the configuration partition. Furthermore, administrators must have a clear, tested procedure for responding to replication abuse, including the immediate isolation of any rogue DCs and the auditing of all directory changes made by the attacker.
+
+[CLI: PowerShell command to audit the replication permissions on the domain and identify any unauthorized accounts with replication rights]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that DCSync and DCShadow attacks require Domain Admin privileges. In reality, they only require specific replication permissions, which can be delegated to non-admin accounts. Another error is assuming that standard directory auditing will catch these attacks; because they abuse the replication protocol, they often bypass standard logs that monitor for direct directory modifications, requiring specialized monitoring of replication traffic.
+
+### Interview Angle
+1. Question: How do you detect a DCSync attack in your environment?
+   Answer: We monitor for Event ID 4662 on sensitive objects, specifically looking for access requests from accounts that are not Domain Controllers. We also monitor for unusual replication traffic patterns and correlate these events with other security signals, such as the use of tools like Mimikatz or other credential dumping utilities.
+2. Question: What are the key considerations when auditing replication permissions in a Tier-1 bank?
+   Answer: The key considerations are the principle of least privilege and regular auditing. We ensure that replication permissions are restricted to the absolute minimum, and we conduct regular audits to identify any unauthorized accounts that have been granted these rights. We also use automated tools to monitor for any changes to these permissions, ensuring that they remain within our authorized scope.
+3. Question: How do you differentiate between a DCSync and a DCShadow attack during an incident investigation?
+   Answer: A DCSync attack is a data extraction technique, where the attacker requests replication data from a legitimate DC. A DCShadow attack is a data injection technique, where the attacker registers a rogue DC to push malicious updates to the directory. We differentiate them by analyzing the logs: DCSync attacks show anomalies in replication requests, while DCShadow attacks show anomalies in the registration of new DC objects and subsequent replication updates.
+
+### Related Concepts
+- Section 1.3: Replication Subsystem (DRSR)
+- Section 3.2: KRBTGT Compromise & Golden/Silver Ticket Attacks
+- Section 3.2: Detection signals & anomalous authentication indicators
