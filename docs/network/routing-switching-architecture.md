@@ -153,3 +153,41 @@ Operationalizing FHRPs requires careful tuning of hello and hold timers to balan
 ### Related Concepts
 - Section 4.1: L2 fundamentals
 - Section 4.3: Inter-VLAN routing & L3 switching
+
+## 5. Route summarization & addressing hierarchy
+
+### Technical Definition
+Route summarization (or route aggregation) is the process of combining multiple specific network prefixes into a single, less-specific summary route. Addressing hierarchy refers to the structured allocation of IP address space (CIDR blocks) that mirrors the physical or logical topology of the network. This approach ensures that routing tables remain compact and stable by hiding the complexity of the underlying network structure from the core backbone.
+
+### Underlying Mechanism
+The mechanism relies on the Longest Prefix Match (LPM) algorithm used by routers to determine the best path. When a router receives a packet, it compares the destination IP against all entries in the Forwarding Information Base (FIB). If multiple matches exist, the router selects the most specific (longest) prefix. Summarization works by advertising only the aggregate prefix (e.g., 10.1.0.0/16) to the core, while the local distribution layer maintains the specific subnets (e.g., 10.1.1.0/24, 10.1.2.0/24). This reduces the size of the RIB and FIB, minimizing memory usage and CPU overhead during route recalculations. Hierarchical addressing is enforced through strict IPAM (IP Address Management) policies, where large blocks are allocated to regions or data centers, and then subdivided into smaller blocks for specific functions or VLANs, ensuring that summarization boundaries align with the physical topology.
+
+[DIAGRAM: Flowchart illustrating the aggregation of multiple specific subnets into a single summary route at the distribution layer]
+
+### Why It Exists
+Route summarization and hierarchical addressing exist to solve the scalability limitations of routing protocols. Without summarization, every minor link flap or subnet change in an access layer would trigger a global update across the entire enterprise network, leading to "routing table churn" and potential instability. By summarizing at the distribution or core boundary, we isolate the impact of local topology changes, ensuring that the core backbone remains stable and efficient. Hierarchical addressing also simplifies troubleshooting and policy enforcement, as traffic patterns become predictable and aligned with the IP structure.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, route summarization is a critical design requirement for global WAN and datacenter interconnects. We enforce a strict hierarchical IP addressing scheme, often utilizing a "top-down" allocation model where large blocks are assigned to specific business units or geographic regions. This allows us to summarize routes at the regional boundary, significantly reducing the size of the global routing table. We treat summarization as a mandatory control for stability; any network segment that cannot be summarized is flagged as a design exception and requires a formal risk assessment. This discipline is essential for maintaining the performance of our high-frequency trading and core banking platforms, where even minor routing instability can have significant financial impact.
+
+### Operational Considerations
+Operationalizing summarization requires robust IPAM tools to manage address allocation and prevent overlapping subnets. Administrators must ensure that summarization boundaries are correctly configured and that "discard routes" (null0 routes) are implemented to prevent routing loops when a summary route is advertised but the specific subnets are down. Monitoring tools should track the size of the routing table and alert on any unexpected growth or prefix instability.
+[CLI: Command to configure a summary address on an OSPF or EIGRP process]
+[CLI: Command to verify the routing table and confirm that specific subnets are hidden behind the summary route]
+[CLI: Command to configure a static discard route to prevent loops for a summary prefix]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that summarization is purely for reducing routing table size. While true, its primary benefit in large networks is stability; it prevents local instability from propagating globally. Another error is assuming that summarization is always possible; if the network is not designed hierarchically, summarization will lead to black-holing traffic, as the router will not know how to reach the specific subnets that were hidden by the summary.
+
+### Interview Angle
+1. Question: How do you design a hierarchical IP addressing scheme that supports both current requirements and future growth?
+   Answer: We use a "variable-length subnet masking" (VLSM) approach, allocating large blocks (e.g., /16 or /18) to major sites or business units, and then subdividing these into smaller blocks (e.g., /24) for specific VLANs or services. We always leave "white space" (unallocated address space) within each block to accommodate future growth without needing to re-address the network.
+2. Question: What are the risks of aggressive route summarization, and how do you mitigate them?
+   Answer: The primary risk is "black-holing" traffic if the summary route is advertised but the specific subnets are unreachable. We mitigate this by implementing "discard routes" (pointing the summary to null0) on the summarizing router. This ensures that if a specific subnet is down, the router drops the traffic rather than forwarding it to a default gateway, which could create a routing loop.
+3. Question: How does route summarization impact traffic engineering and path selection in a multi-homed environment?
+   Answer: Summarization can hide the specific path information needed for granular traffic engineering. If we need to influence traffic to a specific subnet, we may need to advertise more specific routes alongside the summary. We use route maps and prefix lists to carefully control which specific routes are advertised, balancing the need for summarization with the requirement for precise path control.
+
+### Related Concepts
+- Section 4.2: L3 routing protocols (OSPF, EIGRP, BGP)
+- Section 4.3: Inter-VLAN routing & L3 switching
