@@ -77,3 +77,42 @@ Operationalizing SD-WAN requires a shift from box-by-box configuration to centra
 - Section 4.2.1: MPLS vs. internet-based transport
 - Section 4.2.3: Site-to-site VPN (IPsec tunnels, dynamic vs. static)
 - Section 4.2.5: QoS & bandwidth management across WAN links
+
+## 3. Site-to-site VPN (IPsec tunnels, dynamic vs. static)
+
+### Technical Definition
+Site-to-site VPNs are secure, encrypted tunnels established between two or more network gateways (e.g., branch routers, firewalls) to provide private connectivity over untrusted public networks. Static VPNs involve manually configured, point-to-point tunnels with fixed peer IP addresses and security parameters. Dynamic VPNs, such as DMVPN (Dynamic Multipoint VPN) or GETVPN (Group Encrypted Transport VPN), utilize automated discovery and signaling protocols to establish tunnels on-demand, enabling scalable, full-mesh or hub-and-spoke topologies without the administrative burden of managing thousands of static peer configurations.
+
+### Underlying Mechanism
+The mechanism relies on the IPsec protocol suite, which provides authentication (AH or ESP), encryption (AES), and integrity (SHA). IKEv2 (Internet Key Exchange version 2) is the standard for tunnel negotiation, handling the exchange of security associations (SAs) and key management. Static tunnels use crypto-maps or Virtual Tunnel Interfaces (VTIs) to bind traffic to a specific peer. Dynamic VPNs introduce additional protocols: DMVPN uses NHRP (Next Hop Resolution Protocol) to map virtual tunnel IPs to physical public IPs, allowing spokes to dynamically discover each other and build direct tunnels. GETVPN uses a Key Server to distribute group keys, allowing all members of a group to decrypt traffic without the need for point-to-point tunnels, effectively treating the underlying network as a secure, encrypted fabric. Cryptographic validation is handled via PKI, as referenced in Section 3.3, ensuring that tunnel endpoints are trusted.
+
+[DIAGRAM: Flowchart illustrating the difference between static point-to-point tunnels and dynamic DMVPN hub-and-spoke topology]
+
+### Why It Exists
+Site-to-site VPNs exist to provide secure, cost-effective connectivity between geographically dispersed sites. Static VPNs are suitable for small-scale deployments where the number of sites is limited and the topology is simple. However, as the number of sites grows, static configurations become unmanageable, leading to "configuration sprawl" and increased risk of human error. Dynamic VPNs exist to solve this scalability problem, providing a flexible, automated framework that can support thousands of sites while maintaining the security and performance required for enterprise workloads.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, site-to-site VPNs are critical for connecting retail branches, ATMs, and remote offices to the central datacenter. We prioritize dynamic VPN architectures like DMVPN or GETVPN for branch connectivity, as they allow us to scale to thousands of sites with minimal manual intervention. We enforce strict security policies, requiring AES-256 encryption and IKEv2 with certificate-based authentication. We also implement "crypto-agility," ensuring that we can update our encryption algorithms and keys without disrupting connectivity. For high-security environments, we often layer VPNs over private circuits to provide "defense-in-depth," ensuring that even if the private circuit is compromised, the data remains encrypted.
+
+### Operational Considerations
+Operationalizing site-to-site VPNs requires rigorous monitoring of tunnel status, rekeying intervals, and MTU/MSS settings. MTU/MSS clamping is particularly important, as the overhead of IPsec encapsulation can lead to fragmentation and performance issues if not properly managed. Administrators must also ensure that PKI certificates are renewed before they expire to prevent catastrophic tunnel failures.
+[CLI: Command to verify IPsec tunnel status and security associations]
+[CLI: Command to inspect NHRP registration and tunnel mapping in a DMVPN environment]
+[CLI: Command to configure MSS clamping on a tunnel interface to prevent fragmentation]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "VPN is just a tunnel." In reality, a VPN is a comprehensive security framework that requires careful management of keys, certificates, and policies. Another error is assuming that static VPNs are "simpler" than dynamic ones; while they are easier to understand initially, they become exponentially more complex and fragile as the network scales, making them a poor choice for large-scale enterprise deployments.
+
+### Interview Angle
+1. Question: How do you handle the MTU/MSS issues that often plague IPsec VPN deployments?
+   Answer: We implement MSS clamping on all tunnel interfaces, setting the MSS value to a size that accounts for the IPsec overhead (typically 1360-1400 bytes). This ensures that TCP segments are sized correctly before they are encapsulated, preventing fragmentation and the associated performance degradation. We also perform path MTU discovery (PMTUD) where possible, but we rely on MSS clamping as the primary defense.
+2. Question: Explain the trade-offs between DMVPN and GETVPN for a large-scale branch network.
+   Answer: DMVPN is a hub-and-spoke or dynamic mesh architecture that is excellent for connecting branches over the internet, as it handles NAT traversal and dynamic addressing well. GETVPN is a group-based encryption architecture that is best suited for private, MPLS-based networks where you want to encrypt traffic without the overhead of point-to-point tunnels. We choose based on the underlying transport and the specific requirements for topology and scalability.
+3. Question: How do you ensure crypto-agility in your VPN architecture?
+   Answer: We use a centralized PKI and policy management system to push updated security policies and certificates to all VPN gateways. This allows us to rotate keys, update encryption algorithms, and revoke compromised certificates across the entire network in a coordinated and automated manner, ensuring that we can respond quickly to new threats or vulnerabilities.
+
+### Related Concepts
+- Section 3.3: Applied PKI & Cryptographic Chains (for tunnel authentication context)
+- Section 4.2.2: SD-WAN architecture & overlay design
+- Section 4.2.5: QoS & bandwidth management across WAN links
