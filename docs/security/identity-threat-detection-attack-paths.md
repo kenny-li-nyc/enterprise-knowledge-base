@@ -113,3 +113,41 @@ Operationalizing the defense against replication abuse requires a combination of
 - Section 1.3: Replication Subsystem (DRSR)
 - Section 3.2: KRBTGT Compromise & Golden/Silver Ticket Attacks
 - Section 3.2: Detection signals & anomalous authentication indicators
+
+## 4. AD Attack Path Mapping (BloodHound-style relationship abuse)
+
+### Technical Definition
+AD attack path mapping is the systematic analysis of the complex, interconnected relationships within an Active Directory environment to identify hidden paths that lead to privilege escalation or domain compromise. This discipline, popularized by tools like BloodHound, uses graph theory to model the directory as a set of nodes (users, groups, computers, GPOs) and edges (permissions, memberships, sessions). By analyzing these relationships, security architects can identify "attack paths"—sequences of actions that an adversary could take to move from a low-privilege starting point to a high-privilege target, such as a Domain Admin account or a Tier 0 asset.
+
+### Underlying Mechanism
+The mechanism involves collecting data from the directory (e.g., group memberships, ACLs, session data, GPO links) and importing it into a graph database. The analysis engine then traverses the graph to find paths between nodes. For example, if a user is a member of a group that has "GenericAll" permissions on a GPO, and that GPO is linked to a container where a Domain Admin has a session, the engine identifies this as a potential attack path. This analysis accounts for both explicit permissions and effective permissions, including nested group memberships and complex delegation structures. As noted in Section 1.8, the directory authorization framework defines these relationships, and attack path mapping simply visualizes and quantifies the risk inherent in these configurations.
+
+[DIAGRAM: Graph visualization showing a multi-hop attack path from a standard user to a Domain Admin]
+
+### Why It Exists
+This discipline exists because the complexity of Active Directory permissions makes it impossible to manually identify all potential attack paths. In large, mature environments, years of administrative changes, nested groups, and delegated permissions create a "spaghetti" of relationships that are invisible to standard auditing tools. Attack path mapping provides the visibility needed to understand the true security posture of the directory, allowing architects to prioritize remediation efforts based on the actual risk of compromise rather than just theoretical vulnerabilities.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, AD attack path mapping is a critical component of the bank's identity security strategy. Banks must be able to identify and remediate high-risk attack paths to comply with regulatory requirements for perimeter integrity and access governance. Architects must design these environments to be "graph-aware," regularly running attack path analysis to identify and prune unnecessary permissions, nested groups, and dangerous delegation structures. This is a proactive security measure that significantly reduces the attack surface and makes it much harder for adversaries to move laterally within the domain.
+
+### Operational Considerations
+Operationalizing attack path mapping requires a disciplined, iterative approach. Administrators must regularly collect directory data, run graph analysis, and prioritize the remediation of the most critical attack paths. Monitoring is critical; administrators must track the number of high-risk paths over time, identify common configuration issues, and provide reporting on the security posture of the directory. Furthermore, administrators must ensure that they have a clear process for handling remediation, working with application owners and business units to remove unnecessary permissions without disrupting critical business processes.
+
+[CLI: PowerShell command to export directory data for attack path analysis and query the graph database for high-risk paths]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that attack path mapping is a "vulnerability scanner" that finds software bugs. In reality, it is a "configuration analyzer" that finds dangerous relationships and permissions. Another error is assuming that attack path mapping is a "one-time" activity; it must be a continuous process, as new attack paths are constantly created as the directory evolves and new permissions are added.
+
+### Interview Angle
+1. Question: How do you prioritize remediation efforts when attack path mapping identifies thousands of potential paths?
+   Answer: We prioritize remediation based on the "shortest path" to the most critical assets (e.g., Tier 0). We focus on removing the most impactful edges, such as "GenericAll" permissions on sensitive groups or GPOs, and we work to flatten nested group structures to reduce the complexity of the graph.
+2. Question: What are the key considerations when designing an AD environment to be resilient against attack path abuse?
+   Answer: The key considerations are simplicity, least privilege, and regular auditing. We strive to keep the directory structure as simple as possible, enforce the principle of least privilege for all delegated permissions, and regularly run attack path analysis to identify and prune unnecessary relationships.
+3. Question: How do you handle the challenge of removing permissions that are identified as high-risk but are required by legacy applications?
+   Answer: We work with the application owners to understand the business requirement for the permission, and we look for alternative, less-privileged ways to achieve the same goal. If no alternative exists, we document the risk, implement compensating controls (e.g., enhanced monitoring), and include the permission in our regular security reviews.
+
+### Related Concepts
+- Section 1.8: Directory Authorization & Scoping
+- Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
+- Section 3.2: DCSync / DCShadow & Replication Abuse
