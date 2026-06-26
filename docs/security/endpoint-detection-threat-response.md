@@ -36,3 +36,33 @@ Operationalizing EDR/XDR requires a robust lifecycle management process for agen
 - Section 2.6: Application Integrity & Controls
 - Section 2.8: Endpoint Recovery & Resilience
 - Section 3.4: Threat hunting methodology
+
+## 2. Antivirus/anti-malware engines & signature vs. behavioral detection
+
+### Technical Definition
+Antivirus (AV) and anti-malware (AM) engines serve as the primary, high-volume defensive layer on endpoints, designed to identify, block, and remediate malicious software. Signature-based detection relies on comparing file hashes or specific byte sequences against a database of known malicious artifacts. Behavioral detection, conversely, monitors the runtime actions of processes—such as unexpected API calls, unauthorized file system modifications, or suspicious network connections—to identify malicious intent even when the underlying binary is unknown or polymorphic.
+
+### Underlying Mechanism
+The mechanism operates primarily through kernel-mode mini-filter drivers (e.g., `fltmgr.sys` on Windows) that intercept file system I/O requests. When a file is accessed, created, or modified, the filter driver pauses the operation and passes the file data to the AV/AM engine for inspection. Signature scanning performs a rapid lookup of the file's hash or signature against a local or cloud-based database. Behavioral detection hooks into system calls and utilizes heuristics to analyze process ancestry and memory operations. For instance, if a process attempts to inject code into a system process (e.g., `lsass.exe`) or perform mass encryption of user files, the engine triggers an alert or block. While Section 2.6 covers the static enforcement of code integrity via WDAC/AppLocker, AV/AM engines provide the dynamic, runtime analysis layer that intercepts threats that have already bypassed static controls. In the event of a successful breach that bypasses these defenses, the containment and recovery workflows detailed in Section 2.8 are triggered to isolate the host and restore integrity.
+
+[DIAGRAM: Flowchart comparing the static signature-based scan path versus the dynamic behavioral analysis path for a file execution event]
+
+### Why It Exists
+Signature-based detection was the original standard for endpoint security, effective against the predictable, high-volume malware of the past. However, the rise of polymorphic malware, which changes its signature with every iteration, rendered static detection insufficient. Behavioral detection was developed to address this gap, allowing security engines to identify malicious intent based on what a program *does* rather than what it *looks like*. This dual-layered approach is necessary to balance the efficiency of signature matching for known threats with the adaptability of behavioral analysis for novel attacks.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, AV/AM engines are a mandatory compliance requirement (e.g., PCI-DSS) and a critical component of the defense-in-depth strategy. The reality is that these engines must be highly performant to avoid impacting latency-sensitive banking applications. Architects must design for centralized management, ensuring that policies are consistent across the global fleet and that exclusions are strictly governed to prevent security gaps. The integration of AV/AM with EDR is essential; the AV engine acts as the first line of automated prevention, while the EDR provides the context and visibility for threats that evade the initial block.
+
+### Operational Considerations
+Operationalizing AV/AM requires a rigorous approach to policy management and exclusion handling. Over-broad exclusions are a common vector for attackers to hide malicious activity, so they must be documented, justified, and periodically reviewed. Administrators must monitor detection rates and false positives, using automated reporting to identify trends and potential misconfigurations.
+[CLI: PowerShell command to query the current AV engine status, signature version, and recent detection history on a local endpoint]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "AV is dead" and that EDR/XDR replaces the need for traditional anti-malware engines. In reality, AV/AM engines provide essential, high-speed, automated prevention that offloads the burden from the SOC. Relying solely on EDR without a robust AV/AM layer would result in an unmanageable volume of alerts and a failure to block commodity threats that should be handled automatically.
+
+### Interview Angle
+1. Question: How do you balance the need for aggressive behavioral detection with the requirement for system performance in a high-frequency trading environment?
+   Answer: We implement a tiered detection policy. For critical, latency-sensitive systems, we use optimized, signature-based scanning for known threats and apply behavioral monitoring only to high-risk processes, while offloading intensive analysis to the cloud. We also use performance-aware exclusions that are strictly scoped to specific application directories, ensuring that we maintain security without impacting trading performance.
+2. Question: What is your strategy for managing false positives in a large-scale AV/AM deployment?
+   Answer: We use a centralized management console to aggregate detection data and identify patterns of false positives across the fleet. We implement a "detect-only" mode for new or updated policies
