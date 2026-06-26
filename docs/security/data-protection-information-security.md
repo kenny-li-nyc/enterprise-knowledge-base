@@ -152,8 +152,6 @@ Secure data disposal is the process of permanently and irretrievably destroying 
 ### Underlying Mechanism
 The mechanism depends on the storage medium and the data's sensitivity. For magnetic media, secure disposal often involves multiple passes of random data overwriting, which makes recovery via magnetic force microscopy extremely difficult. For solid-state drives (SSDs), logical overwriting is often ineffective due to wear-leveling algorithms, so cryptographic erasure (CE)—where the encryption key is destroyed, rendering the data permanently inaccessible—is the preferred method. For highly sensitive data, physical destruction (e.g., shredding, degaussing) is the only acceptable standard. This process must be fully auditable, with a certificate of destruction generated for every asset, ensuring that the organization can demonstrate compliance with regulatory requirements. This process is the final step in the data lifecycle, ensuring that data is not left behind on decommissioned hardware or in archived storage.
 
-[DIAGRAM: Flowchart showing the secure data disposal lifecycle: Identification, sanitization method selection, execution, and audit/certification]
-
 ### Why It Exists
 Data that is not properly disposed of remains a significant security risk. Decommissioned hard drives, servers, and mobile devices often contain sensitive data that can be easily recovered by attackers. Secure data disposal exists to eliminate this risk, ensuring that data is permanently destroyed and cannot be recovered, even if the hardware is lost, stolen, or sold.
 
