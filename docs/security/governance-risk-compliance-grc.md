@@ -71,3 +71,39 @@ Operationalizing compliance mapping requires a disciplined approach to control m
 ### Related Concepts
 - Section 3.8.1: Security policy framework & lifecycle
 - Section 3.8.4: Audit preparation & evidence collection
+
+## 3. Risk assessment & risk register management
+
+### Technical Definition
+Risk assessment is the systematic process of identifying, analyzing, and evaluating potential threats and vulnerabilities to an organization's information assets. The risk register is the centralized, dynamic repository that documents these identified risks, their associated impact and likelihood, the current risk rating, and the status of mitigation efforts. This process transforms abstract security concerns into quantifiable business data, enabling stakeholders to make informed decisions regarding risk acceptance, avoidance, transfer, or mitigation.
+
+### Underlying Mechanism
+The mechanism relies on a standardized risk scoring methodology (e.g., FAIR, NIST SP 800-30) integrated within the GRC platform. Risks are ingested from various sources, including vulnerability management systems, penetration testing reports, and audit findings. The GRC platform calculates the inherent risk score and, after applying compensating controls, determines the residual risk. Automated workflows trigger periodic re-assessments and ensure that risk owners are accountable for the timely remediation of high-risk items. This data is aggregated into dashboards that provide real-time visibility into the organization's risk posture.
+
+[DIAGRAM: Flowchart showing the risk management lifecycle: Identification, Analysis, Evaluation, Treatment, and Monitoring]
+
+### Why It Exists
+Risk assessment and register management exist to bridge the gap between technical security findings and business strategy. Without a structured risk register, security teams often struggle to prioritize remediation efforts, leading to "firefighting" rather than strategic risk reduction. This process ensures that resources are allocated to the most critical threats, aligning security activities with the organization's risk appetite and business objectives.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, risk assessment is a highly mature, quantitative discipline. Banks often utilize advanced models like Cyber Value-at-Risk (VaR) to translate technical vulnerabilities into financial impact metrics. The risk register is not just an IT document; it is a critical component of the bank's Operational Risk Management (ORM) framework, subject to rigorous scrutiny by internal audit, external regulators, and the Board of Directors. The reality is that every significant risk must have a clearly defined owner, a documented mitigation plan, and a formal acceptance process if the risk exceeds the bank's defined appetite.
+
+### Operational Considerations
+Operationalizing risk management requires a culture of accountability. Administrators must ensure that risk assessments are performed consistently across all business units and that the risk register is kept up-to-date. This involves regular "risk review" meetings with stakeholders to validate the status of mitigation plans and ensure that the risk ratings remain accurate. Administrators must also be adept at communicating risk in business terms, ensuring that non-technical stakeholders understand the implications of the risks being tracked.
+[CLI: PowerShell command to export the current high-risk items from the GRC risk register for executive reporting]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that the risk register is a static document that is updated only during annual audits. In reality, it must be a living document that reflects the current threat landscape. Another error is treating risk assessment as a purely technical exercise; it is fundamentally a business process that requires input from legal, compliance, and business unit leaders to be effective.
+
+### Interview Angle
+1. Question: How do you balance the need for quantitative risk analysis with the practical limitations of data availability?
+   Answer: We start with a qualitative approach to identify and categorize risks, then move toward quantitative analysis for our top-tier risks. We leverage available data points—such as historical incident data, threat intelligence, and vulnerability metrics—to build models that provide a reasonable estimate of potential impact, acknowledging that these are estimates rather than absolute certainties.
+2. Question: How do you handle a situation where a business unit owner refuses to accept the risk or fund the remediation of a critical finding?
+   Answer: We escalate the issue through the formal risk governance structure. We present the risk in terms of potential business impact and regulatory consequences. If the business owner still refuses, the risk is formally escalated to the Risk Committee or the Board, where the decision to accept the risk is documented and signed off by the appropriate executive, ensuring that accountability is clear.
+3. Question: What is the difference between inherent risk and residual risk, and why does it matter?
+   Answer: Inherent risk is the level of risk before any controls are applied. Residual risk is the level of risk remaining after controls are implemented. Understanding this difference is crucial because it allows us to measure the effectiveness of our security controls and determine if further investment is needed to bring the risk within our defined appetite.
+
+### Related Concepts
+- Section 3.8.1: Security policy framework & lifecycle
+- Section 3.8.2: Regulatory compliance mapping
