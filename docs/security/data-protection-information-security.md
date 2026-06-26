@@ -71,3 +71,39 @@ Operationalizing DLP requires a disciplined approach to policy management and in
 ### Related Concepts
 - Section 3.7.1: Data classification & labeling
 - Section 3.4: EDR/XDR Architecture & Telemetry
+
+## 3. Encryption at rest & in transit (beyond PKI mechanics)
+
+### Technical Definition
+Encryption at rest and in transit refers to the cryptographic protection of data when it is stored on persistent media or transmitted across network boundaries. Unlike disk-level encryption, which secures the volume, this layer focuses on the data objects themselves, ensuring confidentiality and integrity through symmetric and asymmetric cryptographic primitives. This discipline encompasses the implementation of robust encryption standards, secure key management practices, and the enforcement of secure communication protocols to protect data from unauthorized access or interception.
+
+### Underlying Mechanism
+At rest, data is encrypted using symmetric algorithms like AES-256-GCM, often managed by a Key Management Service (KMS) backed by Hardware Security Modules (HSMs) to ensure that keys are never exposed in plaintext. In transit, TLS 1.3 provides secure channels, utilizing ephemeral key exchanges for perfect forward secrecy, ensuring that even if a long-term key is compromised, past sessions remain secure. This layer operates above the disk-level encryption described in Section 2.8, which secures the physical volume, and relies on the PKI core engine context established in Section 3.3 for identity and trust validation. The mechanism involves the dynamic wrapping and unwrapping of data objects, where the encryption process is transparent to the application but strictly enforced by the underlying cryptographic policy.
+
+[DIAGRAM: Sequence diagram showing the encryption process for data at rest (KMS/HSM interaction) and data in transit (TLS handshake)]
+
+### Why It Exists
+Encryption at rest and in transit exists to protect data from unauthorized access even if the underlying storage or network is compromised. In a world where data breaches are common and network interception is a constant threat, encryption is the final line of defense. It ensures that even if an attacker gains access to the storage media or intercepts network traffic, the data remains unintelligible and useless without the corresponding decryption keys.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, encryption at rest and in transit is a mandatory regulatory requirement, driven by frameworks such as FIPS 140-2/3, PCI-DSS, and various financial data protection standards. The reality is that banks must manage complex, heterogeneous environments where encryption must be consistently applied across all data stores and communication channels. The design must account for the need for high-performance encryption, ensuring that it does not impact latency-sensitive banking applications, and it must be integrated with the bank's broader key management strategy, ensuring that keys are securely generated, stored, and rotated.
+
+### Operational Considerations
+Operationalizing encryption requires a disciplined approach to key management and protocol configuration. Administrators must ensure that all data stores and communication channels are encrypted using approved standards and that keys are managed in a secure, auditable environment. Monitoring the health of the encryption infrastructure is critical; administrators must track key usage, identify any issues with encryption/decryption, and ensure that the encryption policies are being consistently applied across the enterprise.
+[CLI: PowerShell command to verify the encryption status of a storage volume or a network connection]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that encryption is a "silver bullet" that solves all data protection problems. In reality, encryption is only as strong as the key management practices that support it; if the keys are compromised, the encryption is useless. Another error is assuming that TLS 1.2 is sufficient for modern banking environments; it is increasingly vulnerable to attacks, and organizations should be migrating to TLS 1.3 to ensure the highest level of security.
+
+### Interview Angle
+1. Question: How do you architect an encryption strategy for a global banking environment that includes both on-premises data centers and multi-cloud infrastructure?
+   Answer: We implement a centralized key management strategy, using HSMs to protect our master keys and a KMS to manage the lifecycle of our data encryption keys. We enforce encryption at rest for all data stores and encryption in transit for all communication channels, using TLS 1.3 with perfect forward secrecy. We also implement automated key rotation and monitoring to ensure that our encryption remains effective and compliant.
+2. Question: What are the key challenges in managing encryption in a large, decentralized banking organization?
+   Answer: The key challenges are key management, performance, and consistency. In a large, decentralized organization, it is difficult to ensure that all business units are applying the same encryption standards and that keys are managed securely. We overcome this by implementing a centralized key management framework, automating the encryption process wherever possible, and providing extensive training to ensure that users understand the importance of encryption and how to apply it correctly.
+3. Question: How do you handle the challenge of "encryption performance" in a high-frequency trading environment?
+   Answer: We implement hardware-accelerated encryption, using dedicated cryptographic processors to offload the encryption/decryption burden from the application servers. We also use performance-aware encryption policies, ensuring that we only encrypt the data that is strictly necessary and that we use the most efficient algorithms for our specific use cases.
+
+### Related Concepts
+- Section 2.8: Endpoint Storage & Disks
+- Section 3.3: Applied PKI Trust Chains
