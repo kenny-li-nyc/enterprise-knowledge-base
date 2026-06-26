@@ -151,3 +151,41 @@ Operationalizing attack path mapping requires a disciplined, iterative approach.
 - Section 1.8: Directory Authorization & Scoping
 - Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
 - Section 3.2: DCSync / DCShadow & Replication Abuse
+
+## 5. Kerberoasting & AS-REP Roasting
+
+### Technical Definition
+Kerberoasting and AS-REP roasting are offline password-cracking attacks that exploit the way Kerberos handles service tickets and pre-authentication. Kerberoasting targets service accounts that have a Service Principal Name (SPN) registered, allowing an attacker to request a service ticket and crack the service account's password hash offline. AS-REP roasting targets user accounts that have the "Do not require Kerberos preauthentication" flag enabled, allowing an attacker to request an AS-REP response from the KDC and crack the user's password hash offline. Both techniques allow an attacker to obtain password hashes without interacting with the target account's password directly, bypassing traditional account lockout policies.
+
+### Underlying Mechanism
+Kerberoasting works by requesting a service ticket for a target SPN. The KDC responds with a ticket encrypted using the service account's NTLM hash. The attacker extracts this ticket and uses offline cracking tools (e.g., Hashcat) to brute-force the password. AS-REP roasting exploits a legacy Kerberos feature where an account can request a TGT without pre-authentication. The attacker sends an AS-REQ for the target user. If the account has the "Do not require Kerberos preauthentication" flag set, the KDC responds with an AS-REP encrypted with the user's password hash. The attacker extracts this hash and cracks it offline. Both attacks are highly effective because they do not trigger account lockouts and can be performed from any domain-joined machine.
+
+[DIAGRAM: Sequence diagram showing the Kerberoasting and AS-REP roasting request flows and the offline cracking process]
+
+### Why It Exists
+These attacks exist because of the design of the Kerberos protocol, which prioritizes performance and legacy compatibility. Kerberoasting exists because service tickets must be encrypted with the service account's hash to allow for service-side validation. AS-REP roasting exists because of the "Do not require Kerberos preauthentication" flag, which was originally intended to support legacy clients that did not support pre-authentication. Attackers have repurposed these features to facilitate password cracking, turning the convenience of Kerberos into a significant security liability.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, Kerberoasting and AS-REP roasting are critical security risks, as they allow attackers to compromise service accounts and user accounts without triggering account lockouts. Banks must implement rigorous monitoring for anomalous Kerberos traffic, such as a high volume of service ticket requests or AS-REQ requests for accounts that do not require pre-authentication. Furthermore, the use of strong, complex passwords for all service accounts and the disabling of legacy pre-authentication flags are mandatory controls to limit the effectiveness of these attacks. This is a key focus for security operations centers (SOCs) and identity governance teams, as these attacks can be used to maintain long-term persistence and escalate privileges within the domain.
+
+### Operational Considerations
+Operationalizing the defense against roasting attacks requires a combination of proactive hardening and reactive monitoring. Administrators must audit all service accounts for SPNs and ensure that they have strong, complex passwords. They must also identify and disable the "Do not require Kerberos preauthentication" flag for all user accounts. Monitoring is critical; administrators must implement high-fidelity alerting for Kerberos events, such as Event ID 4769 (Service Ticket request) and 4768 (TGT request), looking for anomalies like a high volume of requests from a single source. Furthermore, administrators must have a clear, tested procedure for responding to roasting attacks, including the immediate rotation of credentials for any accounts that may have been exposed.
+
+[CLI: PowerShell command to audit service accounts for SPNs and identify user accounts with legacy pre-authentication enabled]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that roasting attacks can be fully mitigated by simply enforcing password complexity policies. In reality, while strong passwords make cracking harder, they do not prevent the exposure of the hash itself, which is the core of the attack. Another error is assuming that these attacks are "low risk" because they do not trigger account lockouts; they are highly effective and can be performed silently, making them a prime target for attackers.
+
+### Interview Angle
+1. Question: How do you detect Kerberoasting in your environment?
+   Answer: We monitor for Event ID 4769 (Service Ticket request) and look for anomalies, such as a high volume of requests for service tickets from a single source, or requests for tickets with weak encryption types (e.g., RC4). We also correlate these events with other security signals, such as the use of tools like Rubeus or other Kerberoasting utilities.
+2. Question: What are the key considerations when designing a service account governance strategy to mitigate Kerberoasting?
+   Answer: The key considerations are the principle of least privilege, strong password policies, and regular auditing. We ensure that service accounts have only the minimum necessary permissions, enforce strong, complex passwords, and regularly audit our service accounts to identify and remediate any that are vulnerable to Kerberoasting.
+3. Question: How do you handle the challenge of identifying and remediating accounts with "Do not require Kerberos preauthentication" enabled?
+   Answer: We use automated discovery tools to identify all accounts with this flag enabled, and we work with the business owners to understand the requirement for this configuration. If it is not required, we disable the flag immediately. If it is required, we implement compensating controls, such as enhanced monitoring and strict access controls, to mitigate the risk.
+
+### Related Concepts
+- Section 1.7: Authentication Protocols
+- Section 3.2: Pass-the-hash / pass-the-ticket techniques
+- Section 3.2: Detection signals & anomalous authentication indicators
