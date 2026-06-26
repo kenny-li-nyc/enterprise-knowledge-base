@@ -35,3 +35,39 @@ Operationalizing the policy framework requires a disciplined approach to policy 
 ### Related Concepts
 - Section 3.6: Security Monitoring & SIEM/SOC Operations
 - Section 3.7: Data Protection & Information Security
+
+## 2. Regulatory compliance mapping (SOC 2, ISO 27001, NIST, etc.)
+
+### Technical Definition
+Regulatory compliance mapping is the strategic process of aligning an organization's internal security controls with the requirements of external frameworks and mandates (e.g., SOC 2, ISO 27001, NIST CSF, PCI-DSS). This involves creating a "control cross-walk" or mapping matrix that demonstrates how specific technical and operational controls satisfy the requirements of multiple frameworks simultaneously, thereby reducing audit fatigue and ensuring consistent compliance posture across the enterprise.
+
+### Underlying Mechanism
+The mechanism relies on a GRC platform that maintains a centralized Control Framework (the "Common Control Set"). Each internal control is mapped to one or more regulatory requirements. When an auditor requests evidence for a specific framework (e.g., ISO 27001 Annex A controls), the GRC platform automatically pulls the relevant evidence—such as system configuration logs, access review reports, or vulnerability scan results—from the automated evidence pipelines. These pipelines interface with the SIEM and other monitoring systems, as referenced in Section 3.6, to provide continuous, real-time assurance. This mapping architecture allows the organization to "test once, comply many," where a single control validation satisfies multiple regulatory obligations, significantly streamlining the audit process.
+
+[DIAGRAM: Matrix showing the mapping of internal security controls to multiple regulatory frameworks (SOC 2, ISO 27001, NIST CSF)]
+
+### Why It Exists
+Modern enterprises are subject to an increasing number of overlapping and often conflicting regulatory requirements. Managing compliance for each framework in isolation is operationally unsustainable, leading to redundant control testing, inconsistent security postures, and excessive audit costs. Compliance mapping exists to harmonize these requirements into a unified control framework, providing a single, authoritative view of the organization's compliance status and enabling efficient, scalable audit management.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, compliance mapping is a critical operational function that must satisfy global, multi-jurisdictional mandates. Banks must demonstrate compliance with frameworks like DORA, PCI-DSS v4.0, and various national banking regulations simultaneously. The reality is that compliance mapping must be dynamic; as frameworks evolve or new regulations are introduced, the mapping matrix must be updated to reflect these changes. Furthermore, the mapping must be integrated with the bank's risk management platform, ensuring that compliance gaps are treated as business risks and prioritized accordingly.
+
+### Operational Considerations
+Operationalizing compliance mapping requires a disciplined approach to control management and evidence collection. Administrators must ensure that the mapping matrix is accurate, that controls are clearly defined, and that evidence collection is automated wherever possible. Monitoring the effectiveness of the compliance mapping is critical; administrators must track compliance status across all frameworks, identify gaps in control coverage, and ensure that the mapping remains aligned with the evolving regulatory landscape.
+[CLI: PowerShell command to query the GRC platform for the compliance status of a specific control across multiple frameworks]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "compliance equals security." In reality, compliance is a baseline of minimum requirements; an organization can be fully compliant with a framework and still be vulnerable to sophisticated attacks. Another error is assuming that compliance mapping is a "set and forget" process; it requires continuous maintenance, as regulatory requirements change and the organization's infrastructure evolves.
+
+### Interview Angle
+1. Question: How do you manage the complexity of mapping internal controls to multiple, overlapping regulatory frameworks?
+   Answer: We implement a "Common Control Set" (CCS) approach. We identify the most stringent requirements across all our frameworks and build our internal controls to meet those requirements. We then map these CCS controls to the specific requirements of each framework. This allows us to maintain a single, unified control set that satisfies all our regulatory obligations, significantly reducing the burden of audit preparation.
+2. Question: How do you handle the challenge of "compliance drift," where controls are no longer effective or mapped correctly?
+   Answer: We implement continuous control monitoring. We use automated evidence pipelines to validate the effectiveness of our controls in real-time, and we integrate this data into our GRC platform. If a control fails or drifts, the GRC platform automatically flags it as a compliance gap, triggering an investigation and remediation workflow. This ensures that our compliance posture is always accurate and up-to-date.
+3. Question: What is your strategy for managing the impact of new or updated regulatory frameworks on your existing compliance mapping?
+   Answer: We perform a "gap analysis" whenever a new framework is introduced or an existing one is updated. We map the new requirements to our existing CCS controls and identify any gaps. We then prioritize the remediation of these gaps based on business risk, ensuring that we maintain compliance without disrupting critical business operations.
+
+### Related Concepts
+- Section 3.8.1: Security policy framework & lifecycle
+- Section 3.8.4: Audit preparation & evidence collection
