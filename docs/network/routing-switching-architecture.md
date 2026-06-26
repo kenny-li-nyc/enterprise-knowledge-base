@@ -191,3 +191,41 @@ Operationalizing summarization requires robust IPAM tools to manage address allo
 ### Related Concepts
 - Section 4.2: L3 routing protocols (OSPF, EIGRP, BGP)
 - Section 4.3: Inter-VLAN routing & L3 switching
+
+## 6. Multicast routing fundamentals
+
+### Technical Definition
+Multicast routing is a method of delivering data from a single source to multiple destinations simultaneously using a single stream, optimizing bandwidth usage in one-to-many communication scenarios. It relies on protocols like PIM (Protocol Independent Multicast) to build distribution trees and IGMP (Internet Group Management Protocol) to manage group membership at the edge. Unlike unicast, where traffic is duplicated for every receiver, multicast traffic is replicated only at the point where paths diverge, making it highly efficient for large-scale data distribution.
+
+### Underlying Mechanism
+The mechanism relies on the Reverse Path Forwarding (RPF) check to prevent loops. When a multicast packet arrives, the router checks the source IP against its unicast routing table to ensure the packet arrived on the interface leading back to the source. If the RPF check passes, the packet is forwarded out of all interfaces in the outgoing interface list (OIL). PIM Sparse Mode (PIM-SM) is the standard for enterprise networks, utilizing a Rendezvous Point (RP) as a meeting place for sources and receivers. Sources register with the RP, and receivers join the shared tree (*,G) rooted at the RP. Once the first packet is received, the last-hop router can switch to the shortest-path source tree (S,G) for optimal forwarding. IGMP is used by hosts to signal their interest in joining or leaving specific multicast groups, which the local switch/router then uses to prune or graft branches of the distribution tree.
+
+[DIAGRAM: Flowchart illustrating the PIM-SM join process, showing the shared tree (*,G) and the switchover to the source tree (S,G)]
+
+### Why It Exists
+Multicast routing exists to solve the bandwidth and processing inefficiencies of unicast and broadcast for one-to-many applications. In a unicast model, a source sending a 1Gbps stream to 100 receivers would require 100Gbps of bandwidth. With multicast, the source sends a single 1Gbps stream, and the network fabric handles the replication, drastically reducing the load on the source and the network backbone. This is essential for applications where data must be delivered to a large, dynamic group of receivers, such as financial market data feeds, video conferencing, and software distribution.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, multicast is the lifeblood of high-frequency trading (HFT) and real-time market data distribution. We rely on multicast to deliver price feeds from exchanges to trading engines with microsecond latency. The architecture is highly optimized, often using PIM-SM with Anycast RP to ensure redundancy and load balancing for the Rendezvous Point function. We enforce strict multicast boundaries to prevent "multicast leakage" into unauthorized segments, and we use IGMP snooping on all L2 switches to ensure that multicast traffic is only forwarded to ports with active listeners, preventing the flooding of non-participating hosts.
+
+### Operational Considerations
+Operationalizing multicast requires careful planning of RP placement and multicast group address allocation. Administrators must ensure that the RPF check is consistent across the network, as asymmetric routing can cause RPF failures and traffic loss. Monitoring tools should track multicast group membership, RP health, and PIM neighbor adjacencies.
+[CLI: Command to verify PIM neighbor adjacencies and RP information]
+[CLI: Command to inspect the multicast routing table (mroute) for a specific group]
+[CLI: Command to verify IGMP group membership on a switch interface]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that multicast is just "broadcast with a different address." In reality, multicast is a sophisticated, stateful routing mechanism that requires careful design and management. Another error is assuming that multicast will "just work" across the network; it requires end-to-end configuration of PIM and IGMP, and any misconfiguration in the path will result in silent traffic loss.
+
+### Interview Angle
+1. Question: How do you design a resilient Rendezvous Point (RP) architecture for a global banking network?
+   Answer: We use Anycast RP with MSDP (Multicast Source Discovery Protocol) or PIM Anycast. By configuring multiple RPs with the same IP address (advertised via IGP), we provide redundancy and load balancing. If one RP fails, the IGP automatically routes traffic to the next closest RP, ensuring continuous service for multicast sources and receivers.
+2. Question: Explain the difference between PIM Sparse Mode and Dense Mode, and why Sparse Mode is preferred in enterprise networks.
+   Answer: Dense Mode uses a "flood and prune" mechanism, which is inefficient and does not scale well, as it floods traffic to all segments regardless of whether there are receivers. Sparse Mode uses an explicit join mechanism, where traffic is only forwarded to segments that have requested it. This is much more efficient and scalable, making it the standard for enterprise and banking environments.
+3. Question: What is the purpose of the RPF check, and what happens if it fails?
+   Answer: The RPF check is the primary loop-prevention mechanism in multicast routing. It verifies that the multicast packet arrived on the interface that the router would use to reach the source of the packet. If the RPF check fails, the router assumes the packet is part of a loop and drops it. This is critical for preventing multicast storms, but it can also cause issues in environments with asymmetric routing, where the path to the source is different from the path from the source.
+
+### Related Concepts
+- Section 4.2: L3 routing protocols (OSPF, EIGRP, BGP)
+- Section 4.3: Inter-VLAN routing & L3 switching
