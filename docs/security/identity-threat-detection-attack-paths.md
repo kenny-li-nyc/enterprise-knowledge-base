@@ -189,3 +189,41 @@ Operationalizing the defense against roasting attacks requires a combination of 
 - Section 1.7: Authentication Protocols
 - Section 3.2: Pass-the-hash / pass-the-ticket techniques
 - Section 3.2: Detection signals & anomalous authentication indicators
+
+## 6. Detection Signals & Anomalous Authentication Indicators
+
+### Technical Definition
+Detection signals and anomalous authentication indicators are the telemetry and behavioral patterns that signify potential identity-based attacks. This discipline, often referred to as Identity Threat Detection and Response (ITDR), focuses on identifying deviations from established baselines in authentication behavior. These signals include impossible travel (logins from geographically distant locations in a short time), anomalous login times, unusual user-agent strings, spikes in failed authentication attempts, and the use of administrative tools from non-administrative workstations.
+
+### Underlying Mechanism
+The mechanism relies on the ingestion and analysis of authentication logs (e.g., Windows Event IDs 4624, 4625, 4768, 4769) by a Security Information and Event Management (SIEM) or User and Entity Behavior Analytics (UEBA) platform. These platforms establish a baseline of "normal" behavior for each user and service account, including typical login times, locations, and accessed resources. When an authentication event occurs, the system compares it against this baseline. If the event deviates significantly (e.g., a user logs in from a new country, or an account attempts to access a sensitive resource it has never accessed before), the system generates an alert. This process is continuous, with the baseline being updated dynamically to reflect changes in user behavior and business requirements.
+
+[DIAGRAM: Flowchart illustrating the ITDR detection loop: log ingestion, baseline comparison, anomaly detection, and alerting]
+
+### Why It Exists
+These signals exist because perimeter defenses are no longer sufficient to protect the identity control plane. Attackers have become adept at bypassing traditional security controls, making it essential to detect their presence *after* they have gained a foothold. By focusing on identity-based signals, organizations can detect stealthy, low-and-slow attacks that would otherwise go unnoticed, allowing for rapid incident response and containment before the attacker can achieve their objectives.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, ITDR is a critical component of the bank's security operations, ensuring that identity-based threats are detected and responded to in real-time. Banks must implement rigorous monitoring for anomalous authentication patterns to comply with regulatory requirements for threat intelligence and incident response, such as FFIEC guidelines. Architects must design these systems to be highly available, scalable, and integrated with the bank's broader security infrastructure, ensuring that alerts are prioritized and that the SOC has the necessary context to investigate and respond to identity-based threats effectively.
+
+### Operational Considerations
+Operationalizing ITDR requires a disciplined, iterative approach. Administrators must define clear detection rules, establish incident response playbooks, and ensure that the SIEM/UEBA infrastructure is correctly configured to ingest and analyze authentication logs. Monitoring is critical; administrators must track the number of alerts, identify common false positives, and provide reporting on the effectiveness of the detection signals. Furthermore, administrators must ensure that they have a clear process for handling identity-related security incidents, providing the SOC with the necessary tools and guidance to investigate and respond to these threats efficiently.
+
+[CLI: PowerShell command to query the SIEM for recent anomalous authentication events and verify the status of detection rules]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "alerting" is the same as "detection." In reality, alerting is just the first step; detection requires the context and analysis to determine if an alert represents a genuine security threat. Another error is assuming that ITDR is a "set and forget" solution; it requires ongoing maintenance, as detection rules must be constantly updated to reflect changes in the threat landscape and the business.
+
+### Interview Angle
+1. Question: How do you balance the need for high-fidelity alerting with the risk of "alert fatigue" in a Tier-1 banking SOC?
+   Answer: We balance this by implementing a tiered alerting strategy, where high-confidence alerts (e.g., impossible travel for a Domain Admin) are prioritized for immediate investigation, while lower-confidence alerts are aggregated and analyzed for patterns. We also use automated tuning to reduce false positives and ensure that our SOC analysts are focused on the most critical threats.
+2. Question: What are the key considerations when designing an ITDR strategy for a Tier-1 bank?
+   Answer: The key considerations are visibility, context, and response. The strategy must provide comprehensive visibility into all authentication events, include the necessary context to understand the significance of each event, and be integrated with a clear, pre-defined incident response plan to ensure that threats are contained and remediated effectively.
+3. Question: How do you handle the challenge of detecting "low-and-slow" identity attacks that do not trigger traditional threshold-based alerts?
+   Answer: We use UEBA platforms that analyze behavioral patterns over time, allowing us to detect subtle deviations that would not trigger a simple threshold-based alert. We also correlate these behavioral signals with other security data, such as endpoint activity and network traffic, to build a more complete picture of the attacker's activity.
+
+### Related Concepts
+- Section 1.7: Authentication Protocols
+- Section 3.2: KRBTGT Compromise & Golden/Silver Ticket Attacks
+- Section 3.2: Pass-the-hash / pass-the-ticket techniques
