@@ -102,3 +102,39 @@ Operationalizing threat hunting requires a dedicated team of skilled analysts wh
 ### Related Concepts
 - Section 3.4: EDR/XDR architecture & telemetry
 - Section 3.4: Incident triage & containment workflows
+
+## 4. Incident triage & containment workflows
+
+### Technical Definition
+Incident triage and containment workflows define the structured, repeatable processes for evaluating security alerts, determining the scope of a potential compromise, and executing immediate actions to halt the progression of an attack. Triage involves the rapid assessment of an alert's validity and severity, while containment focuses on the tactical actions—such as network isolation, process termination, or account suspension—required to prevent lateral movement, data exfiltration, or further system damage.
+
+### Underlying Mechanism
+The mechanism relies on the integration of EDR/XDR platforms with Security Orchestration, Automation, and Response (SOAR) systems. Upon alert generation, the SOAR platform executes automated playbooks that query endpoint telemetry to gather context (e.g., process ancestry, network connections, user identity). If the alert is validated as malicious, the platform triggers containment actions via the EDR agent's API, such as isolating the host from the network (while maintaining a management channel for the SOC), killing malicious processes, or revoking user sessions. This process is designed to be deterministic and rapid, minimizing the "dwell time" of an attacker. As referenced in Section 2.8, these containment actions are the immediate precursor to the formal recovery and restoration phase, ensuring that the environment is stabilized before full-scale remediation begins.
+
+[DIAGRAM: Flowchart showing the incident triage and containment lifecycle: Alert ingestion, automated enrichment, decision point, and containment execution]
+
+### Why It Exists
+In a high-velocity threat environment, manual incident response is too slow to counter modern, automated attacks. Attackers can move laterally and exfiltrate data in minutes, far faster than a human analyst can manually investigate an alert. Incident triage and containment workflows exist to provide a standardized, automated response capability that can operate at machine speed, ensuring that threats are contained before they can achieve their objectives.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, incident triage and containment must be executed within strict SLAs to satisfy regulatory requirements and minimize business impact. The workflows must be highly resilient, ensuring that containment actions do not inadvertently disrupt critical banking services (e.g., payment processing). This requires a "fail-safe" design, where automated containment is carefully tuned and, for high-criticality assets, requires human-in-the-loop approval. The process must be fully auditable, with every action logged and correlated with the original alert to satisfy forensic and compliance requirements.
+
+### Operational Considerations
+Operationalizing these workflows requires the development of comprehensive playbooks that cover various attack scenarios (e.g., ransomware, credential theft, lateral movement). Administrators must regularly test these playbooks through tabletop exercises and red team simulations to ensure they are effective and do not cause unintended outages. Monitoring the performance of the triage and containment process is critical; administrators must track metrics such as Mean Time to Acknowledge (MTTA) and Mean Time to Contain (MTTC).
+[CLI: PowerShell command to isolate a compromised host from the network using the EDR agent's management API]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that containment is equivalent to remediation. Containment is a temporary, tactical measure to stop the bleeding; remediation involves the full investigation, root cause analysis, and restoration of the system to a known-good state. Another error is assuming that automated containment is always the right answer; in some cases, aggressive containment can destroy forensic evidence or disrupt critical business processes, so it must be applied with careful consideration of the context.
+
+### Interview Angle
+1. Question: How do you balance the need for rapid, automated containment with the risk of disrupting critical banking services?
+   Answer: We implement a tiered containment strategy. For low-criticality endpoints, we allow fully automated containment. For high-criticality assets, we use a "human-in-the-loop" approach, where the SOAR platform presents the analyst with a recommended containment action and requires manual approval before execution. We also maintain a "whitelist" of critical services that are protected from automated isolation.
+2. Question: What are the key metrics you use to measure the effectiveness of your incident triage and containment workflows?
+   Answer: We focus on Mean Time to Acknowledge (MTTA) and Mean Time to Contain (MTTC). We also track the percentage of alerts that are successfully handled by automated playbooks versus those that require manual intervention, and we use this data to continuously refine our automation and reduce the burden on our SOC analysts.
+3. Question: How do you ensure that your containment actions do not destroy critical forensic evidence?
+   Answer: We configure our containment playbooks to perform a "snapshot" of the endpoint's state—including memory dumps and process logs—before executing any destructive actions like process termination or host isolation. This ensures that we have the necessary evidence for post-incident investigation while still achieving our containment objectives.
+
+### Related Concepts
+- Section 3.4: EDR/XDR architecture & telemetry
+- Section 2.8: Endpoint Recovery & Resilience
