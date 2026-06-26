@@ -37,3 +37,41 @@ Operationalizing this architecture requires a rigorous approach to pipeline heal
 ### Related Concepts
 - Section 3.2: Identity Threat Telemetry
 - Section 3.4: EDR/XDR Architecture & Telemetry
+
+## 2. SIEM rule/use-case development
+
+### Technical Definition
+SIEM rule and use-case development is the engineering discipline of translating threat intelligence and security requirements into actionable detection logic. A "use case" defines a specific threat scenario (e.g., "detecting lateral movement via SMB"), while the "rule" is the technical implementation of that scenario within the SIEM, utilizing query languages like KQL (Kusto Query Language) or SPL (Search Processing Language) to identify malicious patterns in normalized telemetry.
+
+### Underlying Mechanism
+The development process follows a "Detection-as-Code" (DaC) lifecycle. Rules are developed in a version-controlled environment (e.g., Git), allowing for peer review, automated testing, and CI/CD deployment. The mechanism involves mapping detection logic to the MITRE ATT&CK framework to ensure comprehensive coverage. Rules are tested against historical data (backtesting) to validate their efficacy and tune out false positives before being promoted to production. This process relies on the normalized data schema established in Section 3.6.1, ensuring that rules are portable and resilient to log source changes. Once deployed, rules are continuously monitored for performance and alert volume, with a formal retirement process for stale or ineffective detections.
+
+[DIAGRAM: Flowchart illustrating the Detection-as-Code lifecycle: Threat modeling, rule development, backtesting, CI/CD deployment, and tuning]
+
+### Why It Exists
+Without a structured development lifecycle, SIEM rules become a chaotic collection of ad-hoc queries that are difficult to maintain, prone to false positives, and often fail to detect sophisticated threats. Use-case development ensures that detections are aligned with actual business risks and threat intelligence, rather than just "alerting on everything." It provides the necessary rigor to ensure that the SOC is focused on high-fidelity alerts that matter, rather than being overwhelmed by noise.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, SIEM rule development is a critical operational function that must satisfy both security and regulatory requirements. Rules must be mapped to specific compliance controls (e.g., PCI-DSS, DORA) to demonstrate that the bank is actively monitoring for relevant threats. The reality is that rule development must be a collaborative effort between security engineers, threat hunters, and SOC analysts. Furthermore, the bank must maintain a "detection coverage matrix" that tracks which MITRE ATT&CK techniques are covered by automated rules and which require manual hunting, ensuring that there are no blind spots in the bank's defensive posture.
+
+### Operational Considerations
+Operationalizing rule development requires a dedicated team of detection engineers who understand both the attacker's tradecraft and the bank's internal architecture. Administrators must ensure that the rule development environment is separate from production, with strict access controls and audit logging. Monitoring the performance of rules is critical; administrators must track alert volume, false positive rates, and the "time-to-detect" for known threats.
+[CLI: PowerShell command to query the SIEM API for the performance metrics of a specific detection rule]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "more rules are better" and that a larger rule library equates to a stronger security posture. In reality, a large, unmanaged rule library leads to alert fatigue, where critical alerts are buried in a sea of noise. Another error is assuming that rule development is a one-time task; rules must be continuously tuned and updated to reflect the evolving threat landscape and changes in the bank's infrastructure.
+
+### Interview Angle
+1. Question: How do you manage the lifecycle of SIEM rules to prevent alert fatigue and ensure high-fidelity detections?
+   Answer: We implement a strict Detection-as-Code lifecycle. Every rule must be mapped to a specific threat scenario and MITRE ATT&CK technique. We perform rigorous backtesting against historical data to tune out false positives before deployment. We also implement a quarterly "rule review" process where we analyze alert volume and efficacy, retiring rules that no longer provide value or have become too noisy.
+2. Question: How do you ensure that your SIEM rules are aligned with the bank's specific risk profile and regulatory requirements?
+   Answer: We use a threat-modeling approach to identify the most critical threats to our business, such as SWIFT fraud or ransomware. We then map these threats to our detection coverage matrix, ensuring that we have automated rules for the most critical techniques. We also map our rules to regulatory controls, providing auditors with clear evidence of our monitoring capabilities.
+3. Question: What is your strategy for handling "detection gaps" where automated rules are not yet available?
+   Answer: We use a two-pronged approach. First, we prioritize the development of automated rules for the most critical gaps. Second, for gaps that cannot be easily automated, we implement manual threat hunting procedures, as detailed in Section 3.4, to proactively search for those threats. This ensures that we have a comprehensive defensive posture, even where automated detection is not yet mature.
+4. Question: How do you balance the need for broad detection coverage with the performance limitations of the SIEM?
+   Answer: We optimize our rules for performance by using efficient query structures and filtering data at the ingestion layer. We also prioritize the development of rules for high-risk, high-impact threats, and we use a tiered alerting strategy where only the most critical alerts trigger immediate SOC response, while others are routed to lower-priority queues for investigation.
+
+### Related Concepts
+- Section 3.6.1: Log aggregation & correlation architecture
+- Section 3.4: Threat hunting methodology
