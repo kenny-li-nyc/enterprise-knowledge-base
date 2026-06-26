@@ -38,3 +38,42 @@ Operationalizing a hybrid WAN requires sophisticated monitoring to manage the di
 - Section 2.7: Remote Access & ZTNA (for client-side connectivity context)
 - Section 3.3: Applied PKI & Cryptographic Chains (for tunnel authentication context)
 - Section 4.2.2: SD-WAN architecture & overlay design
+
+## 2. SD-WAN architecture & overlay design
+
+### Technical Definition
+SD-WAN (Software-Defined Wide Area Network) is an architectural framework that decouples the network control plane from the underlying physical transport, creating a virtualized overlay network. This overlay abstracts the physical connectivity, allowing for centralized policy management, application-aware routing, and dynamic path selection across heterogeneous transport links, including MPLS, broadband, and LTE/5G. It transforms the WAN from a collection of static, manually configured routers into a unified, software-defined fabric.
+
+### Underlying Mechanism
+The SD-WAN architecture consists of three primary planes: the management plane (orchestrator), the control plane (controller), and the data plane (edge devices). The orchestrator provides a centralized interface for policy definition and zero-touch provisioning. The controller maintains the global topology and distributes routing information to edge devices. The data plane utilizes tunnels (e.g., IPsec, VXLAN) to build the overlay, encapsulating traffic and steering it based on real-time path metrics. Edge devices perform deep packet inspection (DPI) to identify applications and apply policies based on latency, jitter, and packet loss thresholds. The forwarding plane uses these metrics to steer traffic dynamically, often utilizing BFD (Bidirectional Forwarding Detection) for sub-second failure detection and path switching.
+
+[DIAGRAM: Flowchart illustrating the SD-WAN control plane orchestration and data plane overlay tunnel establishment]
+
+### Why It Exists
+SD-WAN exists to address the operational complexity and rigidity of traditional WAN architectures. In a traditional model, every router must be configured individually, and traffic steering is often limited to static routing or basic policy-based routing. SD-WAN simplifies this by centralizing management, automating provisioning, and enabling intelligent, application-aware traffic steering. It allows organizations to leverage lower-cost internet circuits while maintaining the performance and security required for enterprise applications, effectively turning the WAN into a flexible, software-defined asset.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, SD-WAN is the primary driver for branch transformation and cloud-first strategies. We use SD-WAN to manage thousands of retail branches, enabling zero-touch provisioning (ZTP) that allows non-technical staff to deploy new sites in minutes. Centralized security policy enforcement is critical; we integrate SD-WAN with cloud-delivered security stacks (SASE) to ensure that direct internet access (DIA) from branches is as secure as traffic routed through the central datacenter. We also use SD-WAN to optimize the performance of SaaS applications (e.g., Office 365, Salesforce) by steering traffic directly to the nearest cloud entry point, bypassing the latency of backhauling traffic to the corporate core.
+
+### Operational Considerations
+Operationalizing SD-WAN requires a shift from box-by-box configuration to centralized policy management. Administrators must define global policies that are pushed to all edge devices, ensuring consistency and compliance. Monitoring is focused on the health of the overlay tunnels and the performance of the underlying transport circuits.
+[CLI: Command to verify the status of SD-WAN overlay tunnels and controller connectivity]
+[CLI: Command to inspect the application-aware routing policy and path selection logic]
+[CLI: Command to trigger a zero-touch provisioning process for a new branch edge device]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that SD-WAN is a "magic bullet" for poor-quality circuits. While SD-WAN can optimize traffic steering and mitigate the impact of minor jitter or loss, it cannot fix a fundamentally broken or congested physical circuit. Another error is assuming that SD-WAN replaces the need for robust security; while it simplifies security policy enforcement, it must be integrated with a comprehensive security architecture (e.g., SASE, firewalls) to be effective.
+
+### Interview Angle
+1. Question: How do you ensure the scalability and reliability of the SD-WAN control plane in a global banking network?
+   Answer: We deploy the SD-WAN controllers in a highly available, geographically distributed cluster. We use anycast addressing for controller connectivity, ensuring that edge devices always connect to the nearest available controller. We also implement strict rate-limiting and authentication for all control plane traffic to prevent unauthorized access or DDoS attacks.
+2. Question: How do you integrate SD-WAN with existing legacy MPLS networks during a migration?
+   Answer: We use a phased migration approach. We initially deploy SD-WAN as an overlay on top of the existing MPLS network, allowing us to gain visibility and control without disrupting existing traffic. We then gradually introduce internet circuits and migrate traffic to the SD-WAN fabric, eventually decommissioning the MPLS circuits once the SD-WAN overlay is proven to meet our performance and reliability requirements.
+3. Question: What is your strategy for securing direct internet access (DIA) from branch sites using SD-WAN?
+   Answer: We enforce a "security-first" policy. All DIA traffic is routed through a cloud-delivered security stack (SASE) that includes firewalling, URL filtering, and malware inspection. We also implement local breakout policies that only allow trusted, business-critical traffic to bypass the central datacenter, ensuring that we maintain visibility and control over all internet-bound traffic.
+
+### Related Concepts
+- Section 4.2.1: MPLS vs. internet-based transport
+- Section 4.2.3: Site-to-site VPN (IPsec tunnels, dynamic vs. static)
+- Section 4.2.5: QoS & bandwidth management across WAN links
