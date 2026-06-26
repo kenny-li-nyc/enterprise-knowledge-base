@@ -76,3 +76,42 @@ Operationalizing L3 routing requires proactive monitoring of neighbor adjacencie
 - Section 1.1: Active Directory Sites & Subnets (for mapping logical network boundaries to physical site locations)
 - Section 4.1: L2 fundamentals
 - Section 4.3: Inter-VLAN routing & L3 switching
+
+## 3. Inter-VLAN routing & L3 switching
+
+### Technical Definition
+Inter-VLAN routing is the process of forwarding traffic between distinct VLANs using a Layer 3 device, such as a router or a multilayer switch. L3 switching (or multilayer switching) performs this function at hardware speeds by utilizing Application-Specific Integrated Circuits (ASICs) to perform routing lookups, effectively bypassing the performance bottlenecks associated with traditional "router-on-a-stick" configurations. This architecture allows for high-density, wire-speed routing between subnets within the same physical switching fabric.
+
+### Underlying Mechanism
+The mechanism relies on Switch Virtual Interfaces (SVIs) or routed ports to act as the default gateway for each VLAN. When a packet arrives at the switch, the ASIC performs a lookup in the Forwarding Information Base (FIB), which is populated by the control plane's routing table. The FIB, stored in high-speed TCAM, contains the destination prefix, the next-hop MAC address, and the egress interface. The switch then performs a hardware-level rewrite of the Ethernet frame header—updating the source and destination MAC addresses and decrementing the TTL—before forwarding the frame to the destination VLAN. This process, often referred to as CEF (Cisco Express Forwarding) or equivalent ASIC-based forwarding, ensures that the routing decision is made in a single clock cycle, regardless of the number of routes in the table.
+
+[DIAGRAM: Flowchart illustrating the packet rewrite process during L3 switching, showing the transition from ingress VLAN to egress VLAN]
+
+### Why It Exists
+Inter-VLAN routing exists to provide connectivity between segmented broadcast domains while maintaining the security and performance benefits of VLAN isolation. Traditional router-on-a-stick designs, where all inter-VLAN traffic must traverse a single physical link to an external router, create significant bandwidth bottlenecks and latency. L3 switching solves this by distributing the routing function across the switching fabric, allowing traffic to be routed at the core or distribution layer at wire speed, which is essential for modern, high-throughput datacenter environments.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, L3 switching is the backbone of the datacenter and campus network. We utilize high-performance multilayer switches to handle massive volumes of inter-VLAN traffic, such as communication between application tiers and database clusters. We avoid router-on-a-stick designs entirely, preferring to terminate SVIs on core or distribution switches. Security is enforced through SVI-based Access Control Lists (ACLs) or, more commonly, by offloading traffic to a dedicated firewall cluster for deep packet inspection (DPI) when crossing security zones (e.g., from the web tier to the database tier). This ensures that we maintain high performance while adhering to strict regulatory requirements for traffic inspection and segmentation.
+
+### Operational Considerations
+Operationalizing L3 switching requires careful management of SVI configurations and MTU consistency across the fabric. Administrators must ensure that ACLs applied to SVIs are optimized for hardware processing to avoid "punting" traffic to the CPU, which can cause significant performance degradation. Monitoring tools should track ASIC utilization and TCAM usage to ensure that the switch has sufficient resources to handle the routing table and ACL requirements.
+[CLI: Command to verify the SVI status and IP configuration]
+[CLI: Command to inspect the hardware forwarding table (FIB) for a specific destination prefix]
+[CLI: Command to verify ACL hit counts on an SVI to identify traffic patterns]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that an L3 switch is "just a router." While they perform the same function, L3 switches are optimized for high-density, wire-speed switching and may lack the advanced features (e.g., complex NAT, deep packet inspection, or massive routing table support) found in dedicated edge routers. Another error is assuming that all ports on an L3 switch can perform L3 routing; in many platforms, only specific ports or SVIs are capable of L3 forwarding, and misconfiguration can lead to unexpected traffic flows.
+
+### Interview Angle
+1. Question: How do you decide between using an SVI and a routed port for inter-VLAN routing in a core switch?
+   Answer: We use SVIs when we need to provide a gateway for multiple VLANs on a single switch or stack, which is typical for access and distribution layers. We use routed ports for point-to-point connections between core switches or to external routers, as they provide a cleaner, more deterministic L3 boundary and avoid the overhead of L2 encapsulation and STP processing.
+2. Question: What are the performance implications of applying ACLs to an SVI in a high-throughput environment?
+   Answer: If the ACL is not optimized for hardware processing, the switch may be forced to "punt" packets to the CPU for inspection, which can lead to high CPU utilization and packet drops. We ensure that all ACLs are compiled into TCAM and that we avoid features that require software-based processing, such as logging or complex regex matching, on high-traffic interfaces.
+3. Question: How do you handle MTU mismatches in an L3 switching environment, and why does it matter?
+   Answer: MTU mismatches can lead to fragmentation or dropped packets, which are notoriously difficult to troubleshoot. We enforce a consistent MTU (e.g., 9000 bytes for jumbo frames) across the entire L3 fabric. We also implement Path MTU Discovery (PMTUD) where possible, but we rely on consistent configuration as the primary defense against fragmentation-related performance issues.
+
+### Related Concepts
+- Section 4.1: L2 fundamentals
+- Section 4.2: L3 routing protocols (OSPF, EIGRP, BGP)
+- Section 4.4: First-hop redundancy (HSRP/VRRP/GLBP)
