@@ -183,3 +183,41 @@ Operationalizing threat intelligence requires a rigorous approach to feed manage
 ### Related Concepts
 - Section 3.6.2: SIEM rule/use-case development
 - Section 3.4: Threat hunting methodology
+
+## 6. Security metrics & reporting (MTTD/MTTR)
+
+### Technical Definition
+Security metrics and reporting refer to the quantitative measurement and qualitative analysis of SOC performance, focusing on key performance indicators (KPIs) such as Mean Time to Detect (MTTD) and Mean Time to Respond (MTTR). These metrics provide a data-driven view of the SOC's effectiveness in identifying, investigating, and mitigating security incidents, enabling leadership to assess the organization's risk posture and justify investments in security technology and personnel.
+
+### Underlying Mechanism
+The mechanism relies on the automated collection of timestamps from the SIEM and SOAR platforms. MTTD is calculated as the time elapsed between the initial occurrence of a security event (as recorded in the logs) and the moment the alert is generated or acknowledged by the SOC. MTTR is calculated as the time elapsed between the acknowledgment of an alert and the final resolution of the incident. These metrics are aggregated and visualized in real-time dashboards, allowing SOC managers to identify trends, bottlenecks, and areas for improvement. The data is often normalized to account for incident severity and complexity, ensuring that the metrics provide a fair and accurate representation of SOC performance.
+
+[DIAGRAM: Dashboard visualization showing trends in MTTD and MTTR over time, segmented by incident severity and threat type]
+
+### Why It Exists
+Without quantitative metrics, SOC performance is subjective and difficult to manage. Metrics provide the necessary visibility to identify operational inefficiencies, justify resource allocation, and demonstrate the value of the SOC to senior leadership. They also provide a baseline for continuous improvement, allowing the SOC to track the impact of new technologies, processes, and training programs on their overall effectiveness.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, security metrics are a critical component of the bank's risk management and regulatory reporting framework. Banks must demonstrate to regulators (e.g., DORA, FFIEC) that they have effective monitoring and response capabilities, and metrics provide the necessary evidence. The reality is that these metrics must be carefully defined and consistently measured across the global SOC, ensuring that they are not "gamed" to present a false sense of security. Furthermore, metrics must be aligned with business risk, ensuring that the SOC's performance is measured against the protection of the bank's most critical assets.
+
+### Operational Considerations
+Operationalizing security metrics requires a rigorous approach to data collection and reporting. Administrators must ensure that the data sources are accurate and that the metrics are calculated consistently across the SOC. Monitoring the health of the reporting infrastructure is critical; administrators must track the availability of dashboards, the accuracy of the data, and the timeliness of the reports.
+[CLI: PowerShell command to query the SIEM API for the monthly MTTD and MTTR metrics]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that "lower is always better" for all security metrics. In reality, metrics must be interpreted in context; for example, a very low MTTD might indicate that the SOC is alerting on too many false positives, while a very low MTTR might indicate that the SOC is rushing investigations and missing the root cause. Another error is assuming that metrics are a substitute for qualitative analysis; metrics provide the "what," but human analysts are needed to provide the "why."
+
+### Interview Angle
+1. Question: How do you balance the need for fast detection and response with the need for thorough investigation and root cause analysis?
+   Answer: We use a tiered approach to metrics. We track MTTD and MTTR as high-level KPIs, but we also track qualitative metrics such as the "quality of investigation" and the "accuracy of root cause analysis." We also conduct post-incident reviews for all major incidents, where we analyze the investigation process and identify areas for improvement, ensuring that we are not sacrificing quality for speed.
+2. Question: How do you ensure that your security metrics are not "gamed" by SOC analysts?
+   Answer: We implement a transparent and consistent measurement process. We define our metrics clearly, and we use automated data collection to eliminate manual bias. We also conduct regular audits of our metrics, ensuring that they are being calculated correctly and that they are not being manipulated to meet performance targets.
+3. Question: How do you use security metrics to justify investments in new security technology or personnel?
+   Answer: We use metrics to demonstrate the impact of our current investments and to identify the gaps that new investments would address. For example, if our MTTD is high due to a lack of visibility, we use that data to justify the purchase of a new EDR/XDR solution. If our MTTR is high due to a lack of staff, we use that data to justify the hiring of additional analysts.
+4. Question: What is the relationship between security metrics and business risk?
+   Answer: Security metrics are a proxy for business risk. By tracking MTTD and MTTR, we are essentially measuring our ability to minimize the impact of a security incident on the business. We map our metrics to our critical business processes, ensuring that we are focusing our efforts on the areas that pose the greatest risk to the bank.
+
+### Related Concepts
+- Section 3.6.3: Alert triage & escalation workflows
+- Section 3.6.4: SOAR/automated response playbooks
