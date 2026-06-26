@@ -100,7 +100,7 @@ Operationalizing risk management requires a culture of accountability. Administr
 1. Question: How do you balance the need for quantitative risk analysis with the practical limitations of data availability?
    Answer: We start with a qualitative approach to identify and categorize risks, then move toward quantitative analysis for our top-tier risks. We leverage available data points—such as historical incident data, threat intelligence, and vulnerability metrics—to build models that provide a reasonable estimate of potential impact, acknowledging that these are estimates rather than absolute certainties.
 2. Question: How do you handle a situation where a business unit owner refuses to accept the risk or fund the remediation of a critical finding?
-   Answer: We escalate the issue through the formal risk governance structure. We present the risk in terms of potential business impact and regulatory consequences. If the business owner still refuses, the risk is formally escalated to the Risk Committee or the Board, where the decision to accept the risk is documented and signed off by the appropriate executive, ensuring that accountability is clear.
+   Answer: We escalate the issue through the formal risk governance structure. We present the risk in terms of potential business impact and regulatory consequences. If the business owner still refuses, the risk is formally escalated to the Risk Committee or the Board, where the decision to accept the risk is documented and signed off by the appropriate executive, ensuring that there is clear accountability.
 3. Question: What is the difference between inherent risk and residual risk, and why does it matter?
    Answer: Inherent risk is the level of risk before any controls are applied. Residual risk is the level of risk remaining after controls are implemented. Understanding this difference is crucial because it allows us to measure the effectiveness of our security controls and determine if further investment is needed to bring the risk within our defined appetite.
 
@@ -180,3 +180,39 @@ Operationalizing TPRM requires a cross-functional approach involving procurement
 ### Related Concepts
 - Section 3.8.3: Risk assessment & risk register management
 - Section 3.8.2: Regulatory compliance mapping
+
+## 6. Security awareness & training programs
+
+### Technical Definition
+Security awareness and training is the structured program designed to educate employees, contractors, and third parties on security policies, threats, and best practices. It aims to transform the workforce from a potential vulnerability into a proactive line of defense by fostering a security-conscious culture.
+
+### Underlying Mechanism
+The mechanism involves a Learning Management System (LMS) integrated with phishing simulation platforms. Training modules are tailored to specific roles (e.g., developers, finance, HR) and delivered through a mix of e-learning, interactive workshops, and simulated attacks. Performance metrics—such as training completion rates, phishing click rates, and reporting rates—are tracked and reported to management to identify high-risk groups and tailor future training interventions.
+
+[DIAGRAM: Flowchart showing the training lifecycle: Needs assessment, content development, delivery, simulation, and performance measurement]
+
+### Why It Exists
+Human error remains one of the most significant attack vectors, with phishing and social engineering being primary entry points for adversaries. A robust training program reduces the likelihood of successful social engineering attacks, ensures compliance with regulatory mandates, and builds a resilient organizational culture where security is a shared responsibility.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, security awareness is a mandatory regulatory requirement (e.g., GLBA, PCI-DSS). Banks must demonstrate that all employees receive regular, role-based security training. The reality is that training must be engaging and relevant; generic, annual compliance videos are often ineffective. Banks utilize advanced phishing simulations that mimic real-world threats to test employee vigilance and provide immediate, "teachable moments" for those who fail simulations.
+
+### Operational Considerations
+Operationalizing awareness requires a continuous, multi-faceted approach. Administrators must ensure that training content is updated to reflect the current threat landscape and that metrics are used to drive program improvements. It is critical to avoid a "blame culture" when employees fail simulations; instead, the focus should be on education and support.
+[CLI: PowerShell command to query the LMS for training completion status of a specific department]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that security awareness is a "check-the-box" compliance activity. In reality, it is a cultural transformation effort. Another error is relying solely on annual training; effective programs require continuous, bite-sized learning and regular reinforcement through simulations.
+
+### Interview Angle
+1. Question: How do you measure the effectiveness of a security awareness program beyond just completion rates?
+   Answer: We track behavioral metrics, such as the rate at which employees report suspicious emails, the time it takes to report them, and the reduction in click rates over time. We also conduct surveys to gauge the security culture and understanding of policies across the organization.
+2. Question: How do you handle employees who repeatedly fail phishing simulations?
+   Answer: We implement a tiered remediation approach. First-time failures trigger immediate, just-in-time training. Repeat offenders are enrolled in remedial training and may be required to have a conversation with their manager. We focus on education rather than punishment, but we do escalate to HR if the behavior persists, as it represents a significant risk.
+3. Question: How do you tailor security training for different roles, such as developers versus non-technical staff?
+   Answer: We use role-based training paths. Developers receive training on secure coding practices, OWASP Top 10, and vulnerability management. Non-technical staff receive training on social engineering, data handling, and password hygiene. This ensures that the training is relevant and actionable for each audience.
+
+### Related Concepts
+- Section 3.8.1: Security policy framework & lifecycle
+- Section 3.8.3: Risk assessment & risk register management
