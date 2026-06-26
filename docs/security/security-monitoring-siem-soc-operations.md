@@ -75,3 +75,39 @@ Operationalizing rule development requires a dedicated team of detection enginee
 ### Related Concepts
 - Section 3.6.1: Log aggregation & correlation architecture
 - Section 3.4: Threat hunting methodology
+
+## 3. Alert triage & escalation workflows
+
+### Technical Definition
+Alert triage and escalation workflows define the structured, repeatable processes for evaluating security alerts, determining the scope of a potential compromise, and executing immediate actions to halt the progression of an attack. Triage involves the rapid assessment of an alert's validity and severity, while escalation focuses on the tactical movement of an incident to higher-tier analysts or specialized response teams when the complexity or impact of the threat exceeds the capabilities of the initial responder.
+
+### Underlying Mechanism
+The mechanism relies on the integration of SIEM platforms with Security Orchestration, Automation, and Response (SOAR) systems. Upon alert generation, the SOAR platform executes automated playbooks that query endpoint telemetry—as described in Section 3.4—to gather context (e.g., process ancestry, network connections, user identity). If the alert is validated as malicious, the platform triggers containment actions or escalates the ticket to the appropriate analyst queue based on predefined severity levels and asset criticality. This process is designed to be deterministic and rapid, minimizing the "dwell time" of an attacker. The workflow ensures that every alert is acknowledged, investigated, and either resolved or escalated within defined SLAs, providing a clear audit trail for compliance and forensic purposes.
+
+[DIAGRAM: Flowchart showing the incident triage and escalation lifecycle: Alert ingestion, automated enrichment, decision point, and escalation execution]
+
+### Why It Exists
+In a high-velocity threat environment, manual incident response is too slow to counter modern, automated attacks. Attackers can move laterally and exfiltrate data in minutes, far faster than a human analyst can manually investigate an alert. Alert triage and escalation workflows exist to provide a standardized, automated response capability that can operate at machine speed, ensuring that threats are contained before they can achieve their objectives and that the right resources are applied to the right incidents.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, alert triage and escalation must be executed within strict SLAs to satisfy regulatory requirements and minimize business impact. The workflows must be highly resilient, ensuring that escalation actions do not inadvertently disrupt critical banking services (e.g., payment processing). This requires a "fail-safe" design, where automated escalation is carefully tuned and, for high-criticality assets, requires human-in-the-loop approval. The process must be fully auditable, with every action logged and correlated with the original alert to satisfy forensic and compliance requirements.
+
+### Operational Considerations
+Operationalizing these workflows requires the development of comprehensive playbooks that cover various attack scenarios (e.g., ransomware, credential theft, lateral movement). Administrators must regularly test these playbooks through tabletop exercises and red team simulations to ensure they are effective and do not cause unintended outages. Monitoring the performance of the triage and escalation process is critical; administrators must track metrics such as Mean Time to Acknowledge (MTTA) and Mean Time to Escalate (MTTE).
+[CLI: PowerShell command to query the SOAR platform for the status of an escalated incident ticket]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that triage is equivalent to remediation. Triage is a temporary, tactical measure to assess and prioritize; remediation involves the full investigation, root cause analysis, and restoration of the system to a known-good state. Another error is assuming that automated escalation is always the right answer; in some cases, aggressive escalation can destroy forensic evidence or disrupt critical business processes, so it must be applied with careful consideration of the context.
+
+### Interview Angle
+1. Question: How do you balance the need for rapid, automated escalation with the risk of disrupting critical banking services?
+   Answer: We implement a tiered escalation strategy. For low-criticality endpoints, we allow fully automated escalation. For high-criticality assets, we use a "human-in-the-loop" approach, where the SOAR platform presents the analyst with a recommended escalation path and requires manual approval before execution. We also maintain a "whitelist" of critical services that are protected from automated escalation.
+2. Question: What are the key metrics you use to measure the effectiveness of your alert triage and escalation workflows?
+   Answer: We focus on Mean Time to Acknowledge (MTTA) and Mean Time to Escalate (MTTE). We also track the percentage of alerts that are successfully handled by automated playbooks versus those that require manual intervention, and we use this data to continuously refine our automation and reduce the burden on our SOC analysts.
+3. Question: How do you ensure that your escalation actions do not destroy critical forensic evidence?
+   Answer: We configure our escalation playbooks to perform a "snapshot" of the endpoint's state—including memory dumps and process logs—before executing any destructive actions like process termination or host isolation. This ensures that we have the necessary evidence for post-incident investigation while still achieving our escalation objectives.
+
+### Related Concepts
+- Section 3.4: EDR/XDR Architecture & Telemetry
+- Section 3.6.2: SIEM rule/use-case development
