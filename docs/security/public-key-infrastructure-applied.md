@@ -150,3 +150,16 @@ Operationalizing certificate-based IPsec requires tight integration between the 
 - Section 3.3: CA Hierarchy Trust Consumption (Root/Intermediate Validation)
 - Section 3.3: TLS/SSL Certificate Lifecycle & Deployment
 - Section 2.7: VPN client management (IKEv2, SSL VPN)
+
+## 5. Certificate Revocation (CRL/OCSP) in Practice
+
+### Technical Definition
+Certificate revocation is the process of invalidating a digital certificate before its scheduled expiration date. This is necessary when a certificate's private key is compromised, the certificate holder's identity changes, or the certificate was issued erroneously. The two primary mechanisms for checking revocation status are Certificate Revocation Lists (CRLs) and the Online Certificate Status Protocol (OCSP). A CRL is a signed list of revoked certificate serial numbers published periodically by the CA, while OCSP provides a real-time, request-response mechanism for checking the status of a specific certificate.
+
+### Underlying Mechanism
+When a client validates a certificate, it must also verify that the certificate has not been revoked. With CRLs, the client downloads the latest CRL from the CA's distribution point, caches it, and checks if the certificate's serial number is present in the list. With OCSP, the client sends a request to an OCSP responder (often hosted by the CA) containing the certificate's serial number. The responder returns a signed response indicating whether the certificate is "good," "revoked," or "unknown." Modern implementations often use OCSP Stapling, where the server fetches the OCSP response from the responder and "staples" it to the TLS handshake, reducing the load on the CA and improving privacy and performance for the client.
+
+[DIAGRAM: Sequence diagram comparing CRL download/check vs. OCSP request/response vs. OCSP Stapling]
+
+### Why It Exists
+Revocation is the "kill switch" for PK
