@@ -107,3 +107,39 @@ Operationalizing encryption requires a disciplined approach to key management an
 ### Related Concepts
 - Section 2.8: Endpoint Storage & Disks
 - Section 3.3: Applied PKI Trust Chains
+
+## 4. Information rights management (IRM/Azure Information Protection)
+
+### Technical Definition
+Information Rights Management (IRM), often implemented via solutions like Azure Information Protection (AIP), is a data-centric security technology that provides persistent, identity-based protection for unstructured data. Unlike traditional access controls that are tied to the file system or network share, IRM binds security policies directly to the data object itself. This ensures that the protection—including encryption, usage rights (e.g., read-only, no-print, no-forward), and expiration—travels with the file, regardless of where it is stored, how it is shared, or who accesses it.
+
+### Underlying Mechanism
+The mechanism relies on identity-based encryption and policy templates. When a user creates or modifies a document, the IRM engine applies a policy template that defines the authorized users and their specific permissions. The document is then encrypted with a unique key, which is protected by the identity provider (IdP). When a recipient attempts to open the document, the IRM client authenticates the user against the IdP and requests the decryption key. The IdP validates the user's identity and authorization against the policy template, and if authorized, releases the key to the client, which then decrypts the document in memory. This process relies on the PKI trust chains established in Section 3.3 to validate the identity of the user and the integrity of the policy. The application of these policies is triggered by the classification labels defined in Section 3.7.1, ensuring that the protection is consistently applied based on the data's sensitivity.
+
+[DIAGRAM: Sequence diagram showing the IRM/AIP workflow: Policy application, encryption, authentication, and key release]
+
+### Why It Exists
+Traditional access controls are inherently limited because they are tied to the storage location. Once a file is copied to a USB drive, emailed to a third party, or uploaded to a personal cloud storage account, the original access controls are lost. IRM exists to solve this by binding the security policy to the data itself, ensuring that the organization retains control over its sensitive information, even when it is shared outside the corporate network.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, IRM is a critical control for protecting sensitive documents—such as M&A deal rooms, legal contracts, and client financial reports—as they are shared with internal teams and external partners. The reality is that IRM must be highly scalable and integrated with the bank's identity management system to ensure that access is granted only to authorized users. The design must account for the need for a seamless user experience, ensuring that IRM does not hinder productivity, and it must be integrated with the bank's broader information governance strategy, ensuring that IRM policies are aligned with data retention and archival requirements.
+
+### Operational Considerations
+Operationalizing IRM requires a disciplined approach to policy management and user training. Administrators must ensure that policy templates are clearly defined, well-documented, and regularly reviewed. Monitoring the effectiveness of IRM is critical; administrators must track document access, identify any issues with key release, and ensure that the IRM policies are being consistently applied across the enterprise.
+[CLI: PowerShell command to inspect the IRM/AIP protection status of a document]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that IRM is "just encryption." In reality, IRM is a combination of encryption and access control; it not only protects the data from unauthorized access but also enforces usage rights, ensuring that even authorized users can only perform specific actions. Another error is assuming that IRM is a "set and forget" solution; it requires ongoing maintenance, as policy templates must be updated to reflect changes in the business and the threat landscape.
+
+### Interview Angle
+1. Question: How do you architect an IRM strategy for a global banking environment that includes both internal and external users?
+   Answer: We implement a centralized IRM policy management framework, using identity-based access controls to ensure that only authorized users can access sensitive documents. We use federated identity management to extend this protection to external partners, ensuring that we maintain control over our data even when it is shared outside the bank. We also implement automated policy application based on data classification labels, ensuring that protection is consistently applied.
+2. Question: What are the key challenges in managing IRM in a large, decentralized banking organization?
+   Answer: The key challenges are policy management, user experience, and interoperability. In a large, decentralized organization, it is difficult to ensure that all business units are applying the same IRM policies and that the user experience is consistent. We overcome this by implementing a centralized policy management framework, automating the policy application process, and providing extensive training to ensure that users understand the importance of IRM and how to use it correctly.
+3. Question: How do you handle the challenge of "revocation" in an IRM environment?
+   Answer: We implement a centralized revocation process, where we can instantly revoke access to a document by updating the policy template in the IRM management console. When a user attempts to access the document, the IRM client checks the policy template, and if access has been revoked, the client denies access and prevents the document from being opened. This ensures that we retain control over our data, even after it has been shared.
+
+### Related Concepts
+- Section 3.3: Applied PKI Trust Chains
+- Section 3.7.1: Data classification & labeling
