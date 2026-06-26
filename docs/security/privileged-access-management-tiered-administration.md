@@ -75,3 +75,41 @@ Operationalizing PAWs requires a disciplined, policy-driven approach. Administra
 - Section 1.8: Directory Authorization & Scoping
 - Section 2.5: Endpoint Security & LAPS Client Mechanics
 - Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
+
+## 3. Just-in-time / Just-Enough Access (PIM, Time-Bound Elevation)
+
+### Technical Definition
+Just-in-Time (JIT) and Just-Enough Access (JEA) are privileged access management (PAM) strategies that minimize the attack surface by granting administrative privileges only when needed and only for the minimum scope required. JIT provides time-bound elevation, where an account is granted elevated rights for a specific, limited duration, after which the rights are automatically revoked. JEA provides granular, role-based access, ensuring that an administrator has only the specific permissions necessary to perform their assigned tasks, rather than broad, standing administrative rights.
+
+### Underlying Mechanism
+The mechanism relies on a centralized PAM or Privileged Identity Management (PIM) engine that manages the lifecycle of privileged access. When an administrator requests access, the engine validates their identity and authorization, often requiring multi-factor authentication and an approval workflow. Once approved, the engine dynamically modifies the user's group memberships or issues short-lived, scoped tokens that grant the requested privileges. This process is deeply integrated with the directory authorization framework, as described in Section 1.8, to ensure that the elevation is scoped correctly within the existing ACL structure. Furthermore, as discussed in Section 2.5, the endpoint-side enforcement of these privileges is managed by the local client, which processes the temporary elevation request and ensures that the user's session is restricted to the authorized scope for the duration of the JIT window.
+
+[DIAGRAM: Sequence diagram showing the JIT/JEA request, approval, and dynamic privilege elevation process]
+
+### Why It Exists
+These strategies exist to eliminate the risk of "standing privileges," where administrative accounts have permanent, high-level access that can be exploited if the account is compromised. By moving to a model where privileges are granted on-demand and for a limited time, organizations can significantly reduce the window of opportunity for an attacker. JEA further reduces risk by ensuring that even if an account is compromised during its elevated window, the attacker's ability to perform malicious actions is limited to the specific tasks authorized for that role.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, JIT and JEA are critical components of the bank's privileged access governance, ensuring that all administrative actions are authorized, logged, and time-bound. Banks must implement these controls to comply with regulatory requirements for access governance, such as SOX and FFIEC standards. Architects must design these solutions to be highly available, auditable, and integrated with the bank's broader identity and security infrastructure, ensuring that every elevation request is documented and that the principle of least privilege is strictly enforced. This includes providing support staff with clear, automated workflows for requesting access, minimizing the impact on productivity.
+
+### Operational Considerations
+Operationalizing JIT and JEA requires a disciplined, policy-driven approach. Administrators must define clear roles and access policies, establish approval workflows, and ensure that the PAM/PIM infrastructure is correctly configured to enforce these policies. Monitoring is critical; administrators must track all elevation requests, identify any unauthorized or suspicious activity, and provide reporting on the effectiveness of the JIT/JEA policies. Furthermore, administrators must ensure that they have a clear process for handling access-related support requests, providing users with the necessary tools and guidance to request and use their elevated privileges effectively.
+
+[CLI: PowerShell command to request a time-bound elevation for a specific administrative role]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that JIT/JEA is a "silver bullet" that eliminates the need for other security controls. In reality, it is a complementary control that must be integrated with other security measures, such as tiered administration, PAWs, and session monitoring, to be effective. Another error is assuming that JIT/JEA is a "set and forget" solution; it requires ongoing maintenance, as access policies must be constantly updated to reflect changes in the threat landscape and the business.
+
+### Interview Angle
+1. Question: How do you handle the challenge of balancing security with user productivity when implementing JIT/JEA?
+   Answer: We balance security and productivity by implementing clear, automated approval workflows that guide administrators through the process of requesting and using their elevated privileges. We also provide users with visibility into their access status, so they can proactively request access before they need it, minimizing the impact on their work.
+2. Question: What are the key considerations when designing a JIT/JEA strategy for a Tier-1 bank?
+   Answer: The key considerations are security, auditability, and user experience. The strategy must be secure, with granular access controls and audit logging; it must be auditable, with every elevation request documented and approved; and it must be designed to be easy for administrators to request and use their elevated privileges, minimizing the impact on productivity.
+3. Question: How do you handle the challenge of monitoring and reporting on the effectiveness of JIT/JEA policies?
+   Answer: We use centralized monitoring and logging to track all elevation requests, identifying any unauthorized or suspicious activity. This data is then used to refine our policies and improve the overall security posture of the bank, ensuring that we are continuously improving our privileged access governance.
+
+### Related Concepts
+- Section 1.8: Directory Authorization & Scoping
+- Section 2.5: Endpoint Security & LAPS Client Mechanics
+- Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
