@@ -144,3 +144,39 @@ Operationalizing audit preparation requires a culture of continuous compliance. 
 - Section 3.8.1: Security policy framework & lifecycle
 - Section 3.8.2: Regulatory compliance mapping
 - Section 3.8.3: Risk assessment & risk register management
+
+## 5. Third-party/vendor risk management
+
+### Technical Definition
+Third-party/vendor risk management (TPRM) is the systematic process of identifying, assessing, and mitigating the risks associated with external entities that provide products, services, or data access to the organization. This includes managing the entire vendor lifecycle—from initial due diligence and onboarding to continuous monitoring, performance evaluation, and offboarding—to ensure that third-party security practices align with the organization's risk appetite and compliance requirements.
+
+### Underlying Mechanism
+The mechanism relies on a centralized TPRM module within the GRC platform, which integrates with procurement and legal systems. It utilizes automated vendor risk assessment (VRA) questionnaires, threat intelligence feeds for continuous monitoring (e.g., security ratings), and contractual security clauses. The platform tracks vendor risk scores, maps them to internal control frameworks, and triggers remediation workflows when a vendor's security posture degrades. It also manages "fourth-party" risk by requiring vendors to disclose their own critical sub-processors.
+
+[DIAGRAM: Flowchart showing the vendor risk lifecycle: Onboarding/Due Diligence, Continuous Monitoring, Incident Response, and Offboarding]
+
+### Why It Exists
+Third parties are often the weakest link in an organization's security perimeter. Supply chain attacks, data breaches via vendor portals, and service disruptions can have catastrophic impacts on business operations and reputation. TPRM exists to ensure that the organization does not inherit unmanaged risk from its partners, providing visibility into the security posture of the entire ecosystem and ensuring that vendors are held accountable for their security obligations.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, TPRM is a critical regulatory requirement (e.g., OCC Bulletin 2013-29, EBA Guidelines on Outsourcing). Banks must perform rigorous due diligence on all vendors, particularly those providing critical services. The reality is that banks must manage "concentration risk"—the risk of relying too heavily on a single vendor—and maintain robust exit strategies to ensure business continuity if a vendor fails. TPRM is deeply integrated with the bank's broader Operational Risk Management (ORM) framework, and vendor security incidents are treated with the same severity as internal breaches.
+
+### Operational Considerations
+Operationalizing TPRM requires a cross-functional approach involving procurement, legal, security, and business owners. Administrators must ensure that vendor risk assessments are performed before contracts are signed and that continuous monitoring is in place for the duration of the relationship. This involves regular "vendor security reviews" and ensuring that incident response plans are coordinated between the bank and the vendor. Administrators must also be adept at managing vendor relationships, ensuring that security requirements are clearly communicated and enforced.
+[CLI: PowerShell command to query the GRC platform for the current risk rating of a specific vendor]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that a vendor's SOC 2 report is sufficient for all risk assessment needs. In reality, a SOC 2 report is a point-in-time snapshot and may not cover the specific risks relevant to the organization's use case. Another error is assuming that "onboarding" is the only time risk assessment is needed; TPRM must be a continuous process that monitors the vendor's security posture throughout the entire lifecycle of the relationship.
+
+### Interview Angle
+1. Question: How do you handle the challenge of "fourth-party" risk, where your vendors rely on other vendors?
+   Answer: We require our critical vendors to provide transparency into their own supply chain, including their key sub-processors. We incorporate this information into our risk assessment process and require vendors to demonstrate that they have their own robust TPRM programs in place. We also use threat intelligence to monitor the security posture of our vendors' key partners.
+2. Question: How do you manage a situation where a critical vendor suffers a security breach?
+   Answer: We have a pre-defined vendor incident response plan. As soon as we are notified of a breach, we activate our internal incident response team to assess the potential impact on our data and operations. We work closely with the vendor to understand the scope of the breach, the remediation steps being taken, and the timeline for recovery. We also evaluate the need to invoke our exit strategy if the vendor's security posture is deemed unacceptable.
+3. Question: What is your strategy for balancing the need for rigorous vendor security assessments with the business's need for speed and agility?
+   Answer: We implement a risk-based approach to vendor assessment. We categorize vendors based on the sensitivity of the data they access and the criticality of the services they provide. Low-risk vendors undergo a streamlined assessment, while high-risk vendors undergo a comprehensive, in-depth review. This allows us to focus our resources on the most critical risks while still enabling the business to move quickly.
+
+### Related Concepts
+- Section 3.8.3: Risk assessment & risk register management
+- Section 3.8.2: Regulatory compliance mapping
