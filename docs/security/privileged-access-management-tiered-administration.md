@@ -189,3 +189,41 @@ Operationalizing LAPS requires a disciplined, policy-driven approach. Administra
 - Section 2.5: Endpoint Security & LAPS Client Mechanics
 - Section 1.8: Directory Authorization & Scoping
 - Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
+
+## 6. Privileged Session Monitoring & Recording
+
+### Technical Definition
+Privileged session monitoring and recording is the security discipline of capturing, logging, and analyzing the activities performed during a privileged session (e.g., RDP, SSH, or web-based administrative console). This involves recording the session in real-time, capturing keystrokes, screen activity, and command execution, and storing this data in an immutable, centralized repository. The goal is to provide full accountability for all privileged actions, deter malicious behavior, and enable rapid forensic investigation in the event of a security incident.
+
+### Underlying Mechanism
+The mechanism typically involves a proxy-based architecture, where the administrator connects to a privileged session gateway (often part of a PAM solution) rather than directly to the target resource. The gateway intercepts the session traffic, proxies the connection, and records the activity. For graphical sessions (RDP), the gateway captures screen frames and input events; for command-line sessions (SSH), it logs keystrokes and output. This data is then streamed to a secure, tamper-proof storage location and indexed for search and analysis. The system is integrated with the organization's identity provider to ensure that every session is tied to a specific, authenticated user, and it often includes real-time alerting capabilities that can terminate a session if suspicious commands or behaviors are detected.
+
+[DIAGRAM: Architecture diagram showing the privileged session gateway proxying and recording an administrative session]
+
+### Why It Exists
+Privileged session monitoring exists to provide an audit trail for the most sensitive actions performed within the enterprise. Because privileged accounts have the power to modify configurations, access sensitive data, or disable security controls, it is essential to have a complete, immutable record of their activity. This accountability acts as a powerful deterrent against insider threats and provides the necessary evidence for forensic investigations, ensuring that the organization can identify exactly what happened, when, and by whom during a security incident.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, privileged session monitoring is a critical regulatory requirement, often mandated by frameworks like SWIFT CSP, PCI-DSS, and various data protection acts. Banks must ensure that all privileged sessions are recorded, that the recordings are stored securely, and that they are regularly reviewed for compliance and security purposes. Architects must design these systems to be highly available, scalable, and integrated with the bank's broader security infrastructure, ensuring that session data is protected against tampering and that it can be easily retrieved for forensic analysis. This is a high-stakes operational function that requires deep coordination between IT, security, and compliance teams.
+
+### Operational Considerations
+Operationalizing privileged session monitoring requires a disciplined, policy-driven approach. Administrators must define clear policies for which sessions require recording, establish secure storage and retention policies, and ensure that the session gateway infrastructure is correctly configured. Monitoring is critical; administrators must track the status of session recording, identify any failures, and provide reporting on the compliance of the session monitoring deployment. Furthermore, administrators must ensure that they have a clear process for handling session-related support requests, providing support staff with the necessary tools and guidance to perform their duties without compromising the security boundary.
+
+[CLI: PowerShell command to verify the status of the privileged session gateway and confirm that session recording is active]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that privileged session monitoring is "spying" on administrators. In reality, it is a critical security control for accountability and incident response, ensuring that all privileged actions are documented and auditable. Another error is assuming that session monitoring is a "set and forget" solution; it requires ongoing maintenance, as the recording policies must be constantly updated to reflect changes in the threat landscape and the business.
+
+### Interview Angle
+1. Question: How do you handle the challenge of balancing security with user privacy when implementing privileged session monitoring?
+   Answer: We balance security and privacy by implementing clear, transparent policies that inform administrators that their sessions are being recorded for security and compliance purposes. We also use strict access controls to ensure that only authorized personnel can view session recordings, and we implement automated redaction for sensitive information where possible.
+2. Question: What are the key considerations when designing a privileged session monitoring strategy for a Tier-1 bank?
+   Answer: The key considerations are security, auditability, and scalability. The strategy must be secure, with immutable storage and strict access controls; it must be auditable, with every session recorded and logged; and it must be designed to be scalable to support the bank's entire infrastructure, ensuring that all privileged sessions are captured.
+3. Question: How do you handle the challenge of monitoring and reporting on the effectiveness of privileged session monitoring?
+   Answer: We use centralized monitoring and logging to track all privileged sessions, identifying any unauthorized or suspicious activity. This data is then used to refine our policies and improve the overall security posture of the bank, ensuring that we are continuously improving our privileged access governance.
+
+### Related Concepts
+- Section 3.1: Tiered Admin Model (Tier 0/1/2) & ESAE/Red Forest Concepts
+- Section 3.1: Privileged Access Workstations (PAWs)
+- Section 3.1: Just-in-time / Just-Enough Access (PIM, Time-Bound Elevation)
