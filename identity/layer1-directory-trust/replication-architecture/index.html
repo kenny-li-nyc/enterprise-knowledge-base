@@ -1,0 +1,2918 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal architecture reference and interview prep — Identity, Endpoint, Security, Network, Virtualization/Compute, Storage/Data, Cloud/Hybrid">
+      
+      
+      
+      
+        <link rel="prev" href="../forests-domains-ous-sites/">
+      
+      
+        <link rel="next" href="../fsmo-roles/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Replication Architecture - INFRA // REFERENCE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,700,700i%7CIBM+Plex+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#replication-architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="INFRA // REFERENCE" class="md-header__button md-logo" aria-label="INFRA // REFERENCE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            INFRA // REFERENCE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Replication Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kenny-li-nyc/enterprise-knowledge-base" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kenny-li-nyc/enterprise-knowledge-base
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Identity
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../endpoint/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Endpoint
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="INFRA // REFERENCE" class="md-nav__button md-logo" aria-label="INFRA // REFERENCE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    INFRA // REFERENCE
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kenny-li-nyc/enterprise-knowledge-base" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kenny-li-nyc/enterprise-knowledge-base
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Identity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directory & Trust Foundation
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Directory & Trust Foundation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forests-domains-ous-sites/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forests, Domains, OUs & Sites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ad-partitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AD Partitions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AD Partitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#replication-topology-kcc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replication Topology &amp; KCC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Replication Topology &amp; KCC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sites-site-links-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sites / Site Links / Costs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sites / Site Links / Costs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intersite-vs-intrasite-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intersite vs Intrasite Replication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Intersite vs Intrasite Replication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gc-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GC Replication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GC Replication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#replication-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replication Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Replication Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fsmo-roles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FSMO Roles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forest-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forest Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authorization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../federation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Federation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forest-services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forest Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../endpoint/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Endpoint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/device-lifecycle-provisioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Lifecycle & Provisioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/endpoint-identity-trust/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Identity & Trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/configuration-management-policy-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Management & Policy Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/patch-update-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patch & Update Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/endpoint-hardening-baseline-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Hardening & Baseline Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/application-management-delivery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application Management & Delivery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/remote-access-connectivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Remote Access & Connectivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../endpoint/endpoint-recovery-resilience/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Recovery & Resilience
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ad-partitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AD Partitions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AD Partitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#replication-topology-kcc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replication Topology &amp; KCC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Replication Topology &amp; KCC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sites-site-links-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sites / Site Links / Costs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sites / Site Links / Costs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intersite-vs-intrasite-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intersite vs Intrasite Replication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Intersite vs Intrasite Replication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gc-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GC Replication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GC Replication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#replication-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replication Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Replication Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="replication-architecture">Replication Architecture<a class="headerlink" href="#replication-architecture" title="Permanent link">&para;</a></h1>
+<h2 id="ad-partitions">AD Partitions<a class="headerlink" href="#ad-partitions" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition">Technical Definition<a class="headerlink" href="#technical-definition" title="Permanent link">&para;</a></h3>
+<p>Active Directory partitions, also known as naming contexts, are the logical units into which the directory database is divided for the purpose of replication. Each partition represents a distinct set of data that is replicated independently across the forest. There are three primary types of partitions in every Active Directory forest: the Schema partition, the Configuration partition, and the Domain partition. Additionally, Application partitions can be created to store specific application data that does not need to be replicated to every domain controller in the forest.</p>
+<h3 id="underlying-mechanism">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism" title="Permanent link">&para;</a></h3>
+<p>The directory database, <code>ntds.dit</code>, is physically structured to support these partitions. When a domain controller (DC) is promoted, it receives a full copy of the Schema and Configuration partitions, as these are forest-wide. It also receives a copy of the Domain partition for the domain it belongs to. </p>
+<ul>
+<li><strong>Schema Partition:</strong> Contains the definitions of all object classes and attributes. It is replicated to every DC in the forest.</li>
+<li><strong>Configuration Partition:</strong> Contains the physical and logical topology of the forest, including site definitions, subnets, and trust objects (as covered in the Trust Architecture page). It is replicated to every DC in the forest.</li>
+<li><strong>Domain Partition:</strong> Contains the actual objects (users, computers, groups) for a specific domain. It is replicated only to DCs within that domain.</li>
+<li><strong>Application Partitions:</strong> These are user-defined partitions that allow for custom data storage. They can be configured to replicate to a specific set of DCs, providing a mechanism to control replication scope for non-core directory data, such as DNS zones (e.g., <code>DomainDnsZones</code> and <code>ForestDnsZones</code>).</li>
+</ul>
+<pre class="mermaid"><code>flowchart TB
+    subgraph Forest["Forest-Wide Scope"]
+        SCHEMA["Schema Partition&lt;br/&gt;Object classes &amp; attribute definitions"]
+        CONFIG["Configuration Partition&lt;br/&gt;Sites, subnets, trust objects, topology"]
+    end
+
+    subgraph DomainA["Domain A Scope"]
+        DOMA["Domain A Partition&lt;br/&gt;Users, computers, groups"]
+    end
+
+    subgraph DomainB["Domain B Scope"]
+        DOMB["Domain B Partition&lt;br/&gt;Users, computers, groups"]
+    end
+
+    subgraph AppPart["Custom / Configurable Scope"]
+        APP["Application Partition&lt;br/&gt;e.g. DomainDnsZones, ForestDnsZones"]
+    end
+
+    SCHEMA --&gt;|Replicates to| ALLDC1[Every DC in Forest]
+    CONFIG --&gt;|Replicates to| ALLDC2[Every DC in Forest]
+    DOMA --&gt;|Replicates to| DCA[DCs in Domain A only]
+    DOMB --&gt;|Replicates to| DCB[DCs in Domain B only]
+    APP --&gt;|Replicates to| SUBSET[Configurable subset of DCs]
+
+    style Forest fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style DomainA fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style DomainB fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style AppPart fill:#0a1929,stroke:#22d3ee,color:#e0f7fa</code></pre>
+<h3 id="why-it-exists">Why It Exists<a class="headerlink" href="#why-it-exists" title="Permanent link">&para;</a></h3>
+<p>Partitions exist to balance the need for global directory consistency with the need for localized data management and replication efficiency. By separating the directory into partitions, Active Directory ensures that forest-wide changes (like schema updates) are propagated everywhere, while domain-specific data (like user accounts) is contained within the domain, preventing unnecessary replication traffic across the entire forest. Application partitions further extend this by allowing administrators to isolate specific data sets, such as DNS zones, to only the DCs that require them, optimizing bandwidth and storage.</p>
+<h3 id="enterprise-banking-reality">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality" title="Permanent link">&para;</a></h3>
+<p>In a Tier-1 banking environment, partition management is a critical aspect of directory health. The default partitions are generally sufficient, but the use of Application partitions for DNS is standard practice to ensure that DNS data is replicated appropriately across the forest. From a compliance and audit perspective, the integrity of these partitions is paramount. Any corruption in the Schema or Configuration partitions can lead to forest-wide outages. Banking architectures often implement strict monitoring of partition replication health, ensuring that no DC falls behind in its replication cycle. Furthermore, the segregation of data via partitions is often leveraged to meet regulatory requirements where certain data must be restricted to specific geographical or logical boundaries.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Partition</th>
+<th style="text-align: left;">Scope</th>
+<th style="text-align: left;">Replication Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Schema</strong></td>
+<td style="text-align: left;">Forest-wide</td>
+<td style="text-align: left;">All DCs in the forest</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Configuration</strong></td>
+<td style="text-align: left;">Forest-wide</td>
+<td style="text-align: left;">All DCs in the forest</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Domain</strong></td>
+<td style="text-align: left;">Domain-specific</td>
+<td style="text-align: left;">All DCs in the domain</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Application</strong></td>
+<td style="text-align: left;">Custom</td>
+<td style="text-align: left;">Configurable set of DCs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operational-considerations">Operational Considerations<a class="headerlink" href="#operational-considerations" title="Permanent link">&para;</a></h3>
+<p>Day-to-day operations involve monitoring the replication status of each partition. If a DC fails to replicate a specific partition, it can lead to inconsistencies and authentication failures. Administrators must be vigilant about the health of the <code>ntds.dit</code> file and the replication queues. Monitoring tools should be configured to alert on replication latency or failures for each partition type.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp"># </span>Check<span class="w"> </span>replication<span class="w"> </span>status<span class="w"> </span>and<span class="w"> </span>metadata<span class="w"> </span><span class="k">for</span><span class="w"> </span>every<span class="w"> </span>partition<span class="w"> </span>hosted<span class="w"> </span>on<span class="w"> </span>this<span class="w"> </span>DC
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">repadmin /showrepl localhost /verbose</span>
+</code></pre></div>
+<h3 id="common-misconceptions">Common Misconceptions<a class="headerlink" href="#common-misconceptions" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Common Misconceptions</p>
+<ul>
+<li><strong>"All domain controllers have all the data."</strong> This is false. DCs only hold the Schema, Configuration, and their specific Domain partition. They do not hold the Domain partitions of other domains in the forest (unless they are Global Catalog servers, which hold a partial copy).</li>
+<li><strong>"Application partitions are just for DNS."</strong> While DNS is the most common use case, Application partitions can be used for any application that needs to store data in Active Directory, such as custom configuration data or application-specific settings.</li>
+<li><strong>"Partition replication is the same as file replication."</strong> Partition replication is handled by the Active Directory replication engine, which is distinct from the File Replication Service (FRS) or Distributed File System Replication (DFSR) used for SYSVOL.</li>
+</ul>
+</div>
+<h3 id="interview-angle">Interview Angle<a class="headerlink" href="#interview-angle" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>"How does the partition structure impact the scalability of Active Directory?"</strong><ul>
+<li><em>Model Answer:</em> "The partition structure allows Active Directory to scale by limiting the replication scope of domain-specific data. By keeping domain data local to the domain, we prevent the directory from becoming a bottleneck as the number of domains and objects grows. Forest-wide data is kept minimal, ensuring that global changes do not overwhelm the replication infrastructure."</li>
+</ul>
+</li>
+<li><strong>"What is the difference between the Schema partition and the Configuration partition?"</strong><ul>
+<li><em>Model Answer:</em> "The Schema partition defines the 'rules' of the directory—the object classes and attributes that can exist. The Configuration partition defines the 'topology' of the directory—the sites, subnets, and domain structure. Both are forest-wide, but they serve fundamentally different purposes in the directory's operation."</li>
+</ul>
+</li>
+<li><strong>"When would you create a custom Application partition?"</strong><ul>
+<li><em>Model Answer:</em> "I would create a custom Application partition when I have data that needs to be stored in Active Directory but does not need to be replicated to every domain controller in the forest. This is useful for reducing replication traffic and storage requirements for application-specific data that is only needed by a subset of domain controllers."</li>
+</ul>
+</li>
+</ol>
+<h3 id="related-concepts">Related Concepts<a class="headerlink" href="#related-concepts" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="../trust-architecture/">Trust Architecture</a></li>
+<li><a href="./#replication-topology-kcc">Replication Topology &amp; KCC</a></li>
+<li><a href="../forests-domains-ous-sites/#forest">Global Catalog</a></li>
+</ul>
+<h2 id="replication-topology-kcc">Replication Topology &amp; KCC<a class="headerlink" href="#replication-topology-kcc" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_1">Technical Definition<a class="headerlink" href="#technical-definition_1" title="Permanent link">&para;</a></h3>
+<p>The Knowledge Consistency Checker (KCC) is a built-in process that runs on every domain controller (DC) in an Active Directory forest. Its primary responsibility is to generate and maintain the replication topology, ensuring that all domain controllers are connected in a way that allows for efficient and reliable replication of directory data. The KCC automatically creates and manages "connection objects," which define the replication partners and the replication schedule between domain controllers.</p>
+<h3 id="underlying-mechanism_1">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_1" title="Permanent link">&para;</a></h3>
+<p>The KCC operates by building a spanning-tree topology for each partition. It uses the site and subnet information stored in the Configuration partition to understand the physical network layout. The KCC runs periodically (by default, every 15 minutes) to recalculate the topology. If it detects a change in the network (e.g., a new DC is added, a site link is modified, or a DC goes offline), it updates the connection objects to ensure that replication continues to flow efficiently. The KCC ensures that there are at least two paths between any two domain controllers, providing redundancy in case of a link failure.</p>
+<pre class="mermaid"><code>flowchart LR
+    DC1[DC1] &lt;--&gt; DC2[DC2]
+    DC2 &lt;--&gt; DC3[DC3]
+    DC3 &lt;--&gt; DC4[DC4]
+    DC4 &lt;--&gt; DC1
+    DC1 &lt;--&gt; DC3
+    DC2 &lt;--&gt; DC4
+
+    style DC1 fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style DC2 fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style DC3 fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style DC4 fill:#0a1929,stroke:#22d3ee,color:#e0f7fa</code></pre>
+<p><em>Diagram note: solid edges represent KCC-generated connection objects forming a ring/spanning-tree structure. The diagonal links (DC1↔DC3, DC2↔DC4) illustrate the KCC's redundancy guarantee — at least two distinct paths between any pair of DCs, so a single link or DC failure does not partition the topology.</em></p>
+<h3 id="why-it-exists_1">Why It Exists<a class="headerlink" href="#why-it-exists_1" title="Permanent link">&para;</a></h3>
+<p>The KCC exists to automate the complex task of managing replication in a distributed environment. In a large enterprise with hundreds or thousands of domain controllers, manually configuring replication partners would be impossible and error-prone. The KCC ensures that the replication topology is always optimized for the current network state, reducing the administrative burden and minimizing the risk of replication failures.</p>
+<h3 id="enterprise-banking-reality_1">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_1" title="Permanent link">&para;</a></h3>
+<p>In a Tier-1 banking environment, the KCC is the backbone of replication. While the KCC is highly effective, banking architectures often augment it with manual connection objects for specific high-availability requirements or to bypass KCC limitations in complex, multi-site topologies. Audit and compliance teams require that the replication topology be documented and that any manual overrides are justified and reviewed. Replication health is a key performance indicator (KPI) for the directory service, and any KCC-related errors are treated as high-priority incidents.</p>
+<h3 id="operational-considerations_1">Operational Considerations<a class="headerlink" href="#operational-considerations_1" title="Permanent link">&para;</a></h3>
+<p>Day-to-day operations involve monitoring the KCC for errors. The KCC logs events to the Directory Service event log, and any issues (e.g., Event ID 1311) must be investigated immediately. Administrators can use <code>repadmin</code> to force the KCC to recalculate the topology or to view the current connection objects. If the KCC is unable to build a valid topology, it may be necessary to manually intervene, but this should be a last resort.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp"># </span>Force<span class="w"> </span>the<span class="w"> </span>KCC<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span><span class="nb">local</span><span class="w"> </span>DC<span class="w"> </span>to<span class="w"> </span>immediately<span class="w"> </span>recalculate<span class="w"> </span>the<span class="w"> </span>replication<span class="w"> </span>topology
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">repadmin /kcc localhost</span>
+</code></pre></div>
+<h3 id="common-misconceptions_1">Common Misconceptions<a class="headerlink" href="#common-misconceptions_1" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Common Misconceptions</p>
+<ul>
+<li><strong>"The KCC is always right."</strong> While the KCC is highly intelligent, it can sometimes be overridden by manual connection objects. If the KCC is not behaving as expected, it may be due to manual overrides that are no longer appropriate.</li>
+<li><strong>"KCC is the only way to replicate."</strong> While the KCC is the primary mechanism for generating the topology, administrators can manually create connection objects to force specific replication paths.</li>
+<li><strong>"KCC runs only when a DC is rebooted."</strong> The KCC runs periodically (every 15 minutes by default) to ensure the topology remains current.</li>
+</ul>
+</div>
+<h3 id="interview-angle_1">Interview Angle<a class="headerlink" href="#interview-angle_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>"How does the KCC handle site changes?"</strong><ul>
+<li><em>Model Answer:</em> "When site information changes (e.g., a new site is added or a site link is modified), the KCC detects these changes in the Configuration partition. It then recalculates the replication topology to ensure that replication traffic is routed efficiently across the new site structure."</li>
+</ul>
+</li>
+<li><strong>"What is the difference between KCC-generated connections and manual connections?"</strong><ul>
+<li><em>Model Answer:</em> "KCC-generated connections are automatically created and managed by the KCC to ensure a reliable and redundant topology. Manual connections are created by administrators to override the KCC's decisions, often for specific business requirements or to optimize replication in complex scenarios."</li>
+</ul>
+</li>
+<li><strong>"How do you troubleshoot KCC errors?"</strong><ul>
+<li><em>Model Answer:</em> "I would start by checking the Directory Service event log for KCC-related events (e.g., Event ID 1311). I would then use <code>repadmin /kcc</code> to force a recalculation and <code>repadmin /showrepl</code> to inspect the current replication status and connection objects. If the issue persists, I would investigate the site and subnet configuration to ensure it accurately reflects the physical network."</li>
+</ul>
+</li>
+</ol>
+<h3 id="related-concepts_1">Related Concepts<a class="headerlink" href="#related-concepts_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="./#sites-site-links-costs">Sites / Site Links / Costs</a></li>
+<li><a href="./#intersite-vs-intrasite-replication">Intersite vs Intrasite Replication</a></li>
+<li><a href="./#replication-troubleshooting">Replication Troubleshooting</a></li>
+</ul>
+<h2 id="sites-site-links-costs">Sites / Site Links / Costs<a class="headerlink" href="#sites-site-links-costs" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_2">Technical Definition<a class="headerlink" href="#technical-definition_2" title="Permanent link">&para;</a></h3>
+<p>In the context of replication architecture, "Sites / Site Links / Costs" refers to the mechanism by which Active Directory determines the most efficient path for replication traffic across a distributed network. While sites and subnets define the physical network boundaries, site links and their associated costs provide the KCC with the necessary data to calculate the least-cost path for replication. The cost attribute is a relative value assigned to a site link, where a lower cost indicates a preferred, higher-bandwidth, or lower-latency path.</p>
+<h3 id="underlying-mechanism_2">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_2" title="Permanent link">&para;</a></h3>
+<p>The KCC uses Dijkstra's algorithm to calculate the shortest path between any two sites based on the cumulative cost of the site links. When multiple paths exist, the KCC selects the path with the lowest total cost. If costs are equal, the KCC may use other factors, such as the number of hops, to break the tie. Site links also have a replication schedule, which defines the time windows during which replication is allowed to occur. The KCC respects these schedules when building the replication topology, ensuring that replication traffic does not occur during restricted periods. This cost-based path selection is dynamic; if a site link is disabled or its cost is changed, the KCC will recalculate the topology to reflect the new network state.</p>
+<p><pre class="mermaid"><code>flowchart LR
+    HUB[("Hub Site&lt;br/&gt;Core Data Center")]
+    BR1[Branch Site A]
+    BR2[Branch Site B]
+    REG[Regional Site]
+
+    HUB --&gt;|"Cost: 100&lt;br/&gt;(MPLS, 10Gbps)"| REG
+    REG --&gt;|"Cost: 250&lt;br/&gt;(SD-WAN, 100Mbps)"| BR1
+    REG --&gt;|"Cost: 250&lt;br/&gt;(SD-WAN, 100Mbps)"| BR2
+    HUB -.-&gt;|"Cost: 800&lt;br/&gt;(Backup VPN, low bandwidth)"| BR1
+
+    style HUB fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style REG fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style BR1 fill:#0a1929,stroke:#22d3ee,color:#e0f7fa
+    style BR2 fill:#0a1929,stroke:#22d3ee,color:#e0f7fa</code></pre>
+<em>Diagram note: the dashed Hub→Branch A link (cost 800) is a backup path. The KCC's Dijkstra calculation prefers Hub→Regional→Branch A (cumulative cost 350) over the direct low-bandwidth backup path, only falling back to it if the preferred path becomes unavailable.</em></p>
+<h3 id="why-it-exists_2">Why It Exists<a class="headerlink" href="#why-it-exists_2" title="Permanent link">&para;</a></h3>
+<p>This mechanism exists to provide granular control over replication traffic in complex, multi-site environments. By assigning costs to site links, administrators can influence the replication topology to favor high-speed, reliable network links over slower, more expensive WAN connections. This prevents replication traffic from saturating critical business links and ensures that directory data remains consistent across the enterprise without negatively impacting network performance.</p>
+<h3 id="enterprise-banking-reality_2">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_2" title="Permanent link">&para;</a></h3>
+<p>In a Tier-1 banking environment, cost-based path selection is a critical component of WAN optimization. Banking networks are often complex, with multiple data centers and branch offices connected by a mix of MPLS, SD-WAN, and dedicated circuits. Administrators must carefully tune site link costs to reflect the actual performance characteristics of these links. Improperly configured costs can lead to "hairpinning," where replication traffic takes an inefficient path, potentially causing congestion and latency. Banking architectures often use a "hub-and-spoke" site design, where branch offices are connected to regional hubs, and regional hubs are connected to the core data centers, with costs carefully balanced to ensure optimal replication flow.</p>
+<h3 id="operational-considerations_2">Operational Considerations<a class="headerlink" href="#operational-considerations_2" title="Permanent link">&para;</a></h3>
+<p>Operational considerations involve the ongoing tuning of site link costs and schedules. As the network evolves, site link costs must be reviewed and updated to ensure they remain accurate. Administrators should monitor replication latency and bandwidth utilization to identify potential bottlenecks. If replication is consistently slow or failing, it may be necessary to adjust site link costs or schedules. Monitoring tools should be used to visualize the replication topology and identify any inefficiencies.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c"># List all site links along with their cost and replication interval</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">Get-ADReplicationSiteLink</span> <span class="n">-Filter</span> <span class="p">*</span> <span class="n">-Properties</span> <span class="n">Cost</span><span class="p">,</span> <span class="n">ReplicationFrequencyInMinutes</span> <span class="p">|</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="nb">Select-Object</span> <span class="n">Name</span><span class="p">,</span> <span class="n">Cost</span><span class="p">,</span> <span class="n">ReplicationFrequencyInMinutes</span>
+</code></pre></div>
+<h3 id="common-misconceptions_2">Common Misconceptions<a class="headerlink" href="#common-misconceptions_2" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Common Misconceptions</p>
+<ul>
+<li><strong>"Lower cost is always better."</strong> While lower cost is preferred for replication, setting all costs to the same low value can lead to congestion on specific links. Costs should reflect the actual bandwidth and latency of the network.</li>
+<li><strong>"Site links are only for replication."</strong> Site links also influence client-to-DC affinity. Clients will prefer to authenticate to a DC in their own site, and if none are available, they will fail over to a DC in the next closest site based on site link costs.</li>
+<li><strong>"I don't need to worry about replication schedules."</strong> Replication schedules are essential for managing bandwidth during peak business hours. Ignoring them can lead to network congestion and performance issues.</li>
+</ul>
+</div>
+<h3 id="interview-angle_2">Interview Angle<a class="headerlink" href="#interview-angle_2" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>"How does the KCC use site link costs to build the replication topology?"</strong><ul>
+<li><em>Model Answer:</em> "The KCC uses Dijkstra's algorithm to calculate the least-cost path between sites based on the cumulative cost of the site links. It builds a spanning-tree topology that ensures all sites are connected with the lowest possible total cost, while also respecting replication schedules."</li>
+</ul>
+</li>
+<li><strong>"What are the risks of misconfiguring site link costs?"</strong><ul>
+<li><em>Model Answer:</em> "Misconfiguring site link costs can lead to inefficient replication paths, network congestion, and increased latency. It can also negatively impact client-to-DC affinity, causing clients to authenticate to distant domain controllers instead of local ones."</li>
+</ul>
+</li>
+<li><strong>"How do you balance replication traffic with network bandwidth constraints?"</strong><ul>
+<li><em>Model Answer:</em> "I balance replication traffic by carefully tuning site link costs and schedules. I prioritize high-speed, reliable links by assigning them lower costs and allow replication during off-peak hours using replication schedules. I also monitor bandwidth utilization to ensure that replication traffic does not interfere with critical business applications."</li>
+</ul>
+</li>
+</ol>
+<h3 id="related-concepts_2">Related Concepts<a class="headerlink" href="#related-concepts_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="./#replication-topology-kcc">Replication Topology &amp; KCC</a></li>
+<li><a href="./#intersite-vs-intrasite-replication">Intersite vs Intrasite Replication</a></li>
+<li><a href="./#replication-troubleshooting">Replication Troubleshooting</a></li>
+</ul>
+<h2 id="intersite-vs-intrasite-replication">Intersite vs Intrasite Replication<a class="headerlink" href="#intersite-vs-intrasite-replication" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_3">Technical Definition<a class="headerlink" href="#technical-definition_3" title="Permanent link">&para;</a></h3>
+<p>Intersite and Intrasite replication are the two primary modes of Active Directory replication, distinguished by the network connectivity and the replication protocols used. Intrasite replication occurs between domain controllers within the same site, where high-speed, low-latency connectivity is assumed. Intersite replication occurs between domain controllers in different sites, typically over WAN links with limited bandwidth and higher latency.</p>
+<h3 id="underlying-mechanism_3">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_3" title="Permanent link">&para;</a></h3>
+<p>Intrasite replication is optimized for speed and consistency. It uses change notification, which triggers immediate replication when a change occurs, ensuring that all DCs in a site are synchronized almost instantly. It uses uncompressed RPC over IP for maximum performance. Intersite replication, conversely, is optimized for bandwidth efficiency. It uses replication schedules to control when replication occurs, and it compresses data to minimize bandwidth usage. It can also use different transport protocols, such as RPC over IP or SMTP (though SMTP is rarely used in modern environments), to accommodate different network conditions.</p>
+<h3 id="why-it-exists_3">Why It Exists<a class="headerlink" href="#why-it-exists_3" title="Permanent link">&para;</a></h3>
+<p>This distinction exists to manage the trade-off between replication speed and network bandwidth. Intrasite replication prioritizes speed because the network is assumed to be fast and reliable. Intersite replication prioritizes bandwidth efficiency because WAN links are often slow, expensive, and unreliable. By separating these two modes, Active Directory ensures that replication is as fast as possible where it can be, and as efficient as possible where it must be.</p>
+<h3 id="enterprise-banking-reality_3">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_3" title="Permanent link">&para;</a></h3>
+<p>In a Tier-1 banking environment, the distinction between intersite and intrasite replication is fundamental to global operations. Banking architectures are designed to ensure that intrasite replication is always fast and reliable, providing consistent authentication and directory services within each data center or office. Intersite replication is carefully managed to ensure that global directory consistency is maintained without impacting the performance of critical banking applications. This often involves complex site link configurations, compression settings, and replication schedules that are tailored to the specific bandwidth and latency characteristics of the global network.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Intrasite Replication</th>
+<th style="text-align: left;">Intersite Replication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Connectivity</strong></td>
+<td style="text-align: left;">High-speed, low-latency</td>
+<td style="text-align: left;">WAN links, higher latency</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Trigger</strong></td>
+<td style="text-align: left;">Change notification (immediate)</td>
+<td style="text-align: left;">Replication schedule</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Compression</strong></td>
+<td style="text-align: left;">None (usually)</td>
+<td style="text-align: left;">Compressed</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Protocol</strong></td>
+<td style="text-align: left;">RPC over IP</td>
+<td style="text-align: left;">RPC over IP or SMTP</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operational-considerations_3">Operational Considerations<a class="headerlink" href="#operational-considerations_3" title="Permanent link">&para;</a></h3>
+<p>Operational considerations involve monitoring the performance and health of both intrasite and intersite replication. Intrasite replication issues are typically related to network connectivity or DC health, while intersite replication issues are often related to site link configuration, bandwidth constraints, or replication schedules. Administrators should monitor replication latency and compression ratios to ensure that intersite replication is performing as expected.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp"># </span>Show<span class="w"> </span>replication<span class="w"> </span>summary<span class="w"> </span>across<span class="w"> </span>all<span class="w"> </span>DCs,<span class="w"> </span>including<span class="w"> </span>latency<span class="w"> </span>and<span class="w"> </span>failure<span class="w"> </span>counts
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go">repadmin /replsummary</span>
+</code></pre></div>
+<h3 id="common-misconceptions_3">Common Misconceptions<a class="headerlink" href="#common-misconceptions_3" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Common Misconceptions</p>
+<ul>
+<li><strong>"Intersite replication is always slower."</strong> While intersite replication is typically scheduled and compressed, it is not necessarily "slower" in terms of data throughput; it is just optimized for different network conditions.</li>
+<li><strong>"Intrasite replication is always better."</strong> Intrasite replication is optimized for speed, but it can consume significant bandwidth if not managed correctly, especially in large sites with many DCs.</li>
+<li><strong>"I can ignore intersite replication settings."</strong> Intersite replication settings are critical for WAN optimization and must be carefully configured to avoid network congestion.</li>
+</ul>
+</div>
+<h3 id="interview-angle_3">Interview Angle<a class="headerlink" href="#interview-angle_3" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>"What is the primary difference between intrasite and intersite replication?"</strong><ul>
+<li><em>Model Answer:</em> "The primary difference is the network environment and the replication strategy. Intrasite replication assumes high-speed, low-latency connectivity and uses change notification for immediate synchronization. Intersite replication assumes WAN connectivity and uses scheduled, compressed replication to optimize bandwidth usage."</li>
+</ul>
+</li>
+<li><strong>"How does change notification affect intrasite replication?"</strong><ul>
+<li><em>Model Answer:</em> "Change notification triggers immediate replication when a change occurs, ensuring that all DCs in a site are synchronized almost instantly. This is essential for maintaining consistency in high-performance environments."</li>
+</ul>
+</li>
+<li><strong>"When would you consider using SMTP for intersite replication?"</strong><ul>
+<li><em>Model Answer:</em> "SMTP replication is rarely used in modern environments. It was designed for scenarios where network connectivity is intermittent or unreliable, allowing replication to occur asynchronously via email. In modern, well-connected networks, RPC over IP is the standard and preferred protocol."</li>
+</ul>
+</li>
+</ol>
+<h3 id="related-concepts_3">Related Concepts<a class="headerlink" href="#related-concepts_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="./#replication-topology-kcc">Replication Topology &amp; KCC</a></li>
+<li><a href="./#sites-site-links-costs">Sites / Site Links / Costs</a></li>
+<li><a href="./#replication-troubleshooting">Replication Troubleshooting</a></li>
+</ul>
+<h2 id="gc-replication">GC Replication<a class="headerlink" href="#gc-replication" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_4">Technical Definition<a class="headerlink" href="#technical-definition_4" title="Permanent link">&para;</a></h3>
+<p>Global Catalog (GC) replication is the process by which a subset of attributes from every object in the forest is replicated to domain controllers designated as Global Catalog servers. This subset is known as the Partial Attribute Set (PAS). The GC replication process ensures that these servers maintain a forest-wide, read-only index of objects, enabling efficient forest-wide searches and facilitating user authentication in multi-domain environments.</p>
+<h3 id="underlying-mechanism_4">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_4" title="Permanent link">&para;</a></h3>
+<p>The PAS is defined in the Schema partition. When an attribute is marked as "replicated to the Global Catalog" in the schema, it becomes part of the PAS. The replication engine then ensures that this attribute is replicated to all GC servers in the forest, regardless of which domain the object belongs to. When a change is made to an attribute that is part of the PAS, the replication engine triggers a forest-wide replication event to update all GC servers. This process is distinct from standard domain partition replication, as it involves cross-domain replication of a specific attribute subset. Adding or removing attributes from the PAS can be a resource-intensive operation, as it requires a full re-propagation of the affected attributes to all GC servers in the forest.</p>
+<h3 id="why-it-exists_4">Why It Exists<a class="headerlink" href="#why-it-exists_4" title="Permanent link">&para;</a></h3>
+<p>GC replication exists to support forest-wide operations, such as searching for users or groups across domains and resolving Universal Group memberships during logon. By maintaining a partial copy of all objects in the forest, GC servers allow these operations to be performed locally, without the need for cross-domain queries, which would be slow and inefficient. This significantly improves the performance and scalability of forest-wide operations.</p>
+<h3 id="enterprise-banking-reality_4">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_4" title="Permanent link">&para;</a></h3>
+<p>In a Tier-1 banking environment, GC placement is a strategic decision. GC servers are typically placed in every major site to ensure that authentication and search operations are fast and reliable. The PAS is carefully managed to include only the attributes necessary for business operations, as adding unnecessary attributes to the PAS increases replication traffic and storage requirements. Audit and compliance teams often require that GC servers be hardened and monitored, as they are critical infrastructure components. Any changes to the PAS are treated as high-risk changes and are subject to rigorous testing and change management procedures.</p>
+<h3 id="operational-considerations_4">Operational Considerations<a class="headerlink" href="#operational-considerations_4" title="Permanent link">&para;</a></h3>
+<p>Operational considerations involve monitoring the health and replication status of GC servers. Administrators should monitor the replication latency of the PAS and ensure that all GC servers are synchronized. If a GC server fails to replicate the PAS, it can lead to authentication failures and search inconsistencies. Monitoring tools should be configured to alert on replication latency or failures for GC servers.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp"># </span>Verify<span class="w"> </span>GC<span class="w"> </span>role<span class="w"> </span>status<span class="w"> </span>and<span class="w"> </span>replication<span class="w"> </span>health<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span><span class="nb">local</span><span class="w"> </span>domain<span class="w"> </span>controller
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="go">repadmin /showrepl localhost /verbose</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="go">nltest /dsgetdc:%USERDNSDOMAIN% /GC</span>
+</code></pre></div>
+<h3 id="common-misconceptions_4">Common Misconceptions<a class="headerlink" href="#common-misconceptions_4" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Common Misconceptions</p>
+<ul>
+<li><strong>"GCs are just domain controllers."</strong> While GCs are domain controllers, they have the additional responsibility of hosting the PAS and providing forest-wide search and authentication services.</li>
+<li><strong>"GCs replicate everything."</strong> GCs only replicate the Partial Attribute Set (PAS), not the entire directory database of every domain in the forest.</li>
+<li><strong>"GCs are only for logon."</strong> While GCs are critical for Universal Group membership resolution during logon, they are also essential for forest-wide searches and other directory operations.</li>
+</ul>
+</div>
+<h3 id="interview-angle_4">Interview Angle<a class="headerlink" href="#interview-angle_4" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>"What is the impact of adding an attribute to the Partial Attribute Set (PAS)?"</strong><ul>
+<li><em>Model Answer:</em> "Adding an attribute to the PAS triggers a forest-wide replication event, as all GC servers in the forest must be updated with the new attribute. This can significantly increase replication traffic and storage requirements, so it should be done carefully and only when necessary."</li>
+</ul>
+</li>
+<li><strong>"How do you determine the optimal placement of GC servers?"</strong><ul>
+<li><em>Model Answer:</em> "The optimal placement of GC servers depends on the network topology and the distribution of users and resources. In general, GC servers should be placed in every major site to ensure that authentication and search operations are fast and reliable. I would also consider the bandwidth and latency of the network links between sites."</li>
+</ul>
+</li>
+<li><strong>"What happens if a GC server is unavailable?"</strong><ul>
+<li><em>Model Answer:</em> "If a GC server is unavailable, forest-wide operations, such as searching for users across domains or resolving Universal Group memberships, may fail or be significantly slower. Authentication may also be impacted if the user's domain controller relies on the GC for Universal Group membership resolution."</li>
+</ul>
+</li>
+</ol>
+<h3 id="related-concepts_4">Related Concepts<a class="headerlink" href="#related-concepts_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="../forests-domains-ous-sites/#forest">Forests, Domains, OUs &amp; Sites</a></li>
+<li><a href="./#replication-topology-kcc">Replication Topology &amp; KCC</a></li>
+<li><a href="./#ad-partitions">AD Partitions</a></li>
+</ul>
+<h2 id="replication-troubleshooting">Replication Troubleshooting<a class="headerlink" href="#replication-troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_5">Technical Definition<a class="headerlink" href="#technical-definition_5" title="Permanent link">&para;</a></h3>
+<p>Replication troubleshooting is the systematic process of identifying, diagnosing, and resolving issues that prevent Active Directory domain controllers from synchronizing directory data. It involves analyzing replication metadata, verifying network connectivity, ensuring DNS integrity, and utilizing diagnostic tools to pinpoint the root cause of replication failures, which can range from simple network outages to complex database corruption.</p>
+<h3 id="underlying-mechanism_5">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_5" title="Permanent link">&para;</a></h3>
+<p>Troubleshooting relies on understanding the replication pipeline. When replication fails, the KCC or the replication engine logs specific events in the Directory Service event log. Troubleshooting involves:
+- <strong>Metadata Analysis:</strong> Using <code>repadmin /showrepl</code> or <code>repadmin /replsummary</code> to identify which DCs are failing to replicate and which partitions are affected.
+- <strong>Connectivity Verification:</strong> Using <code>ping</code>, <code>tracert</code>, or <code>Test-NetConnection</code> to ensure that the DCs can communicate over the required ports (e.g., 135, 445, 389, 636, 3268, 3269).
+- <strong>DNS Integrity:</strong> Verifying that SRV records are correctly registered and that DCs can resolve each other's FQDNs.
+- <strong>Database Health:</strong> Using <code>ntdsutil</code> to check the integrity of the <code>ntds.dit</code> database if corruption is suspected.
+- <strong>Event Log Analysis:</strong> Reviewing Event IDs such as 1311 (KCC topology errors), 1864 (replication latency), and 1925 (replication failure).</p>
+<h3 id="why-it-exists_5">Why It Exists<a class="headerlink" href="#why-it-exists_5" title="Permanent link">&para;</a></h3>
+<p>Replication is the heartbeat of Active Directory. If replication fails, the directory becomes inconsistent, leading to authentication failures, GPO application issues, and service outages. Troubleshooting exists to restore the directory to a consistent state as quickly as possible, minimizing the impact on business operations.</p>
+<h3 id="enterprise-banking-reality_5">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_5" title="Permanent link">&para;</a></h3>
+<p>In a Tier-1 banking environment, replication troubleshooting is a high-priority, high-visibility activity. Automated monitoring systems (e.g., SCOM, SIEM) are configured to alert on any replication failure, and these alerts are treated as critical incidents. Troubleshooting is typically a Tier-3 or Tier-4 activity, requiring deep expertise in Active Directory internals. Audit and compliance teams require that all replication issues be documented, tracked, and resolved within defined SLAs. The focus is on proactive prevention through robust monitoring and regular health checks.</p>
+<h3 id="operational-considerations_5">Operational Considerations<a class="headerlink" href="#operational-considerations_5" title="Permanent link">&para;</a></h3>
+<p>Operational considerations involve maintaining a set of standard operating procedures (SOPs) for replication troubleshooting. This includes having a clear escalation path, well-defined diagnostic steps, and a library of common fixes. Administrators should be proficient in using <code>repadmin</code>, <code>dcdiag</code>, and <code>ntdsutil</code>. Regular health checks, such as running <code>dcdiag /test:replications</code>, should be part of the routine maintenance schedule.</p>
+<p>[CLI: Command to run a comprehensive replication health check]</p>
+<h3 id="common-misconceptions_5">Common Misconceptions<a class="headerlink" href="#common-misconceptions_5" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Common Misconceptions</p>
+<ul>
+<li><strong>"Replication is broken."</strong> Replication failures are often a symptom of an underlying issue, such as DNS misconfiguration, network connectivity problems, or time synchronization issues, rather than a failure of the replication engine itself.</li>
+<li><strong>"Force replication fixes everything."</strong> While <code>repadmin /syncall</code> can force replication, it does not fix the root cause of the failure. If the underlying issue is not addressed, the replication will fail again.</li>
+<li><strong>"I can just restore the DC from backup."</strong> Restoring a DC from backup is a last resort and should only be done if all other troubleshooting steps have failed, as it can lead to USN rollback issues if not performed correctly.</li>
+</ul>
+</div>
+<h3 id="interview-angle_5">Interview Angle<a class="headerlink" href="#interview-angle_5" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>"How do you approach a replication failure?"</strong><ul>
+<li><em>Model Answer:</em> "I start by identifying the scope of the failure—is it one DC, one partition, or the entire forest? I then use <code>repadmin /showrepl</code> to get a detailed view of the replication status. I check the Directory Service event log for specific error codes. I verify network connectivity and DNS integrity, as these are the most common causes of replication issues. I then use <code>dcdiag</code> to perform a comprehensive health check."</li>
+</ul>
+</li>
+<li><strong>"What is the role of DNS in replication troubleshooting?"</strong><ul>
+<li><em>Model Answer:</em> "DNS is critical for replication. Domain controllers use DNS to locate their replication partners. If DNS is misconfigured, DCs will be unable to resolve each other's FQDNs, leading to replication failures. I always verify DNS health as one of the first steps in troubleshooting."</li>
+</ul>
+</li>
+<li><strong>"How do you interpret Event ID 1311?"</strong><ul>
+<li><em>Model Answer:</em> "Event ID 1311 indicates that the KCC is unable to build a valid replication topology. This is often caused by site or subnet misconfigurations, or by a lack of connectivity between domain controllers. I would investigate the site and subnet definitions and verify network connectivity between the affected DCs."</li>
+</ul>
+</li>
+</ol>
+<h3 id="related-concepts_5">Related Concepts<a class="headerlink" href="#related-concepts_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="./#replication-topology-kcc">Replication Topology &amp; KCC</a></li>
+<li><a href="./#sites-site-links-costs">Sites / Site Links / Costs</a></li>
+<li><a href="dns.md">DNS</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.instant", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

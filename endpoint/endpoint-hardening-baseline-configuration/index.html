@@ -1,0 +1,2960 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal architecture reference and interview prep — Identity, Endpoint, Security, Network, Virtualization/Compute, Storage/Data, Cloud/Hybrid">
+      
+      
+      
+      
+        <link rel="prev" href="../patch-update-management/">
+      
+      
+        <link rel="next" href="../application-management-delivery/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Endpoint Hardening & Baseline Configuration - INFRA // REFERENCE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,700,700i%7CIBM+Plex+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#25-endpoint-hardening-baseline-configuration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="INFRA // REFERENCE" class="md-header__button md-logo" aria-label="INFRA // REFERENCE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            INFRA // REFERENCE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Endpoint Hardening & Baseline Configuration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kenny-li-nyc/enterprise-knowledge-base" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kenny-li-nyc/enterprise-knowledge-base
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../identity/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Identity
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Endpoint
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="INFRA // REFERENCE" class="md-nav__button md-logo" aria-label="INFRA // REFERENCE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    INFRA // REFERENCE
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kenny-li-nyc/enterprise-knowledge-base" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kenny-li-nyc/enterprise-knowledge-base
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../identity/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Identity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../identity/layer1-directory-trust/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directory & Trust Foundation
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Directory & Trust Foundation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/forests-domains-ous-sites/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forests, Domains, OUs & Sites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/replication-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/fsmo-roles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FSMO Roles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/forest-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forest Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/authorization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/trust-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/federation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Federation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/forest-services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forest Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Endpoint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../device-lifecycle-provisioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Lifecycle & Provisioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoint-identity-trust/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Identity & Trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration-management-policy-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Management & Policy Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../patch-update-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patch & Update Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Hardening & Baseline Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Hardening & Baseline Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-cisstigdisa-baseline-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CIS/STIG/DISA Baseline Benchmarks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. CIS/STIG/DISA Baseline Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-attack-surface-reduction-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Attack Surface Reduction Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Attack Surface Reduction Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-local-admin-rights-management-laps-just-in-time-elevation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Local Admin Rights Management (LAPS, Just-in-Time Elevation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Local Admin Rights Management (LAPS, Just-in-Time Elevation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-removable-media-peripheral-control-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Removable Media &amp; Peripheral Control Policies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Removable Media &amp; Peripheral Control Policies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-secure-boot-tpm-and-firmware-level-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Secure Boot, TPM, and Firmware-level Hardening
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Secure Boot, TPM, and Firmware-level Hardening">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-baseline-drift-auditing-remediation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Baseline Drift Auditing &amp; Remediation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Baseline Drift Auditing &amp; Remediation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-endpoint-health-attestation-reporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Endpoint Health Attestation Reporting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Endpoint Health Attestation Reporting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../application-management-delivery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application Management & Delivery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remote-access-connectivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Remote Access & Connectivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoint-recovery-resilience/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Recovery & Resilience
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-cisstigdisa-baseline-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CIS/STIG/DISA Baseline Benchmarks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. CIS/STIG/DISA Baseline Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-attack-surface-reduction-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Attack Surface Reduction Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Attack Surface Reduction Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-local-admin-rights-management-laps-just-in-time-elevation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Local Admin Rights Management (LAPS, Just-in-Time Elevation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Local Admin Rights Management (LAPS, Just-in-Time Elevation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-removable-media-peripheral-control-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Removable Media &amp; Peripheral Control Policies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Removable Media &amp; Peripheral Control Policies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-secure-boot-tpm-and-firmware-level-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Secure Boot, TPM, and Firmware-level Hardening
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Secure Boot, TPM, and Firmware-level Hardening">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-baseline-drift-auditing-remediation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Baseline Drift Auditing &amp; Remediation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Baseline Drift Auditing &amp; Remediation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-endpoint-health-attestation-reporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Endpoint Health Attestation Reporting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Endpoint Health Attestation Reporting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="25-endpoint-hardening-baseline-configuration">2.5 Endpoint Hardening &amp; Baseline Configuration<a class="headerlink" href="#25-endpoint-hardening-baseline-configuration" title="Permanent link">&para;</a></h1>
+<h2 id="1-cisstigdisa-baseline-benchmarks">1. CIS/STIG/DISA Baseline Benchmarks<a class="headerlink" href="#1-cisstigdisa-baseline-benchmarks" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition">Technical Definition<a class="headerlink" href="#technical-definition" title="Permanent link">&para;</a></h3>
+<p>Baseline benchmarks, such as those provided by the Center for Internet Security (CIS), the Defense Information Systems Agency (DISA) Security Technical Implementation Guides (STIGs), and other regulatory bodies, represent the industry-standard "hardened" configuration state for operating systems and applications. These benchmarks define a comprehensive set of security settings—ranging from password complexity and account lockout policies to advanced audit logging and service restrictions—designed to minimize the attack surface of an endpoint. In a Tier-1 banking context, these benchmarks serve as the foundational security posture, providing a verifiable, repeatable, and defensible configuration that aligns with global regulatory requirements.</p>
+<h3 id="underlying-mechanism">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism" title="Permanent link">&para;</a></h3>
+<p>The implementation of these benchmarks involves mapping the recommended settings to the native configuration interfaces of the operating system, such as the Windows Registry, local security policies, or specific application configuration files. As noted in Section 2.3, the actual enforcement of these settings is handled by the organization's policy delivery vehicles, such as GPOs or MDM profiles, which translate the benchmark requirements into actionable configuration state. The benchmarks themselves are typically delivered as structured documentation or automated configuration templates (e.g., GPO backups or Intune configuration profiles) that administrators import into their management systems to ensure that the endpoint configuration aligns with the desired security baseline.</p>
+<p>[DIAGRAM: Flowchart illustrating the mapping of benchmark requirements to policy delivery vehicles and endpoint enforcement]</p>
+<h3 id="why-it-exists">Why It Exists<a class="headerlink" href="#why-it-exists" title="Permanent link">&para;</a></h3>
+<p>Baseline benchmarks exist to solve the problem of "configuration entropy," where endpoints drift from a secure state over time due to manual changes, software installations, or lack of standardized management. Historically, administrators relied on ad-hoc security configurations, which were often incomplete, inconsistent, and difficult to audit. Benchmarks provide a standardized, peer-reviewed, and widely accepted security baseline that organizations can adopt to ensure a consistent level of protection across their entire fleet, regardless of the specific hardware or software environment.</p>
+<h3 id="enterprise-banking-reality">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality" title="Permanent link">&para;</a></h3>
+<p>For Tier-1 banks, adopting a recognized baseline like CIS or DISA STIG is not optional; it is a fundamental requirement for compliance with frameworks such as FFIEC, SWIFT CSP, and NIST SP 800-53. These benchmarks provide the "gold standard" against which the bank's security posture is measured during internal and external audits. Architects must tailor these benchmarks to the bank's specific operational needs, ensuring that the hardening measures do not disrupt critical banking applications while maintaining the highest possible level of security. This often involves a "baseline-plus" approach, where the standard benchmark is augmented with additional, bank-specific security controls.</p>
+<h3 id="operational-considerations">Operational Considerations<a class="headerlink" href="#operational-considerations" title="Permanent link">&para;</a></h3>
+<p>Operationalizing baseline benchmarks requires a continuous, lifecycle-based approach. Administrators must regularly review and update their configuration baselines to align with the latest versions of the benchmarks and the evolving threat landscape. This involves testing the impact of new baseline settings in a staging environment before deploying them to production, ensuring that they do not cause operational issues. Furthermore, administrators must monitor for "baseline drift," where endpoints deviate from the established configuration, and implement automated remediation processes to bring them back into compliance.</p>
+<p>[CLI: PowerShell command to audit the current system configuration against a defined security baseline]</p>
+<h3 id="common-misconceptions">Common Misconceptions<a class="headerlink" href="#common-misconceptions" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that applying a baseline benchmark makes a system "unhackable." In reality, benchmarks are only one layer of a defense-in-depth strategy; they reduce the attack surface but do not eliminate all vulnerabilities. Another error is assuming that benchmarks are "set and forget"; they require ongoing maintenance and adjustment to remain effective as the OS and application landscape evolves.</p>
+</div>
+<h3 id="interview-angle">Interview Angle<a class="headerlink" href="#interview-angle" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How do you balance the strict security requirements of a DISA STIG with the operational needs of a high-performance trading environment?
+   Answer: The balance is achieved through a risk-based approach. We implement the core security controls of the STIG that are essential for protection, while selectively relaxing or compensating for controls that would negatively impact performance or application stability. This is documented and approved through the bank's formal risk acceptance process.</li>
+<li>Question: What is the difference between a "baseline" and a "policy" in the context of endpoint hardening?
+   Answer: A baseline is the desired, hardened state of the system, while a policy is the mechanism used to enforce that state. The baseline defines <em>what</em> the configuration should be, and the policy defines <em>how</em> that configuration is delivered and maintained on the endpoint.</li>
+<li>Question: How do you manage the conflict between different baseline standards (e.g., CIS vs. STIG) in a global banking environment?
+   Answer: We adopt a "superset" approach, where we identify the most stringent requirements from each standard and create a unified, internal baseline that meets or exceeds all applicable regulatory requirements. This ensures consistency and simplifies the audit process across different jurisdictions.</li>
+</ol>
+<h3 id="related-concepts">Related Concepts<a class="headerlink" href="#related-concepts" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 1.4: Active Directory Schema and Attribute Management</li>
+<li>Section 2.3: Configuration Management (GPO/MDM)</li>
+<li>Section 2.5: Baseline drift auditing &amp; remediation</li>
+</ul>
+<h2 id="2-attack-surface-reduction-rules">2. Attack Surface Reduction Rules<a class="headerlink" href="#2-attack-surface-reduction-rules" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_1">Technical Definition<a class="headerlink" href="#technical-definition_1" title="Permanent link">&para;</a></h3>
+<p>Attack Surface Reduction (ASR) rules are a set of granular security controls within Microsoft Defender for Endpoint that restrict specific behaviors often exploited by malware and adversarial actors. These rules target common attack vectors, such as the execution of malicious scripts, the launching of child processes from Office applications, and the theft of credentials from the Local Security Authority Subsystem Service (LSASS). By enforcing these restrictions, ASR rules effectively shrink the "attack surface" of an endpoint, preventing malicious code from executing or spreading even if it manages to bypass initial perimeter defenses.</p>
+<h3 id="underlying-mechanism_1">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_1" title="Permanent link">&para;</a></h3>
+<p>ASR rules operate by hooking into the operating system kernel and application processes to monitor for specific, high-risk behaviors. When an application or script attempts to perform a restricted action—such as an Office application attempting to spawn a PowerShell process—the ASR rule intercepts the call and evaluates it against the configured policy. As noted in Section 2.3, these rules are delivered via the organization's policy delivery vehicles (MDM or GPO), which configure the ASR engine on the endpoint. If the action violates the policy, the ASR rule blocks it and logs the event, providing visibility into potential malicious activity without requiring a full security scan.</p>
+<p>[DIAGRAM: Sequence diagram showing the ASR rule interception of a malicious process execution attempt]</p>
+<h3 id="why-it-exists_1">Why It Exists<a class="headerlink" href="#why-it-exists_1" title="Permanent link">&para;</a></h3>
+<p>ASR rules exist to mitigate the risk of "living off the land" (LotL) attacks, where adversaries use legitimate, built-in system tools (like PowerShell, WMI, or Office macros) to execute malicious code. Traditional antivirus solutions often struggle to detect these attacks because the tools themselves are trusted. ASR rules shift the focus from detecting <em>malware</em> to restricting <em>malicious behavior</em>, providing a powerful defense against sophisticated threats that rely on abusing legitimate system functionality.</p>
+<h3 id="enterprise-banking-reality_1">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_1" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, ASR rules are a critical component of the endpoint security strategy, particularly for preventing ransomware and credential theft. Banks must implement these rules carefully, as they can potentially disrupt legitimate business processes that rely on complex Office macros or administrative scripts. The standard practice is to deploy ASR rules in "Audit" mode first, allowing security teams to analyze the impact on business applications before switching to "Block" mode. This ensures that the bank's security posture is hardened without causing operational downtime, which is essential for maintaining the availability of critical banking services.</p>
+<h3 id="operational-considerations_1">Operational Considerations<a class="headerlink" href="#operational-considerations_1" title="Permanent link">&para;</a></h3>
+<p>Operationalizing ASR rules requires a disciplined, iterative approach. Administrators must use the audit logs to identify legitimate business processes that might be blocked by ASR rules and create exclusions where necessary. This requires close collaboration between the security team and the application owners to ensure that the rules are tuned correctly. Furthermore, administrators must monitor the ASR event logs for blocked actions, which can serve as an early warning system for potential security incidents. The ability to quickly adjust ASR policies in response to new threat intelligence is a key operational capability.</p>
+<p>[CLI: PowerShell command to query the current status and configuration of ASR rules on a Windows device]</p>
+<h3 id="common-misconceptions_1">Common Misconceptions<a class="headerlink" href="#common-misconceptions_1" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that ASR rules are a replacement for EDR (Endpoint Detection and Response) or antivirus solutions. In reality, ASR rules are a complementary defense-in-depth control; they reduce the attack surface, but they do not provide the comprehensive threat detection and response capabilities of an EDR platform. Another error is assuming that ASR rules can be deployed in "Block" mode without prior testing; this is a recipe for operational disruption and should be avoided at all costs.</p>
+</div>
+<h3 id="interview-angle_1">Interview Angle<a class="headerlink" href="#interview-angle_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How do you manage the risk of ASR rules blocking legitimate business applications in a banking environment?
+   Answer: We use a phased deployment strategy. ASR rules are first deployed in "Audit" mode, and we use the resulting telemetry to identify and whitelist legitimate business processes. Only after we have verified that the rules will not disrupt critical applications do we transition them to "Block" mode.</li>
+<li>Question: What is the difference between ASR rules and traditional application whitelisting (e.g., AppLocker or WDAC)?
+   Answer: Application whitelisting restricts <em>what</em> can run (i.e., only signed/approved binaries), while ASR rules restrict <em>how</em> applications behave (i.e., preventing specific, high-risk actions). They are complementary controls; whitelisting prevents unauthorized software, while ASR rules prevent authorized software from being abused.</li>
+<li>Question: How do you handle a situation where an ASR rule blocks a critical business process during an emergency?
+   Answer: We have a pre-defined "break-glass" procedure that allows authorized administrators to temporarily disable or modify the ASR policy to restore service. This action is logged, audited, and must be followed by a post-incident review to determine if the policy needs to be permanently adjusted or if the business process needs to be re-engineered.</li>
+</ol>
+<h3 id="related-concepts_1">Related Concepts<a class="headerlink" href="#related-concepts_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 2.3: Configuration Management (GPO/MDM)</li>
+<li>Section 3.2: EDR and Threat Detection</li>
+<li>Section 2.5: CIS/STIG/DISA Baseline Benchmarks</li>
+</ul>
+<h2 id="3-local-admin-rights-management-laps-just-in-time-elevation">3. Local Admin Rights Management (LAPS, Just-in-Time Elevation)<a class="headerlink" href="#3-local-admin-rights-management-laps-just-in-time-elevation" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_2">Technical Definition<a class="headerlink" href="#technical-definition_2" title="Permanent link">&para;</a></h3>
+<p>Local admin rights management is the practice of removing persistent administrative privileges from standard user accounts and implementing controlled, audited mechanisms for elevation. This includes the Local Administrator Password Solution (LAPS) for managing unique, randomized local administrator passwords across the fleet, and Just-In-Time (JIT) elevation for granting temporary, scoped administrative access to users when required for specific tasks. This approach is central to the principle of least privilege, ensuring that users operate with the minimum level of access necessary to perform their job functions, thereby reducing the risk of privilege escalation and lateral movement.</p>
+<h3 id="underlying-mechanism_2">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_2" title="Permanent link">&para;</a></h3>
+<p>LAPS works by generating a random password for the local administrator account on each machine, which is then encrypted and stored in a specific attribute in Active Directory (e.g., <code>ms-Mcs-AdmPwd</code> or the modern <code>msLAPS</code> attributes, as discussed in Section 1.4). JIT elevation typically involves an agent-based or policy-based request-approval workflow where a user requests elevation, and upon approval, the system grants temporary membership to the local Administrators group or provides a temporary token. As noted in Section 2.3, the policy delivery vehicles (GPO/MDM) are used to configure the LAPS client or the JIT agent on the endpoint, ensuring that the management policies are applied consistently across the fleet.</p>
+<p>[DIAGRAM: Sequence diagram showing the LAPS password rotation process and the JIT elevation request-approval workflow]</p>
+<h3 id="why-it-exists_2">Why It Exists<a class="headerlink" href="#why-it-exists_2" title="Permanent link">&para;</a></h3>
+<p>Persistent local admin rights are a primary vector for lateral movement and privilege escalation. If a user is compromised while running as an administrator, the attacker gains full control over the endpoint and can easily move laterally to other systems. Removing these rights forces attackers to find alternative, more difficult paths to escalate privileges, significantly increasing the cost and complexity of an attack. LAPS and JIT elevation provide a secure, manageable way to handle the necessary administrative tasks without granting permanent, high-level access to standard users.</p>
+<h3 id="enterprise-banking-reality_2">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_2" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, "Zero Standing Privileges" (ZSP) is the goal. LAPS is the baseline for managing the local admin account, ensuring that if one machine is compromised, the password cannot be used to compromise others. JIT elevation is used for power users or developers who occasionally need admin rights, ensuring that these rights are temporary, audited, and tied to a specific business justification. This aligns with FFIEC and NIST requirements for least privilege and provides a clear audit trail for all administrative actions, which is essential for regulatory compliance.</p>
+<h3 id="operational-considerations_2">Operational Considerations<a class="headerlink" href="#operational-considerations_2" title="Permanent link">&para;</a></h3>
+<p>Operationalizing LAPS requires ensuring that the LAPS client is installed and configured on all endpoints and that the AD schema is correctly extended to support the password attributes. JIT elevation requires a robust request-approval workflow and integration with the organization's identity management system. Monitoring is critical; administrators must audit all elevation requests and password retrievals to detect anomalous behavior. Furthermore, administrators must manage the lifecycle of these administrative rights, ensuring that they are revoked immediately after the task is completed.</p>
+<p>[CLI: PowerShell command to retrieve the current LAPS password for a specific computer account]</p>
+<h3 id="common-misconceptions_2">Common Misconceptions<a class="headerlink" href="#common-misconceptions_2" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that LAPS is a replacement for JIT elevation. In reality, LAPS manages the <em>local</em> admin account, while JIT manages <em>user</em> elevation. Another error is assuming that removing local admin rights is sufficient; it must be coupled with robust application control (e.g., WDAC) to prevent users from running unauthorized software that could potentially exploit vulnerabilities to gain higher privileges.</p>
+</div>
+<h3 id="interview-angle_2">Interview Angle<a class="headerlink" href="#interview-angle_2" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How do you implement a "Zero Standing Privileges" model for local admin rights in a large banking environment?
+   Answer: We use LAPS to secure the local admin account and implement a JIT elevation solution for users who require administrative access. All elevation requests are tied to a business justification, audited, and automatically revoked after a set period.</li>
+<li>Question: What are the risks of using a single, shared local administrator password across the fleet?
+   Answer: The risk is "pass-the-hash" attacks, where an attacker can compromise one machine and use the shared password to gain administrative access to every other machine in the fleet. LAPS mitigates this by ensuring every machine has a unique, randomized password.</li>
+<li>Question: How do you handle the operational friction caused by removing local admin rights?
+   Answer: We minimize friction by providing a self-service JIT elevation portal for common tasks and by ensuring that the vast majority of applications can run without administrative privileges. We also invest in robust application packaging to ensure that software updates and installations are handled centrally.</li>
+</ol>
+<h3 id="related-concepts_2">Related Concepts<a class="headerlink" href="#related-concepts_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 1.4: Active Directory Schema and Attribute Management</li>
+<li>Section 2.3: Configuration Management (GPO/MDM)</li>
+<li>Section 3.1: Privileged Access Management (PAM)</li>
+</ul>
+<h2 id="4-removable-media-peripheral-control-policies">4. Removable Media &amp; Peripheral Control Policies<a class="headerlink" href="#4-removable-media-peripheral-control-policies" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_3">Technical Definition<a class="headerlink" href="#technical-definition_3" title="Permanent link">&para;</a></h3>
+<p>Removable media and peripheral control policies are security configurations that restrict the use of external hardware devices—such as USB flash drives, external hard drives, Bluetooth adapters, and other peripherals—to prevent unauthorized data exfiltration and the introduction of malware. These policies define which devices are permitted to connect to an endpoint, what level of access they have (e.g., read-only vs. read-write), and whether data transferred to or from these devices is subject to encryption or inspection. This is a critical component of a comprehensive Data Loss Prevention (DLP) strategy, particularly in high-security environments where physical access to endpoints is a potential vulnerability.</p>
+<h3 id="underlying-mechanism_3">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_3" title="Permanent link">&para;</a></h3>
+<p>The mechanism relies on the operating system's Plug and Play (PnP) manager and the device driver stack. When a peripheral is connected, the OS identifies the device based on its hardware ID (VID/PID) and class. Security policies, delivered via the policy delivery vehicles described in Section 2.3, instruct the OS to either allow or block the device based on these identifiers. Advanced peripheral control solutions can also enforce encryption for removable storage, ensuring that any data written to a USB drive is automatically encrypted with an enterprise-managed key. This prevents data from being accessed if the drive is lost or stolen, providing a critical layer of protection for sensitive banking data.</p>
+<p>[DIAGRAM: Flowchart illustrating the device connection process, policy evaluation, and the decision to allow, block, or restrict access]</p>
+<h3 id="why-it-exists_3">Why It Exists<a class="headerlink" href="#why-it-exists_3" title="Permanent link">&para;</a></h3>
+<p>Removable media and peripherals are a major, often overlooked, attack vector. USB drives are a classic method for introducing malware into air-gapped or highly secure networks (the "Stuxnet" scenario), and they are also a primary tool for data exfiltration. By controlling these devices, organizations can significantly reduce the risk of both malicious data theft and the accidental introduction of threats. This is particularly important in banking, where the protection of customer data and transactional integrity is a top priority.</p>
+<h3 id="enterprise-banking-reality_3">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_3" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, peripheral control is a non-negotiable requirement for compliance with frameworks like PCI-DSS and FFIEC. Banks typically implement a "default-deny" policy for all removable media, only allowing specific, approved devices (e.g., encrypted USB drives) for authorized users. This is often integrated with DLP solutions that monitor and log all file transfers to removable media, providing a clear audit trail for compliance reporting. Architects must ensure that these policies are granular enough to support business needs (e.g., allowing specific peripherals for specialized hardware) while maintaining a strict security boundary.</p>
+<h3 id="operational-considerations_3">Operational Considerations<a class="headerlink" href="#operational-considerations_3" title="Permanent link">&para;</a></h3>
+<p>Operationalizing peripheral control requires a robust process for managing device exceptions. Administrators must have a clear, documented procedure for approving and whitelisting new devices, ensuring that this process is both secure and efficient. Monitoring is critical; administrators must track all device connection attempts, including blocked ones, to identify potential security incidents or unauthorized attempts to bypass the policy. Furthermore, administrators must manage the lifecycle of these devices, ensuring that they are decommissioned and wiped securely when they are no longer needed.</p>
+<p>[CLI: PowerShell command to query the current device control policy and list all connected peripherals on a Windows device]</p>
+<h3 id="common-misconceptions_3">Common Misconceptions<a class="headerlink" href="#common-misconceptions_3" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that blocking USB ports is sufficient to prevent data exfiltration. In reality, data can be exfiltrated through a wide range of other channels, including network connections, cloud storage, and even physical printing. Another error is assuming that peripheral control policies are "set and forget"; they require ongoing maintenance to ensure that they remain effective as new hardware and software are introduced into the environment.</p>
+</div>
+<h3 id="interview-angle_3">Interview Angle<a class="headerlink" href="#interview-angle_3" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How do you balance the need for peripheral control with the operational requirements of users who need to transfer data?
+   Answer: We implement a "default-deny" policy and provide approved, encrypted removable media for authorized users. For those who need to transfer data, we provide secure, managed alternatives, such as encrypted file shares or cloud-based collaboration platforms, which are monitored and audited.</li>
+<li>Question: What are the risks of allowing unauthorized Bluetooth peripherals in a banking environment?
+   Answer: The risks include unauthorized data exfiltration, the introduction of malware, and the potential for "man-in-the-middle" attacks where an attacker intercepts data transmitted over the Bluetooth connection. We mitigate this by disabling Bluetooth on all endpoints where it is not strictly required for business operations.</li>
+<li>Question: How do you handle a situation where a user needs to connect a specialized peripheral (e.g., a check scanner) that is not on the approved list?
+   Answer: We have a formal exception process where the device is evaluated for security risks. If approved, the device is whitelisted by its hardware ID (VID/PID) and the policy is updated to allow it for that specific user or group. This ensures that we maintain control while supporting necessary business functions.</li>
+</ol>
+<h3 id="related-concepts_3">Related Concepts<a class="headerlink" href="#related-concepts_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 2.3: Configuration Management (GPO/MDM)</li>
+<li>Section 3.2: Data Loss Prevention (DLP)</li>
+<li>Section 2.5: CIS/STIG/DISA Baseline Benchmarks</li>
+</ul>
+<h2 id="5-secure-boot-tpm-and-firmware-level-hardening">5. Secure Boot, TPM, and Firmware-level Hardening<a class="headerlink" href="#5-secure-boot-tpm-and-firmware-level-hardening" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_4">Technical Definition<a class="headerlink" href="#technical-definition_4" title="Permanent link">&para;</a></h3>
+<p>Secure Boot, Trusted Platform Module (TPM), and firmware-level hardening constitute the hardware-rooted trust foundation of modern endpoint security. Secure Boot is a UEFI feature that ensures only cryptographically signed, trusted bootloaders and drivers can execute during the startup process, preventing bootkits and rootkits from compromising the OS kernel. The TPM is a secure microcontroller that provides hardware-based cryptographic services, including key generation, storage, and platform integrity measurements. Firmware-level hardening involves configuring the UEFI/BIOS to disable unnecessary interfaces, enforce secure boot policies, and protect against unauthorized firmware modifications, creating a tamper-resistant foundation for the entire system.</p>
+<h3 id="underlying-mechanism_4">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_4" title="Permanent link">&para;</a></h3>
+<p>The mechanism relies on a "Chain of Trust" established at power-on. The UEFI firmware verifies the digital signature of the bootloader against a database of trusted certificates stored in the firmware (Secure Boot). Simultaneously, the system performs "Measured Boot," where each component of the boot process (firmware, bootloader, kernel) is hashed and recorded in the TPM's Platform Configuration Registers (PCRs). This creates an immutable record of the system's integrity state. If any component is tampered with, the hash will not match the expected value, and the TPM will refuse to release the secrets (such as disk encryption keys) required to boot the OS. This hardware-backed integrity check is the foundation for modern endpoint security, ensuring that the OS is running on a trusted, unmodified platform.</p>
+<p>[DIAGRAM: Sequence diagram showing the Chain of Trust from power-on, through UEFI Secure Boot, to OS kernel initialization]</p>
+<h3 id="why-it-exists_4">Why It Exists<a class="headerlink" href="#why-it-exists_4" title="Permanent link">&para;</a></h3>
+<p>These technologies exist to defend against sophisticated, persistent threats that operate below the operating system level. Traditional software-based security can be bypassed if the attacker gains control of the boot process or the firmware. By rooting trust in hardware (TPM) and enforcing integrity checks at the earliest possible stage of the boot process (Secure Boot), organizations can ensure that the endpoint is in a known-good state before the OS even loads. This provides a level of assurance that is impossible to achieve with software-only solutions, making it a critical component for high-security environments.</p>
+<h3 id="enterprise-banking-reality_4">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_4" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, hardware-rooted trust is a non-negotiable requirement for all endpoints. Architects must ensure that the entire fleet supports TPM 2.0 and that the UEFI/BIOS configurations are locked down to prevent tampering. The audit and compliance angle is significant: regulators often require proof that cryptographic keys are stored in FIPS 140-2/3 validated hardware and that the boot process is verified. If a device lacks a TPM or has a disabled TPM, it is effectively untrusted and should be blocked from accessing sensitive resources via Conditional Access policies. This creates an operational dependency on hardware procurement standards and firmware lifecycle management.</p>
+<h3 id="operational-considerations_4">Operational Considerations<a class="headerlink" href="#operational-considerations_4" title="Permanent link">&para;</a></h3>
+<p>Operationalizing hardware-rooted trust requires robust monitoring of the TPM and Secure Boot state across the fleet. Administrators must use tools to verify that the TPM is initialized, owned, and functioning correctly, and that Secure Boot is enabled and enforcing policies. If a TPM fails or is cleared, the device identity is effectively destroyed, requiring a re-enrollment process. Monitoring for "TPM lockout" events is also critical, as these can indicate brute-force attempts against the hardware. Furthermore, administrators must manage the lifecycle of firmware updates, ensuring that they are signed and verified before deployment to prevent unauthorized firmware modifications.</p>
+<p>[CLI: PowerShell command to query the TPM status, manufacturer, version, and Secure Boot state on a Windows endpoint]</p>
+<h3 id="common-misconceptions_4">Common Misconceptions<a class="headerlink" href="#common-misconceptions_4" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that BitLocker encryption alone provides sufficient hardware-backed identity. While BitLocker uses the TPM to protect the disk encryption key, it is a separate function from the device identity certificate. Another frequent error is assuming that virtual TPMs (vTPMs) in virtualized environments provide the same level of security as physical TPMs; while they offer similar functionality, they are only as secure as the hypervisor hosting them, which may not meet the strict hardware-isolation requirements of certain banking compliance frameworks.</p>
+</div>
+<h3 id="interview-angle_4">Interview Angle<a class="headerlink" href="#interview-angle_4" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How do you handle a scenario where a fleet of legacy devices lacks TPM 2.0 but must access sensitive banking applications?
+   Answer: The architectural response is to enforce a "Zero Trust" posture where these devices are treated as untrusted. They should be isolated to a restricted network segment or denied access to sensitive applications entirely, with a clear roadmap for hardware replacement.</li>
+<li>Question: What are the risks of allowing unauthorized firmware modifications in a banking environment?
+   Answer: The risks include the installation of persistent rootkits that can bypass all OS-level security controls, the theft of cryptographic keys, and the potential for long-term, undetected data exfiltration. We mitigate this by enforcing Secure Boot, locking down UEFI/BIOS settings, and monitoring for unauthorized firmware changes.</li>
+<li>Question: How do you ensure that firmware updates do not compromise the Chain of Trust?
+   Answer: We only deploy firmware updates that are digitally signed by the hardware manufacturer and verified by our internal security team. We also perform pre-deployment testing in a staging environment to ensure that the update does not break Secure Boot or TPM functionality.</li>
+</ol>
+<h3 id="related-concepts_4">Related Concepts<a class="headerlink" href="#related-concepts_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 2.2: Device Certificates &amp; TPM-backed Keys</li>
+<li>Section 2.5: CIS/STIG/DISA Baseline Benchmarks</li>
+<li>Section 3.1: Secure Boot and Measured Boot Architecture</li>
+</ul>
+<h2 id="6-baseline-drift-auditing-remediation">6. Baseline Drift Auditing &amp; Remediation<a class="headerlink" href="#6-baseline-drift-auditing-remediation" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_5">Technical Definition<a class="headerlink" href="#technical-definition_5" title="Permanent link">&para;</a></h3>
+<p>Baseline drift auditing and remediation is the continuous process of monitoring endpoint configurations to detect deviations from the established security baseline (e.g., CIS/STIG) and automatically correcting those deviations to restore the desired state. Drift occurs when manual changes, unauthorized software installations, or failed updates alter the configuration of an endpoint, potentially introducing security vulnerabilities or compliance gaps. Auditing provides the visibility into these deviations, while remediation ensures that the endpoint is brought back into compliance, maintaining the integrity of the organization's security posture.</p>
+<h3 id="underlying-mechanism_5">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_5" title="Permanent link">&para;</a></h3>
+<p>The mechanism relies on the management agent (e.g., Intune, MECM, or a DSC engine) performing periodic "compliance scans" or "enforcement cycles." During these cycles, the agent compares the current local configuration against the policy definition stored on the management server. If a discrepancy is detected—such as a user manually disabling a security feature or a local script modifying a registry key—the agent triggers a remediation action. This action typically involves re-applying the original policy settings, effectively overwriting the unauthorized change and restoring the device to its intended configuration. As noted in Section 2.3, the policy delivery vehicles (GPO/MDM) are used to configure the enforcement engine on the endpoint, ensuring that the management policies are applied consistently across the fleet.</p>
+<p>[DIAGRAM: Sequence diagram showing the drift detection cycle, the comparison logic, and the remediation action]</p>
+<h3 id="why-it-exists_5">Why It Exists<a class="headerlink" href="#why-it-exists_5" title="Permanent link">&para;</a></h3>
+<p>Baseline drift auditing and remediation exist to maintain the integrity of the security posture in a dynamic environment. Users with local administrative rights, malware, or even failed software updates can inadvertently or maliciously alter system configurations, creating security vulnerabilities or operational instability. By automating the detection and remediation of these changes, organizations can ensure that their security baselines are enforced consistently across the entire fleet, reducing the risk of configuration-related security incidents and minimizing the need for manual intervention.</p>
+<h3 id="enterprise-banking-reality_5">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_5" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, baseline drift is a significant compliance and security risk. Regulators require proof that systems are configured according to hardened baselines (e.g., FFIEC, PCI-DSS). Drift auditing provides the necessary evidence that these baselines are being maintained, and automated remediation ensures that any deviations are corrected immediately. Architects must design drift detection policies to be both comprehensive and performant, ensuring that the remediation process does not negatively impact system performance or user productivity, while providing detailed logs for audit and compliance reporting.</p>
+<h3 id="operational-considerations_5">Operational Considerations<a class="headerlink" href="#operational-considerations_5" title="Permanent link">&para;</a></h3>
+<p>Operationalizing drift auditing requires a balance between automated remediation and alerting. While automated remediation is powerful, it can also be disruptive if a policy is incorrectly configured or if a legitimate change is flagged as drift. Administrators must implement a "monitor-first" approach, where drift is detected and alerted on before automated remediation is enabled. This allows for the validation of policies and the identification of "false positives" before they are automatically corrected. Furthermore, administrators must monitor the remediation logs to identify patterns of drift, which can indicate broader issues such as a buggy application or a need for policy refinement.</p>
+<p>[CLI: PowerShell command to trigger a manual compliance check and view the remediation status on a Windows device]</p>
+<h3 id="common-misconceptions_5">Common Misconceptions<a class="headerlink" href="#common-misconceptions_5" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that automated remediation is a "silver bullet" for security. In reality, it only corrects <em>known</em> configuration deviations; it does not protect against zero-day exploits or advanced persistent threats that do not manifest as configuration drift. Another error is assuming that remediation is always successful; if a device is in a severely compromised state, the management agent itself may be disabled or tampered with, rendering automated remediation ineffective.</p>
+</div>
+<h3 id="interview-angle_5">Interview Angle<a class="headerlink" href="#interview-angle_5" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How do you distinguish between "legitimate" configuration changes and "drift" in a large enterprise environment?
+   Answer: The distinction is made through policy definition. Any change that is not explicitly defined in the desired state policy is considered drift. Legitimate changes must be managed through the formal change management process, where the desired state policy is updated to reflect the new configuration.</li>
+<li>Question: What are the risks of aggressive automated remediation, and how do you mitigate them?
+   Answer: The primary risk is "remediation loops" or the disruption of critical business processes due to incorrectly applied policies. Mitigation involves a phased rollout of remediation policies, starting with "monitor-only" mode to validate the policy, and implementing robust alerting to identify and investigate remediation failures.</li>
+<li>Question: How do you handle drift in a co-managed environment where both MECM and Intune are enforcing policies?
+   Answer: The key is to ensure that the workload authority is clearly defined and that the policies in both management planes are aligned. If both planes attempt to manage the same setting, it can lead to "policy flapping," where the device constantly toggles between the two configurations. This is mitigated by ensuring that only one management plane is authoritative for any given setting.</li>
+</ol>
+<h3 id="related-concepts_5">Related Concepts<a class="headerlink" href="#related-concepts_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 2.3: Configuration Management (GPO/MDM)</li>
+<li>Section 2.5: CIS/STIG/DISA Baseline Benchmarks</li>
+<li>Section 2.3: Policy reporting &amp; compliance dashboards</li>
+</ul>
+<h2 id="7-endpoint-health-attestation-reporting">7. Endpoint Health Attestation Reporting<a class="headerlink" href="#7-endpoint-health-attestation-reporting" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_6">Technical Definition<a class="headerlink" href="#technical-definition_6" title="Permanent link">&para;</a></h3>
+<p>Endpoint health attestation reporting is the process of collecting, analyzing, and visualizing the integrity state of an endpoint as verified by hardware-rooted trust mechanisms, such as the Trusted Platform Module (TPM) and Secure Boot. It provides a verifiable, cryptographic claim that the device booted into a trusted state and has not been compromised by firmware-level or kernel-level threats. This reporting is essential for ensuring that only devices with a verified, "clean" boot integrity can access sensitive banking resources, providing a critical layer of assurance beyond standard configuration compliance.</p>
+<h3 id="underlying-mechanism_6">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_6" title="Permanent link">&para;</a></h3>
+<p>The mechanism relies on the Device Health Attestation (DHA) service or similar cloud-based attestation providers. During the boot process, the device performs "Measured Boot," where each component is hashed and recorded in the TPM's Platform Configuration Registers (PCRs). When an attestation request is made, the device sends a signed quote of these PCRs to the attestation service. The service validates these measurements against a known-good baseline and issues a health certificate or claim. This claim is then ingested by management platforms (e.g., Intune, MECM) and visualized in compliance dashboards, providing administrators with a real-time view of the boot integrity of the entire fleet.</p>
+<p>[DIAGRAM: Sequence diagram showing the Measured Boot process, the TPM signing the PCRs, and the attestation service issuing a health certificate]</p>
+<h3 id="why-it-exists_6">Why It Exists<a class="headerlink" href="#why-it-exists_6" title="Permanent link">&para;</a></h3>
+<p>Endpoint health attestation reporting exists to provide cryptographic proof of device integrity. Traditional software-based security agents can be blinded or bypassed by rootkits that gain control of the boot process or the kernel. By rooting trust in hardware (TPM) and enforcing integrity checks at the earliest possible stage of the boot process (Secure Boot), organizations can ensure that the endpoint is in a known-good state before the OS even loads. Attestation reporting bridges the gap between "is the device configured correctly?" (compliance) and "is the device actually trustworthy?" (integrity).</p>
+<h3 id="enterprise-banking-reality_6">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_6" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, endpoint health attestation is a critical requirement for accessing the most sensitive transactional systems. Banks use this reporting to gate access to core banking applications; if a device fails attestation (e.g., due to an unauthorized firmware modification), it is automatically blocked from accessing the banking network, regardless of the user's credentials or compliance status. This is a key requirement for DORA (Digital Operational Resilience Act) and similar mandates, which require organizations to demonstrate the integrity and resilience of their digital infrastructure.</p>
+<h3 id="operational-considerations_6">Operational Considerations<a class="headerlink" href="#operational-considerations_6" title="Permanent link">&para;</a></h3>
+<p>Operationalizing health attestation reporting requires careful management of the "known-good" baselines. If a firmware update changes the boot measurements, the attestation service must be updated to recognize the new baseline, or the entire fleet will fail attestation. This requires tight integration between the patch management process and the attestation service. Administrators must also monitor for "attestation failures" as a potential indicator of a compromised device or a failed update, and ensure that there is a clear remediation path for devices that fail to attest.</p>
+<p>[CLI: PowerShell command to query the current TPM PCR values and verify the device's attestation status]</p>
+<h3 id="common-misconceptions_6">Common Misconceptions<a class="headerlink" href="#common-misconceptions_6" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that attestation is a "set and forget" configuration. In reality, it requires continuous maintenance of the baseline measurements. Another error is assuming that attestation protects against all forms of compromise; it only verifies the integrity of the boot process and firmware, not the security of the applications running on top of the OS.</p>
+</div>
+<h3 id="interview-angle_6">Interview Angle<a class="headerlink" href="#interview-angle_6" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Question: How does attestation differ from standard compliance reporting?
+   Answer: Compliance reporting focuses on the <em>configuration</em> and <em>state</em> of the OS and applications (e.g., is the firewall on?), while attestation reporting focuses on the <em>integrity</em> of the hardware and boot process (e.g., has the firmware been tampered with?).</li>
+<li>Question: How do you handle a situation where a legitimate firmware update causes a fleet of devices to fail attestation?
+   Answer: The process must include a "pre-flight" phase where new firmware baselines are validated in a test environment and then pushed to the attestation service before the firmware is deployed to the production fleet.</li>
+<li>Question: Why is attestation considered a "higher" form of trust than standard compliance?
+   Answer: Attestation is rooted in hardware and the boot process, making it much harder to spoof than software-based compliance signals, which can be manipulated by a compromised kernel.</li>
+</ol>
+<h3 id="related-concepts_6">Related Concepts<a class="headerlink" href="#related-concepts_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Section 2.2: Device Attestation &amp; Health Certificates</li>
+<li>Section 2.5: Baseline drift auditing &amp; remediation</li>
+<li>Section 3.1: Secure Boot and Measured Boot Architecture</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.instant", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

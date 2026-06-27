@@ -1,0 +1,2717 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal architecture reference and interview prep — Identity, Endpoint, Security, Network, Virtualization/Compute, Storage/Data, Cloud/Hybrid">
+      
+      
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../endpoint-identity-trust/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Device Lifecycle & Provisioning - INFRA // REFERENCE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,700,700i%7CIBM+Plex+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#device-lifecycle-provisioning" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="INFRA // REFERENCE" class="md-header__button md-logo" aria-label="INFRA // REFERENCE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            INFRA // REFERENCE
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Device Lifecycle & Provisioning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kenny-li-nyc/enterprise-knowledge-base" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kenny-li-nyc/enterprise-knowledge-base
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../identity/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Identity
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Endpoint
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="INFRA // REFERENCE" class="md-nav__button md-logo" aria-label="INFRA // REFERENCE" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    INFRA // REFERENCE
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kenny-li-nyc/enterprise-knowledge-base" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kenny-li-nyc/enterprise-knowledge-base
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../identity/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Identity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../identity/layer1-directory-trust/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directory & Trust Foundation
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Directory & Trust Foundation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/forests-domains-ous-sites/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forests, Domains, OUs & Sites
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/replication-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/fsmo-roles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FSMO Roles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/forest-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forest Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/authorization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/trust-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/federation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Federation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../identity/layer1-directory-trust/forest-services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forest Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Endpoint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Lifecycle & Provisioning
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Device Lifecycle & Provisioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-procurement-to-decommission-lifecycle-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Procurement-to-decommission lifecycle stages
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Procurement-to-decommission lifecycle stages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-imaging-vs-zero-touch-provisioning-autopilotdepandroid-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Imaging vs. zero-touch provisioning (Autopilot/DEP/Android Enterprise)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Imaging vs. zero-touch provisioning (Autopilot/DEP/Android Enterprise)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-device-enrollment-models-corporate-byod-sharedkiosk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Device enrollment models (corporate, BYOD, shared/kiosk)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Device enrollment models (corporate, BYOD, shared/kiosk)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-asset-tagging-inventory-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Asset tagging &amp; inventory systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Asset tagging &amp; inventory systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-bulk-enrollment-staging-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Bulk enrollment &amp; staging workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Bulk enrollment &amp; staging workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-decommissioning-secure-wipe-procedures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Decommissioning &amp; secure wipe procedures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Decommissioning &amp; secure wipe procedures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoint-identity-trust/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Identity & Trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration-management-policy-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Management & Policy Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../patch-update-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patch & Update Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoint-hardening-baseline-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Hardening & Baseline Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../application-management-delivery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application Management & Delivery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remote-access-connectivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Remote Access & Connectivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoint-recovery-resilience/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Endpoint Recovery & Resilience
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-procurement-to-decommission-lifecycle-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Procurement-to-decommission lifecycle stages
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Procurement-to-decommission lifecycle stages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-imaging-vs-zero-touch-provisioning-autopilotdepandroid-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Imaging vs. zero-touch provisioning (Autopilot/DEP/Android Enterprise)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Imaging vs. zero-touch provisioning (Autopilot/DEP/Android Enterprise)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-device-enrollment-models-corporate-byod-sharedkiosk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Device enrollment models (corporate, BYOD, shared/kiosk)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Device enrollment models (corporate, BYOD, shared/kiosk)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-asset-tagging-inventory-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Asset tagging &amp; inventory systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Asset tagging &amp; inventory systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-bulk-enrollment-staging-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Bulk enrollment &amp; staging workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Bulk enrollment &amp; staging workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-decommissioning-secure-wipe-procedures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Decommissioning &amp; secure wipe procedures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Decommissioning &amp; secure wipe procedures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-definition_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#underlying-mechanism_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Underlying Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-exists_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why It Exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-banking-reality_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise / Banking Reality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operational-considerations_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Considerations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-misconceptions_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Misconceptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-angle_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Angle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-concepts_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="device-lifecycle-provisioning">Device Lifecycle &amp; Provisioning<a class="headerlink" href="#device-lifecycle-provisioning" title="Permanent link">&para;</a></h1>
+<h2 id="1-procurement-to-decommission-lifecycle-stages">1. Procurement-to-decommission lifecycle stages<a class="headerlink" href="#1-procurement-to-decommission-lifecycle-stages" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition">Technical Definition<a class="headerlink" href="#technical-definition" title="Permanent link">&para;</a></h3>
+<p>The procurement-to-decommission lifecycle encompasses the entire operational lifespan of an endpoint device, from the initial acquisition and supply-chain integration to its eventual secure retirement. This lifecycle is a structured sequence of phases—procurement, staging, deployment, operational management, and decommissioning—designed to ensure that every device is accounted for, secured, and compliant with organizational policies from the moment it leaves the manufacturer until it is physically or logically destroyed.</p>
+<h3 id="underlying-mechanism">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism" title="Permanent link">&para;</a></h3>
+<p>Internally, this lifecycle is managed through a combination of asset management databases (CMDB), Mobile Device Management (MDM) platforms, and directory services. When a device is procured, its unique hardware identifier (e.g., serial number, hardware hash) is registered in the vendor's portal (like Apple Business Manager or Windows Autopilot) and subsequently linked to the organization's tenant. As the device moves through the lifecycle, its state is tracked via status flags in the MDM, which trigger automated workflows—such as domain joining or certificate enrollment—based on the device's current phase. This state-machine approach ensures that a device cannot bypass security controls, as the MDM enforces compliance policies at every transition point.</p>
+<h3 id="why-it-exists">Why It Exists<a class="headerlink" href="#why-it-exists" title="Permanent link">&para;</a></h3>
+<p>The lifecycle model exists to mitigate the risks associated with unmanaged hardware, which is a primary vector for data exfiltration and unauthorized network access. By formalizing the stages of a device's life, organizations can enforce consistent security baselines, maintain an accurate inventory for audit purposes, and ensure that sensitive data is properly sanitized before a device is repurposed or retired. It transforms the endpoint from a "black box" into a managed asset with a verifiable chain of custody.</p>
+<h3 id="enterprise-banking-reality">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, the device lifecycle is not merely an IT operational task but a regulatory requirement under frameworks like BCBS 239 and SOX, which demand precise asset tracking and data protection. Banking environments utilize "immutable supply-chain security," where devices are shipped directly from the manufacturer to the end-user, with the hardware hash pre-registered in the tenant to prevent interception. The decommissioning phase is equally critical; banking standards require strict adherence to NIST SP 800-88 R1 guidelines for media sanitization, ensuring that no residual data can be recovered from retired assets, often requiring a certificate of destruction for audit compliance.</p>
+<h3 id="operational-considerations">Operational Considerations<a class="headerlink" href="#operational-considerations" title="Permanent link">&para;</a></h3>
+<p>Effective lifecycle management requires tight integration between procurement, IT operations, and security teams.
+[CLI: Get-AutopilotDevice -SerialNumber <SerialNumber>]
+[CLI: Invoke-DeviceWipe -DeviceId <DeviceId>]
+Monitoring the lifecycle requires real-time dashboards that track device status, compliance, and age, allowing for proactive replacement cycles and identifying "orphaned" devices that have fallen out of the management loop.</p>
+<h3 id="common-misconceptions">Common Misconceptions<a class="headerlink" href="#common-misconceptions" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that "decommissioning" simply means deleting the device object from Active Directory or the MDM. This is false. Decommissioning is a multi-faceted process that includes revoking certificates, wiping the device's storage according to regulatory standards, and updating the asset inventory. Simply deleting the object leaves the physical hardware and any residual data in an unmanaged, potentially compromised state.</p>
+</div>
+<h3 id="interview-angle">Interview Angle<a class="headerlink" href="#interview-angle" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scenario:</strong> You are tasked with implementing a zero-touch procurement process for a global bank. How do you ensure the security of the supply chain?
+   <em>Model Answer:</em> I would implement a "direct-to-user" shipping model where devices are shipped directly from the manufacturer to the employee. I would require the manufacturer to provide the hardware hashes for pre-registration in our tenant, ensuring that the device is automatically enrolled and secured the moment it connects to the internet, without ever touching our internal staging environment.</li>
+<li><strong>Scenario:</strong> An auditor asks how you prove that retired devices do not contain sensitive banking data. What is your response?
+   <em>Model Answer:</em> I would provide the audit team with our documented decommissioning policy, which mandates adherence to NIST SP 800-88 R1 for media sanitization. I would also present the certificates of destruction provided by our certified IT asset disposition (ITAD) partner, which verify that the storage media was physically or logically destroyed.</li>
+<li><strong>Scenario:</strong> How do you handle the "orphaned device" problem in a large enterprise?
+   <em>Model Answer:</em> I would implement an automated "heartbeat" monitoring system that flags devices that have not checked in with the MDM for a defined period (e.g., 30 days). These devices are then automatically moved to a "quarantine" OU, as discussed in Section 1.1, and their access is revoked until they are accounted for or decommissioned.</li>
+</ol>
+<h3 id="related-concepts">Related Concepts<a class="headerlink" href="#related-concepts" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries for staged devices.</li>
+<li>[Directory Authorization &amp; Delegation (Section 1.8)] - For the scoped permission sets required for enrollment agents to register devices.</li>
+</ul>
+<h2 id="2-imaging-vs-zero-touch-provisioning-autopilotdepandroid-enterprise">2. Imaging vs. zero-touch provisioning (Autopilot/DEP/Android Enterprise)<a class="headerlink" href="#2-imaging-vs-zero-touch-provisioning-autopilotdepandroid-enterprise" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_1">Technical Definition<a class="headerlink" href="#technical-definition_1" title="Permanent link">&para;</a></h3>
+<p>Imaging is the legacy practice of deploying a monolithic, pre-configured OS image to a device, often requiring physical access or PXE boot infrastructure. Zero-touch provisioning (ZTP) is the modern, cloud-native paradigm where devices are automatically configured upon first boot via cloud services like Windows Autopilot, Apple Device Enrollment Program (DEP), or Android Enterprise, bypassing the need for custom images.</p>
+<h3 id="underlying-mechanism_1">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_1" title="Permanent link">&para;</a></h3>
+<p>Imaging relies on capturing and deploying a static OS state, which is then "pushed" to the device. ZTP, conversely, leverages hardware-bound identifiers (e.g., hardware hashes, serial numbers) registered in a cloud portal. Upon the device's first network connection, it queries the portal, receives an enrollment profile, and automatically pulls its configuration, policies, and applications from the MDM. This process ensures the device starts from a clean, vendor-provided OS state, which is then transformed into the corporate state via policy application, rather than image application.</p>
+<h3 id="why-it-exists_1">Why It Exists<a class="headerlink" href="#why-it-exists_1" title="Permanent link">&para;</a></h3>
+<p>Imaging was a necessary response to the limitations of early network bandwidth and the lack of cloud-based management tools. ZTP exists to eliminate the "IT staging" bottleneck, enabling remote, secure, and scalable deployments that ensure every device starts from a clean, vendor-provided OS state, which is inherently more secure and easier to maintain than a custom image that requires constant patching and testing.</p>
+<h3 id="enterprise-banking-reality_1">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_1" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, imaging is increasingly viewed as technical debt and a security risk due to the difficulty of maintaining "golden images" and the potential for image-based malware. ZTP is the standard for modern banking endpoints, as it provides an immutable, audit-ready deployment path that aligns with regulatory requirements for secure, verifiable device configuration. Banking environments prioritize ZTP because it allows for rapid, secure deployment to a global workforce without the need for centralized staging facilities.</p>
+<h3 id="operational-considerations_1">Operational Considerations<a class="headerlink" href="#operational-considerations_1" title="Permanent link">&para;</a></h3>
+<p>Transitioning to ZTP requires a shift from image management to policy management, where the focus is on defining the desired state rather than the initial state.
+[CLI: Get-AutopilotProfile -Name "BankingStandard"]
+[CLI: Set-DeviceEnrollmentProfile -ProfileName "BankingStandard" -Assignment "AllDevices"]
+Monitoring the success of ZTP deployments is critical, as is ensuring that the cloud portal is correctly configured and that the MDM is ready to receive the device.</p>
+<h3 id="common-misconceptions_1">Common Misconceptions<a class="headerlink" href="#common-misconceptions_1" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that ZTP is simply "imaging in the cloud." This is false. ZTP is a fundamental shift from managing static images to managing dynamic, policy-driven configurations, which requires a different mindset and operational model. Imaging is about "what the device looks like," while ZTP is about "what the device is allowed to do."</p>
+</div>
+<h3 id="interview-angle_1">Interview Angle<a class="headerlink" href="#interview-angle_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scenario:</strong> You are leading a migration from legacy imaging to Windows Autopilot. What is the biggest architectural challenge?
+   <em>Model Answer:</em> The biggest challenge is the shift from image-based deployment to policy-based configuration. We must ensure that all applications, security policies, and configurations are correctly defined in the MDM before we can retire the imaging infrastructure. It requires a thorough audit of our current image and a mapping of those settings to modern MDM policies.</li>
+<li><strong>Scenario:</strong> Why is ZTP considered more secure than imaging?
+   <em>Model Answer:</em> ZTP starts from a clean, vendor-provided OS state, which is inherently more secure than a custom image that may contain outdated software, misconfigurations, or even embedded malware. ZTP also ensures that the device is enrolled in the MDM from the very first boot, providing immediate visibility and control.</li>
+<li><strong>Scenario:</strong> How do you handle applications that are not yet compatible with ZTP?
+   <em>Model Answer:</em> I would use a phased approach, where ZTP is used for the OS and core security policies, and legacy applications are delivered via a secondary mechanism, such as application virtualization or a just-in-time delivery service. This allows us to move to ZTP while still supporting the necessary legacy applications.</li>
+</ol>
+<h3 id="related-concepts_1">Related Concepts<a class="headerlink" href="#related-concepts_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries for staged devices.</li>
+<li>[Directory Authorization &amp; Delegation (Section 1.8)] - For the scoped permission sets required for enrollment agents to register devices.</li>
+</ul>
+<h2 id="3-device-enrollment-models-corporate-byod-sharedkiosk">3. Device enrollment models (corporate, BYOD, shared/kiosk)<a class="headerlink" href="#3-device-enrollment-models-corporate-byod-sharedkiosk" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_2">Technical Definition<a class="headerlink" href="#technical-definition_2" title="Permanent link">&para;</a></h3>
+<p>Device enrollment models define the relationship between the organization and the endpoint, dictating the level of management, security control, and user privacy. Corporate-owned models provide full management and control; Bring Your Own Device (BYOD) models focus on containerization and data separation; and Shared/Kiosk models are designed for multi-user, restricted-access scenarios.</p>
+<h3 id="underlying-mechanism_2">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_2" title="Permanent link">&para;</a></h3>
+<p>Corporate enrollment typically uses device-level management (e.g., DEP, Autopilot) to enforce full control over the OS, including security policies, application deployment, and remote wipe capabilities. BYOD enrollment uses Mobile Application Management (MAM) or "Work Profiles" to create a secure, encrypted container for corporate data, leaving the personal data untouched. Shared/Kiosk models utilize specialized enrollment profiles that restrict the device to a single application or a limited set of applications, often with a "guest" or "multi-user" profile that resets the device state after each session.</p>
+<h3 id="why-it-exists_2">Why It Exists<a class="headerlink" href="#why-it-exists_2" title="Permanent link">&para;</a></h3>
+<p>These models exist to accommodate the diverse needs of the modern workforce, balancing the requirement for security and compliance with the need for flexibility and user privacy. By offering different enrollment models, organizations can tailor their management strategy to the specific risk profile of the device and the user, ensuring that corporate data is protected without unnecessarily infringing on personal privacy or hindering productivity.</p>
+<h3 id="enterprise-banking-reality_2">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_2" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, the enrollment model is a critical security decision. Corporate-owned devices are the standard for high-risk roles (e.g., traders, developers, executives) and are subject to full management and monitoring. BYOD is often restricted to low-risk roles (e.g., contractors, general staff) and is limited to email and collaboration tools via MAM. Shared/Kiosk devices are used for branch operations, teller machines, and customer-facing kiosks, where security is enforced through strict application whitelisting and session-based resets. Compliance frameworks require that each model be documented, with clear policies on what data can be accessed and what security controls are enforced.</p>
+<h3 id="operational-considerations_2">Operational Considerations<a class="headerlink" href="#operational-considerations_2" title="Permanent link">&para;</a></h3>
+<p>Managing multiple enrollment models requires a robust MDM/UEM platform that can enforce different policies based on the enrollment type.
+[CLI: Set-DeviceEnrollmentRestriction -Platform "iOS" -AllowPersonalDevices $false]
+[CLI: Get-DeviceEnrollmentProfile -Type "Kiosk"]
+Monitoring compliance across different enrollment models is essential, as is ensuring that the appropriate security policies are applied to each device type.</p>
+<h3 id="common-misconceptions_2">Common Misconceptions<a class="headerlink" href="#common-misconceptions_2" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that BYOD means "unmanaged." This is false. BYOD is a management model, not a lack of management. Even in BYOD, the organization must enforce security policies on the corporate data container, such as requiring MFA, preventing data copy-paste, and ensuring that the device is not jailbroken or rooted.</p>
+</div>
+<h3 id="interview-angle_2">Interview Angle<a class="headerlink" href="#interview-angle_2" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scenario:</strong> You are designing an enrollment strategy for a bank. How do you decide which model to use for a specific user group?
+   <em>Model Answer:</em> I would perform a risk assessment based on the user's role, the data they access, and the device they use. High-risk roles require corporate-owned devices with full management. Low-risk roles can be supported via BYOD with MAM policies. Kiosk devices are reserved for specific, restricted-use cases.</li>
+<li><strong>Scenario:</strong> How do you ensure that personal data is protected in a BYOD model?
+   <em>Model Answer:</em> I would use MAM policies to create a secure, encrypted container for corporate data. This container is logically separated from the personal data, and the MDM has no visibility into or control over the personal apps or data on the device.</li>
+<li><strong>Scenario:</strong> What are the security risks of shared/kiosk devices?
+   <em>Model Answer:</em> Shared/kiosk devices are vulnerable to physical tampering, unauthorized application installation, and session-based data leakage. I would mitigate these risks by using a restricted OS profile, disabling unnecessary hardware ports, and ensuring that the device state is reset after each session.</li>
+</ol>
+<h3 id="related-concepts_2">Related Concepts<a class="headerlink" href="#related-concepts_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[Directory Structure (Section 1.1)] - For context on OU-based administrative inheritance boundaries for staged devices.</li>
+<li>[Directory Authorization &amp; Delegation (Section 1.8)] - For the scoped permission sets required for enrollment agents to register devices.</li>
+</ul>
+<h2 id="4-asset-tagging-inventory-systems">4. Asset tagging &amp; inventory systems<a class="headerlink" href="#4-asset-tagging-inventory-systems" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_3">Technical Definition<a class="headerlink" href="#technical-definition_3" title="Permanent link">&para;</a></h3>
+<p>Asset tagging is the process of assigning a unique identifier (physical or logical) to an endpoint device to track its location, ownership, and status throughout its lifecycle. Inventory systems are the centralized databases (CMDBs) that store this metadata, providing a single source of truth for the organization's hardware estate.</p>
+<h3 id="underlying-mechanism_3">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_3" title="Permanent link">&para;</a></h3>
+<p>Asset tagging often involves physical barcodes or RFID tags linked to a database record. Logically, this is implemented via unique identifiers like serial numbers, UUIDs, or hardware hashes stored in an MDM or CMDB. Inventory systems use APIs to ingest data from procurement portals, MDMs, and network scanners, creating a dynamic, real-time view of the device estate.</p>
+<h3 id="why-it-exists_3">Why It Exists<a class="headerlink" href="#why-it-exists_3" title="Permanent link">&para;</a></h3>
+<p>It exists to provide visibility and accountability. Without accurate asset tagging and inventory, organizations cannot effectively manage their hardware, ensure compliance, or respond to security incidents. It is the foundation for all lifecycle management activities.</p>
+<h3 id="enterprise-banking-reality_3">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_3" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, asset tagging is a regulatory mandate (e.g., BCBS 239, SOX). Banks must maintain a precise, real-time inventory of all endpoints to ensure that every device is accounted for and secured. This often involves automated discovery tools that scan the network and cross-reference findings with the CMDB to identify "shadow IT" or unmanaged devices.</p>
+<h3 id="operational-considerations_3">Operational Considerations<a class="headerlink" href="#operational-considerations_3" title="Permanent link">&para;</a></h3>
+<p>Effective inventory management requires automated discovery and integration.
+[CLI: Get-AssetInventory -Filter "Status -eq 'Active'"]
+[CLI: Sync-CMDB -Source "MDM" -Destination "AssetDB"]
+Monitoring for discrepancies between the CMDB and the MDM is critical for maintaining data accuracy.</p>
+<h3 id="common-misconceptions_3">Common Misconceptions<a class="headerlink" href="#common-misconceptions_3" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that manual spreadsheets are sufficient for asset inventory. This is false. Manual spreadsheets are prone to error, quickly become outdated, and cannot scale to the needs of a large enterprise. Automated, real-time inventory systems are the only way to maintain an accurate and compliant asset estate.</p>
+</div>
+<h3 id="interview-angle_3">Interview Angle<a class="headerlink" href="#interview-angle_3" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scenario:</strong> How do you handle "shadow IT" devices that appear on the network but are not in the CMDB?
+   <em>Model Answer:</em> I would implement automated network discovery tools that scan for new devices and automatically flag them for investigation. I would then integrate this data with our CMDB to identify and either onboard or quarantine the unauthorized devices.</li>
+<li><strong>Scenario:</strong> Why is real-time inventory critical for security incident response?
+   <em>Model Answer:</em> Real-time inventory allows us to quickly identify which devices are affected by a security vulnerability or incident. It enables us to isolate the affected devices, assess the impact, and initiate remediation without delay.</li>
+<li><strong>Scenario:</strong> How do you ensure the accuracy of your CMDB?
+   <em>Model Answer:</em> I would implement automated data ingestion from multiple sources (MDM, network scanners, procurement portals) and use reconciliation rules to resolve conflicts. I would also perform regular audits to verify the data against physical assets.</li>
+</ol>
+<h3 id="related-concepts_3">Related Concepts<a class="headerlink" href="#related-concepts_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[Procurement-to-decommission lifecycle stages (Section 2.1)]</li>
+<li>[Device enrollment models (Section 2.1)]</li>
+</ul>
+<h2 id="5-bulk-enrollment-staging-workflows">5. Bulk enrollment &amp; staging workflows<a class="headerlink" href="#5-bulk-enrollment-staging-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_4">Technical Definition<a class="headerlink" href="#technical-definition_4" title="Permanent link">&para;</a></h3>
+<p>Bulk enrollment is the process of provisioning multiple devices simultaneously, often used for large-scale deployments or shared device environments. Staging workflows are the pre-configuration steps taken before a device is handed to an end-user, ensuring that the device is ready for immediate use upon arrival.</p>
+<h3 id="underlying-mechanism_4">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_4" title="Permanent link">&para;</a></h3>
+<p>Bulk enrollment typically uses provisioning packages (PPKG files), Windows Configuration Designer, or MDM-specific bulk enrollment tokens (e.g., Apple Configurator, Android Enterprise QR codes). These packages contain configuration profiles, Wi-Fi settings, and enrollment credentials. Staging workflows involve applying these packages to devices in a controlled environment, often using automated tools to ensure consistency and reduce manual effort.</p>
+<h3 id="why-it-exists_4">Why It Exists<a class="headerlink" href="#why-it-exists_4" title="Permanent link">&para;</a></h3>
+<p>It exists to reduce the time and effort required for large-scale deployments, especially in environments where individual, manual enrollment is impractical. By automating the provisioning process, organizations can ensure that devices are configured consistently and securely, reducing the risk of misconfiguration and ensuring that devices are ready for use immediately upon deployment.</p>
+<h3 id="enterprise-banking-reality_4">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_4" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, bulk enrollment is essential for branch rollouts, teller machine deployments, and large-scale hardware refreshes. Compliance frameworks require that these bulk processes are secure, repeatable, and auditable. Banking environments often use "staging" facilities where devices are pre-configured, tested, and then shipped to the final location, ensuring that the deployment process is controlled and that the devices are ready for immediate use.</p>
+<h3 id="operational-considerations_4">Operational Considerations<a class="headerlink" href="#operational-considerations_4" title="Permanent link">&para;</a></h3>
+<p>Effective bulk enrollment requires careful management of provisioning packages and enrollment tokens.
+[CLI: Install-ProvisioningPackage -PackagePath <Path>]
+[CLI: Get-EnrollmentToken -Type "Bulk"]
+Monitoring for deployment success and ensuring that the provisioning packages are correctly applied is critical for maintaining a consistent and secure deployment.</p>
+<h3 id="common-misconceptions_4">Common Misconceptions<a class="headerlink" href="#common-misconceptions_4" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that bulk enrollment tokens are "master keys" for the entire environment. This is false. Bulk enrollment tokens are scoped to specific enrollment tasks and should be treated as sensitive credentials. They should be rotated regularly and access to them should be strictly controlled.</p>
+</div>
+<h3 id="interview-angle_4">Interview Angle<a class="headerlink" href="#interview-angle_4" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scenario:</strong> How do you secure bulk enrollment tokens?
+   <em>Model Answer:</em> I would store bulk enrollment tokens in a secure, encrypted vault and restrict access to them to only authorized personnel. I would also rotate the tokens regularly and monitor their usage to detect any unauthorized attempts to use them.</li>
+<li><strong>Scenario:</strong> What are the risks of using provisioning packages?
+   <em>Model Answer:</em> Provisioning packages can be used to inject malicious configurations or software if they are not properly secured. I would ensure that all provisioning packages are digitally signed and that the devices are configured to only accept signed packages.</li>
+<li><strong>Scenario:</strong> How do you ensure consistency across bulk deployments?
+   <em>Model Answer:</em> I would use automated staging workflows that apply the same provisioning packages and configuration profiles to all devices. I would also perform regular audits of the deployed devices to ensure that they are correctly configured and compliant with organizational policies.</li>
+</ol>
+<h3 id="related-concepts_4">Related Concepts<a class="headerlink" href="#related-concepts_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[Device enrollment models (Section 2.1)]</li>
+<li>[Imaging vs. zero-touch provisioning (Section 2.1)]</li>
+</ul>
+<h2 id="6-decommissioning-secure-wipe-procedures">6. Decommissioning &amp; secure wipe procedures<a class="headerlink" href="#6-decommissioning-secure-wipe-procedures" title="Permanent link">&para;</a></h2>
+<h3 id="technical-definition_5">Technical Definition<a class="headerlink" href="#technical-definition_5" title="Permanent link">&para;</a></h3>
+<p>Decommissioning and secure wipe procedures constitute the final phase of the device lifecycle, ensuring that all corporate data, credentials, and configuration profiles are irrecoverably destroyed before a device is repurposed, sold, or physically destroyed. This process is designed to prevent data leakage and ensure compliance with data privacy regulations.</p>
+<h3 id="underlying-mechanism_5">Underlying Mechanism<a class="headerlink" href="#underlying-mechanism_5" title="Permanent link">&para;</a></h3>
+<p>Secure wipe procedures typically involve a cryptographic erase (crypto-erase) or a multi-pass overwrite of the storage media. Crypto-erase involves destroying the encryption keys that protect the data, rendering the data unreadable. Overwrite procedures involve writing random patterns of data to the storage media, making it impossible to recover the original data. For mobile devices, this is often handled by the MDM, which sends a "wipe" command that triggers a factory reset and, in many cases, a cryptographic erase of the storage. For PCs, this may involve a combination of BIOS/UEFI-level secure erase commands and software-based wiping tools that adhere to NIST SP 800-88 R1 standards.</p>
+<h3 id="why-it-exists_5">Why It Exists<a class="headerlink" href="#why-it-exists_5" title="Permanent link">&para;</a></h3>
+<p>These procedures exist to mitigate the risk of data leakage from retired assets. In an era where data is the most valuable asset, the potential for sensitive information to be recovered from a discarded hard drive or mobile device is a significant security and compliance risk. Secure wipe procedures provide a verifiable, auditable method for ensuring that data is destroyed, protecting the organization from data breaches and regulatory penalties.</p>
+<h3 id="enterprise-banking-reality_5">Enterprise / Banking Reality<a class="headerlink" href="#enterprise-banking-reality_5" title="Permanent link">&para;</a></h3>
+<p>In Tier-1 banking, decommissioning is a highly regulated process. Banking standards (e.g., PCI-DSS, GLBA) require that all storage media be sanitized according to NIST SP 800-88 R1 guidelines before it leaves the organization's control. This often involves a multi-step process: logical wipe via MDM, physical destruction of the storage media by a certified ITAD partner, and the issuance of a certificate of destruction. The entire process must be documented and auditable, providing a clear chain of custody from the moment the device is retired until it is destroyed.</p>
+<h3 id="operational-considerations_5">Operational Considerations<a class="headerlink" href="#operational-considerations_5" title="Permanent link">&para;</a></h3>
+<p>Effective decommissioning requires a clear policy, standardized procedures, and reliable ITAD partners.
+[CLI: Invoke-DeviceWipe -DeviceId <DeviceId> -KeepEnrollmentData $false]
+[CLI: Get-DeviceWipeStatus -DeviceId <DeviceId>]
+Monitoring the decommissioning process is critical, as is ensuring that all devices are accounted for and that the certificates of destruction are properly filed and audited.</p>
+<h3 id="common-misconceptions_5">Common Misconceptions<a class="headerlink" href="#common-misconceptions_5" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A common misconception is that a "factory reset" is equivalent to a secure wipe. This is false. A factory reset may remove the user's data, but it does not guarantee that the data is irrecoverable. Secure wipe procedures, such as cryptographic erase or multi-pass overwriting, are required to ensure that the data is truly destroyed and cannot be recovered by forensic tools.</p>
+</div>
+<h3 id="interview-angle_5">Interview Angle<a class="headerlink" href="#interview-angle_5" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scenario:</strong> You are designing a decommissioning policy for a bank. What are the key requirements for secure wipe?
+   <em>Model Answer:</em> The policy must mandate adherence to NIST SP 800-88 R1 for media sanitization. It must also require a verifiable chain of custody, including a certificate of destruction for all storage media, and it must be audited regularly to ensure compliance.</li>
+<li><strong>Scenario:</strong> Why is physical destruction often preferred over logical wiping?
+   <em>Model Answer:</em> Physical destruction provides the highest level of assurance that the data is irrecoverable. While logical wiping (like crypto-erase) is effective, physical destruction eliminates any doubt and is often the preferred method for highly sensitive data, especially when the storage media is no longer needed.</li>
+<li><strong>Scenario:</strong> How do you handle devices that cannot be wiped (e.g., damaged hardware)?
+   <em>Model Answer:</em> Devices that cannot be wiped must be treated as high-risk and must be physically destroyed. I would ensure that these devices are tracked and that their destruction is documented and verified by a certified ITAD partner, just like any other retired asset.</li>
+</ol>
+<h3 id="related-concepts_5">Related Concepts<a class="headerlink" href="#related-concepts_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[Procurement-to-decommission lifecycle stages (Section 2.1)]</li>
+<li>[Asset tagging &amp; inventory systems (Section 2.1)]</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.instant", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
