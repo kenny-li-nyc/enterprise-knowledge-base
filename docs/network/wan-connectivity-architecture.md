@@ -194,3 +194,42 @@ Operationalizing QoS requires careful planning and consistent configuration acro
 - Section 4.2.1: MPLS vs. internet-based transport
 - Section 4.2.2: SD-WAN architecture & overlay design
 - Section 4.2.4: Circuit diversity & last-mile redundancy
+
+## 6. Branch/remote site connectivity models
+
+### Technical Definition
+Branch/remote site connectivity models define the architectural patterns used to connect distributed locations to the enterprise core, cloud services, and the internet. These models dictate how traffic is routed, secured, and optimized at the edge. Common models include hub-and-spoke (backhauling traffic to a central DC), direct-to-cloud (DIA), and hybrid-mesh architectures, each offering different trade-offs between security, performance, and operational complexity.
+
+### Underlying Mechanism
+The mechanism relies on edge gateways (routers, SD-WAN appliances) that perform service chaining and traffic steering. In a hub-and-spoke model, all traffic is tunneled to a central hub for inspection. In a direct-to-cloud model, the edge gateway performs local breakout, steering SaaS and internet traffic directly to the cloud, while routing internal traffic to the DC. Service chaining involves directing traffic through a sequence of virtualized network functions (VNFs) or cloud-based security services (SASE) before it reaches its destination. This is governed by application-aware policies that evaluate the destination, security requirements, and path health metrics (latency, jitter, loss) to determine the optimal exit point.
+
+[DIAGRAM: Flowchart illustrating the traffic flow differences between hub-and-spoke, direct-to-cloud, and hybrid-mesh branch models]
+
+### Why It Exists
+Branch connectivity models exist to balance the competing requirements of security, performance, and cost. Traditional hub-and-spoke models provide centralized security but suffer from latency and bandwidth bottlenecks. Direct-to-cloud models improve performance for SaaS applications but require robust, distributed security. Hybrid models allow organizations to tailor connectivity to the specific needs of each site, optimizing the user experience while maintaining a consistent security posture across the enterprise.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, we utilize a tiered branch connectivity model. Tier 1 sites (Regional Hubs) use high-capacity, redundant MPLS and internet circuits with full-stack security. Tier 2 sites (Standard Branches) use SD-WAN with hybrid transport and cloud-delivered security (SASE). Tier 3 sites (ATMs, Kiosks) use lightweight, highly secure connectivity (e.g., LTE/5G + IPsec) with minimal local footprint. We enforce strict segmentation, ensuring that branch traffic is isolated from the core network unless explicitly permitted. We also leverage ZTNA agents for remote users, as discussed in Section 2.7, to ensure that identity-based access controls are enforced regardless of the branch connectivity model.
+
+### Operational Considerations
+Operationalizing branch connectivity requires a standardized, repeatable deployment model. We use zero-touch provisioning (ZTP) to deploy edge devices, ensuring that configurations are consistent and compliant. Monitoring is focused on the performance of the branch edge and the health of the connectivity to the core and cloud services.
+[CLI: Command to verify the branch connectivity model and service chaining configuration]
+[CLI: Command to inspect the local breakout policy for a specific branch site]
+[CLI: Command to monitor the health of the branch edge gateway and its connection to the SD-WAN controller]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that all branches require the same connectivity model. In reality, a "one-size-fits-all" approach is inefficient and often insecure. Another error is assuming that direct-to-cloud connectivity is inherently less secure; with modern SASE and cloud-delivered security, direct-to-cloud can be just as secure as backhauling traffic, provided the security policies are correctly implemented and enforced.
+
+### Interview Angle
+1. Question: How do you determine the appropriate connectivity model for a new branch site?
+   Answer: We evaluate the site based on its business function, traffic volume, and security requirements. A high-volume trading branch requires a different model than a low-volume ATM kiosk. We use a standardized "branch tiering" framework that maps site requirements to pre-defined connectivity and security templates, ensuring consistency and scalability.
+2. Question: How do you ensure that branch connectivity models remain resilient against carrier outages?
+   Answer: We mandate circuit diversity for all branch tiers, as discussed in Section 4.2.4. We also implement SD-WAN with active-active transport, allowing us to seamlessly failover between circuits. For critical sites, we include an LTE/5G backup circuit as a "last resort" path, ensuring that the branch remains connected even if all wired circuits fail.
+3. Question: How do you manage the security of direct-to-cloud traffic from branch sites?
+   Answer: We use a cloud-delivered security stack (SASE) that provides firewalling, URL filtering, and malware inspection for all internet-bound traffic. We also enforce identity-based access controls, ensuring that only authorized users and devices can access cloud resources. This allows us to maintain a consistent security posture regardless of whether the traffic is routed through the DC or directly to the cloud.
+
+### Related Concepts
+- Section 2.7: Remote Access & ZTNA (for client-side connectivity context)
+- Section 4.2.2: SD-WAN architecture & overlay design
+- Section 4.2.4: Circuit diversity & last-mile redundancy
