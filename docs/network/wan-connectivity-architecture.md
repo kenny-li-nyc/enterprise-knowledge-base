@@ -155,3 +155,42 @@ Operationalizing circuit diversity requires ongoing validation and testing. Admi
 - Section 4.2.1: MPLS vs. internet-based transport
 - Section 4.2.2: SD-WAN architecture & overlay design
 - Section 4.2.5: QoS & bandwidth management across WAN links
+
+## 5. QoS & bandwidth management across WAN links
+
+### Technical Definition
+Quality of Service (QoS) and bandwidth management are the architectural frameworks used to prioritize, shape, and police network traffic to ensure that critical applications receive the necessary resources, even during periods of congestion. QoS involves classifying traffic based on its sensitivity to latency, jitter, and packet loss, and then applying policies to ensure that high-priority traffic (e.g., voice, video, trading data) is serviced before lower-priority traffic (e.g., bulk file transfers, guest internet). Bandwidth management complements QoS by controlling the rate at which traffic is sent, preventing congestion before it occurs.
+
+### Underlying Mechanism
+The mechanism relies on the Differentiated Services (DiffServ) model, where packets are marked with a Differentiated Services Code Point (DSCP) value in the IP header. Edge devices inspect these markings and map them to hardware queues (e.g., Low Latency Queuing - LLQ, Class-Based Weighted Fair Queuing - CBWFQ). LLQ provides strict priority queuing for latency-sensitive traffic, ensuring it is always serviced first. CBWFQ allocates a guaranteed percentage of bandwidth to specific traffic classes, ensuring fair resource distribution. Traffic shaping buffers excess traffic to smooth out bursts, while policing drops traffic that exceeds defined rate limits. In an SD-WAN environment, these policies are often applied dynamically based on the application's requirements and the real-time performance of the underlying transport circuits.
+
+[DIAGRAM: Flowchart illustrating the traffic classification, marking, and queuing process in a WAN edge router]
+
+### Why It Exists
+QoS and bandwidth management exist because network resources are finite and traffic demands are often bursty and unpredictable. Without these mechanisms, a large file transfer could saturate a WAN link, causing latency-sensitive applications like voice or trading feeds to experience jitter and packet loss, leading to poor user experience or financial loss. By implementing QoS, we ensure that the network behaves predictably, prioritizing the traffic that is most critical to the business and maximizing the utility of available bandwidth.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, QoS is a non-negotiable requirement for maintaining the performance of our core banking and trading platforms. We implement a strict, end-to-end QoS policy that prioritizes traffic based on its business value. Trading feeds and voice traffic are assigned to the highest priority queues (LLQ), while general corporate traffic is assigned to lower-priority queues. We also implement bandwidth management to prevent non-critical applications from consuming excessive resources, ensuring that our core services always have the bandwidth they need. This is critical for compliance with FFIEC standards, which require banks to maintain the availability and performance of their critical systems.
+
+### Operational Considerations
+Operationalizing QoS requires careful planning and consistent configuration across the entire network. Administrators must ensure that DSCP markings are preserved across all network segments, including service provider networks (where possible). Monitoring is essential; we track queue drops, latency, and jitter for each traffic class to ensure that our QoS policies are effective and that our bandwidth allocations are appropriate.
+[CLI: Command to verify QoS policy configuration and class-map/policy-map statistics]
+[CLI: Command to inspect hardware queue drops and identify congested interfaces]
+[CLI: Command to configure traffic shaping on a WAN interface to match the committed information rate (CIR)]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that QoS can "create" bandwidth. QoS is a prioritization mechanism, not a bandwidth expansion tool; if the link is fundamentally undersized for the traffic load, QoS will only manage the congestion, not eliminate it. Another error is assuming that QoS is a "set and forget" configuration; as application traffic patterns change, QoS policies must be reviewed and updated to ensure they remain aligned with business priorities.
+
+### Interview Angle
+1. Question: How do you design a QoS policy that balances the needs of latency-sensitive trading traffic with bulk data replication?
+   Answer: We use a multi-level queuing strategy. Trading traffic is placed in a strict priority queue (LLQ) with a bandwidth limit to prevent it from starving other traffic. Bulk data replication is placed in a lower-priority class with a guaranteed bandwidth allocation (CBWFQ), ensuring it gets throughput when the link is not congested but is throttled when trading traffic spikes.
+2. Question: How do you ensure that QoS markings are preserved across a service provider's network?
+   Answer: We negotiate QoS transparency with our service providers, ensuring that they honor our DSCP markings. If the provider does not support end-to-end QoS, we implement "tunnel-based QoS," where we encapsulate the traffic in an IPsec tunnel and copy the DSCP markings to the outer IP header, ensuring that the provider sees the priority markings.
+3. Question: What is the difference between traffic shaping and traffic policing, and when would you use each?
+   Answer: Traffic shaping buffers excess traffic, smoothing out bursts and reducing packet loss, which is ideal for outbound traffic on a WAN link. Traffic policing drops traffic that exceeds the rate limit, which is typically used for inbound traffic or to enforce strict bandwidth limits on a service provider's ingress interface. We use shaping for our own WAN links to ensure smooth performance and policing for traffic entering our network from untrusted sources.
+
+### Related Concepts
+- Section 4.2.1: MPLS vs. internet-based transport
+- Section 4.2.2: SD-WAN architecture & overlay design
+- Section 4.2.4: Circuit diversity & last-mile redundancy
