@@ -38,3 +38,42 @@ Operationalizing zone architecture requires rigorous policy management and lifec
 - Section 4.1: L3 routing protocols & Inter-VLAN routing (for structural routing context)
 - Section 2.6: App Control & WDAC Hardening (for application sandbox context)
 - Section 4.3.2: DMZ design patterns
+
+## 2. DMZ design patterns
+
+### Technical Definition
+A Demilitarized Zone (DMZ) is a physical or logical subnetwork that exposes an organization's external-facing services (e.g., web servers, mail servers, VPN gateways) to an untrusted network, typically the internet, while keeping the rest of the internal network secure. The DMZ acts as a buffer zone, ensuring that if an external-facing service is compromised, the attacker does not have direct access to the internal network.
+
+### Underlying Mechanism
+The mechanism relies on multi-homed firewall configurations or "sandwich" architectures. In a classic dual-homed DMZ, a perimeter firewall connects the internet to the DMZ, and an internal firewall connects the DMZ to the internal network. Traffic from the internet is terminated at the perimeter firewall, which only allows traffic to specific services within the DMZ. Traffic from the DMZ to the internal network is then inspected by the internal firewall, which enforces strict access controls, ensuring that only authorized requests (e.g., database queries) can reach internal resources. This architecture utilizes NAT and proxying to further obfuscate the internal network topology. The policy lookup pipeline in these firewalls ensures that traffic is never routed directly from the internet to the internal network, effectively creating a "break" in the connection that must be re-established by the security appliance. This structural isolation complements the L3 routing mechanics described in Section 4.1 by adding a mandatory inspection layer at the perimeter.
+
+[DIAGRAM: Flowchart illustrating a multi-tier DMZ architecture with perimeter and internal firewalls]
+
+### Why It Exists
+The DMZ exists to minimize the blast radius of a compromise of public-facing services. Because these services are inherently exposed to the internet, they are the most likely targets for exploitation. By placing them in a DMZ, we ensure that an attacker who gains control of a web server is trapped within the DMZ, unable to move laterally into the internal network. This provides a critical layer of defense-in-depth, ensuring that the compromise of a single service does not lead to a full-scale breach of the enterprise.
+
+### Enterprise / Banking Reality
+In Tier-1 banking, we utilize multi-tier DMZ architectures to support complex application stacks. We often implement a "Web-App-DB" DMZ pattern, where the web tier resides in the outer DMZ, the application tier in an inner DMZ, and the database tier in the internal network. Each tier is separated by a firewall, and traffic is strictly controlled at every boundary. We integrate Web Application Firewalls (WAFs) at the perimeter to provide deep packet inspection for HTTP/HTTPS traffic, protecting against common web exploits like SQL injection and cross-site scripting. This architecture is essential for PCI-DSS compliance, as it ensures that cardholder data is never directly accessible from the internet.
+
+### Operational Considerations
+Operationalizing a DMZ requires rigorous management of the services hosted within it. Administrators must ensure that these services are hardened, patched, and monitored for any signs of compromise. Monitoring tools should track traffic patterns into and out of the DMZ, alerting on any unusual activity that might indicate an attempted breach.
+[CLI: Command to verify firewall rules for traffic entering the DMZ]
+[CLI: Command to inspect WAF logs for blocked web attacks]
+[CLI: Command to monitor the health and resource utilization of DMZ-hosted services]
+
+### Common Misconceptions
+!!! warning
+    A common misconception is that a DMZ is a "safe" zone. In reality, a DMZ is a "less-trusted" zone; it is still exposed to the internet and should be treated as potentially compromised. Another error is assuming that a single firewall can provide the same level of security as a multi-firewall DMZ; while a single firewall can create a DMZ, it introduces a single point of failure and a single point of compromise, which is unacceptable in high-security banking environments.
+
+### Interview Angle
+1. Question: How do you design a DMZ to support a multi-tier application that requires database access?
+   Answer: We use a multi-tier DMZ architecture. The web tier is in the outer DMZ, the application tier in an inner DMZ, and the database in the internal network. We use separate firewalls or distinct security zones to enforce strict access control at each tier. The web tier can only talk to the app tier, and the app tier can only talk to the database tier, using specific ports and protocols. This ensures that even if the web server is compromised, the attacker cannot directly access the database.
+2. Question: What is the role of a WAF in a DMZ, and how does it complement the firewall?
+   Answer: The firewall provides network-level security (L3/L4), controlling access based on IP and port. The WAF provides application-level security (L7), inspecting the content of HTTP/HTTPS traffic for malicious payloads. They are complementary; the firewall prevents unauthorized network access, while the WAF prevents application-layer attacks that the firewall would miss.
+3. Question: How do you handle the management of certificates for services hosted in the DMZ?
+   Answer: We use a centralized PKI and certificate management system to issue and manage certificates for all DMZ-hosted services. We ensure that certificates are rotated regularly and that we have a robust revocation process in place. We also use TLS termination at the perimeter (e.g., on the WAF or load balancer) to ensure that we can inspect the traffic before it reaches the backend services, as referenced in Section 3.3 for cryptographic validation.
+
+### Related Concepts
+- Section 4.3.1: Firewall zone architecture
+- Section 4.3.3: Microsegmentation strategy
+- Section 3.3: Applied PKI & Cryptographic Chains (for certificate management context)
